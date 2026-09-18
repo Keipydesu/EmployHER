@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { auth0 } from "../src/server/auth0";
 
 const steps = [
   [
@@ -18,14 +19,36 @@ const steps = [
   ],
 ];
 
-export default function Home() {
+export default async function Home() {
+  const session = auth0 ? await auth0.getSession() : null;
+
   return (
     <main>
       <header>
         <Link href="/" aria-label="EmployHER home">
           Employ<span>HER</span>
         </Link>
-        <span className="badge">In development</span>
+        <nav className="site-nav" aria-label="Account">
+          <span className="badge">In development</span>
+          {session && (
+            <>
+              <span className="who">
+                {session.user.email ?? session.user.name}
+              </span>
+              {/* Ends the session and redirects to Auth0 to log out */}
+              <a href="/auth/logout">Log out</a>
+            </>
+          )}
+          {auth0 && !session && (
+            <>
+              {/* Redirects to Auth0 Universal Login */}
+              <a href="/auth/login">Log in</a>
+              <a className="cta" href="/auth/login?screen_hint=signup">
+                Sign up
+              </a>
+            </>
+          )}
+        </nav>
       </header>
       <section className="intro">
         <p className="eyebrow">A career navigator for your next chapter</p>

@@ -10,3 +10,7 @@ next-env.d.ts
 artifacts/
 
 .local/
+
+# Auth0 MCP artifacts
+.auth0-mcp-state.json
+.auth0-mcp-writes.log
