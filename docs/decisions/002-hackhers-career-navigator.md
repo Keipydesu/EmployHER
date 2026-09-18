@@ -2,6 +2,7 @@
 
 - Status: Accepted user direction for product scope and chosen stack; schema/contracts/limits are implementation proposals.
 - Date: 2026-09-18
+- Hosting choice superseded by [decision 003](003-localhost-demo.md); the app now targets localhost.
 - Supersedes: decision 001's Rails framework and previous product/stack roadmap authority.
 
 ## Context

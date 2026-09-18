@@ -1,0 +1,27 @@
+name: Local app checks
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Configure isolated synthetic-data environment
+        run: |
+          printf 'POSTGRES_PASSWORD=%s\n' "$(openssl rand -hex 24)" > .env
+      - name: Check formatting, lint, types, and production build
+        run: docker build --target runner -t employher-check .
+      - name: Check production HTTP and static assets
+        run: sh scripts/smoke-production.sh employher-check
+      - name: Start local services
+        run: docker compose up --build --wait
+      - name: Check HTTP and vector queries
+        run: sh scripts/smoke.sh
+      - name: Stop services
+        if: always()
+        run: docker compose down --volumes

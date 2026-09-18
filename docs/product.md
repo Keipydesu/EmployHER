@@ -47,7 +47,7 @@ Pitch: “EmployHER connects what you have done to what you can do next. It turn
 
 One web app, one database, two allowlisted job sources with a reviewed static snapshot for the MVP, a small corpus, and bounded model calls. Normal login is required for saved personal state. Backboard remains in the chosen architecture but its outage must not block matching. Demo fixtures may be used while real-data gates remain closed.
 
-No application scaffold in this documentation task. No automated applications, outreach, employer quality scores, gender inference, hiring guarantees, unrestricted scraping, agent swarm, agent-to-agent auth, payments, blockchain, OCR, or mentor marketplace. A full four-week curriculum is deferred in favor of three concrete next steps.
+The local Docker foundation includes a minimal app scaffold; the product roadmap below remains to be implemented. No automated applications, outreach, employer quality scores, gender inference, hiring guarantees, unrestricted scraping, agent swarm, agent-to-agent auth, payments, blockchain, OCR, or mentor marketplace. A full four-week curriculum is deferred in favor of three concrete next steps.
 
 ## Three-person parallel MVP roadmap
 
@@ -80,15 +80,15 @@ To avoid re-researching the same learning/certification question for every stude
 | --- | --- | --- |
 | A — Profile | PDF/text intake, Gemini extraction, evidence validation, review/correction UI, truthful path-specific résumé suggestions, confirmed versioned profiles and profile embeddings; owns résumé routes | Synthetic cases cover supported facts, absent evidence, malformed input and corrections; exact excerpts resolve; only confirmed current profiles feed matching |
 | B — Opportunities | Static seed/import, role embeddings, pgvector retrieval, requirement comparison, grounded explanations, path checklists and progress/tree/results UI, next steps, contextual learning/community resources; owns job/resource/match routes | Repeat seeds create no duplicates; filters and source status respected; no invented gaps for missing requirements; unknown eligibility visible; profile edits invalidate results |
-| C — Platform | Auth0, app navigation/layout, shared database/migration integration, ownership helpers, CSRF, operation/idempotency primitives, CI and Vercel preview; owns shared config | Two synthetic users cannot access each other's records; retries do not duplicate completed operations; provider keys stay server-side; preview/build/checks pass |
+| C — Platform | Auth0, app navigation/layout, shared database/migration integration, ownership helpers, CSRF, operation/idempotency primitives, CI and localhost setup; owns shared config | Two synthetic users cannot access each other's records; retries do not duplicate completed operations; provider keys stay server-side; local app/build/checks pass |
 
 A and B integrate C's shared primitives into their own routes and test ownership locally; C does not become the author of every route. B can build against A's confirmed-profile fixture while A builds against B's sample results. C provides development adapters early; authentication and ownership must be real before M2 acceptance. A may start optional coaching only after their core slice integrates.
 
 ### M2 — Integration and synthetic demo
 
-Integrate continuously as small PRs land. A verifies intake through confirmation; B verifies profile-to-role evidence and results; C runs deployment and cross-user browser checks. Replace mocked *service responses* with implemented endpoints/providers, while retaining clearly labeled synthetic résumé fixtures and the static catalog. Do not enable real résumé intake.
+Integrate continuously as small PRs land. A verifies intake through confirmation; B verifies profile-to-role evidence and results; C verifies local startup and cross-user browser checks. Replace mocked *service responses* with implemented endpoints/providers, while retaining clearly labeled synthetic résumé fixtures and the static catalog. Do not enable real résumé intake.
 
-**Exit:** deployed demo shows an application-ready example, a confirmed learning-gap example and a contextual sourced resource. Also verify correction invalidation, no matches, missing requirements, unknown eligibility, timeout/retry states, quotas, escaped output and no sensitive logs. No hiring probabilities or implication that repository freshness proves a vacancy is open. The model may suggest an application action without making further learning a prerequisite. Each owner cross-reviews another track (A reviews B, B reviews C, C reviews A).
+**Exit:** localhost demo shows an application-ready example, a confirmed learning-gap example and a contextual sourced resource. Also verify correction invalidation, no matches, missing requirements, unknown eligibility, timeout/retry states, quotas, escaped output and no sensitive logs. No hiring probabilities or implication that repository freshness proves a vacancy is open. The model may suggest an application action without making further learning a prerequisite. Each owner cross-reviews another track (A reviews B, B reviews C, C reviews A).
 
 ### M3 — Parallel pilot hardening and optional coaching
 
