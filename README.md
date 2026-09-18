@@ -10,6 +10,8 @@ personalized learning roadmaps, and relevant mentors.
 - [Tech stack](TECH-STACK.md) — framework and infrastructure decisions, what is
   operator-instructed versus proposed, and what must be re-verified at implementation.
 - [Formatted PRD](prd-artifact.html) — download and open in a browser.
+- [Agent instructions](AGENTS.md) — shared working brief; `CLAUDE.md` links to it.
+- [Decision records](docs/decisions) — durable choices and proposal status.
 
 The PRD is the reviewed planning baseline. Application implementation has not started.
 The documents retain their original working title, Career Roadmap & Mentor Match.
