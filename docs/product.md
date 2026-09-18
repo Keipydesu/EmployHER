@@ -6,13 +6,15 @@ EmployHER helps HackHers participants turn existing experience into a practical 
 
 Audience focus does not require gender inference or gender-based access restrictions. Users choose whether to see documented women's employee groups, mentorship programs, inclusive benefits, scholarships, communities, and organizations. Evidence and source dates accompany suggestions; lack of a documented signal is unknown, not a negative employer judgment.
 
+The [career-path user story](user-story.md) expands this journey into a progress/tree view, path-specific résumé guidance and contextual learning/mentorship resources. Its progress bars measure transparent evidence-checklist coverage, never hiring probability.
+
 ## Screens and behavior
 
 1. Sign in with Auth0. Explain data processing; default the public demo to synthetic résumé fixtures.
 2. Upload a text-based PDF or paste text in an approved pilot. Show parse errors and a text fallback; scanned PDF/OCR is out of scope.
 3. Review skills, experience, and education with evidence excerpts. Correct or add user-reported information before confirming the profile.
 4. Choose location, remote preference, role type, career interests, and optional inclusion-resource categories.
-5. Browse ranked active roles. Each card shows source, last checked date, apply link, matched evidence, and missing or uncertain qualifications.
+5. Explore curated tech paths and expandable evidence checkpoints, then browse relevant ranked active roles. Each card shows source, last checked date, apply link, matched evidence, and missing or uncertain qualifications.
 6. Open a role for up to three practical next steps with deliverables. “Not evidenced” never means “you cannot do this.”
 7. Open coaching for follow-up questions. Opt in separately to remembering selected preferences; allow correction and deletion.
 
@@ -57,16 +59,27 @@ Begin concurrently: **A** owns profile/evidence DTOs and five synthetic résumé
 
 Use static snapshots from [Summer2027-Internships](https://github.com/SimplifyJobs/Summer2027-Internships) and [New-Grad-Positions](https://github.com/SimplifyJobs/New-Grad-Positions). Target at least 15 reviewed tech roles spanning internship/new-grad tracks and three sourced support resources. Store repository/ref/commit, source and application URLs, review date, per-role cohort, and explicit requirements. Titles/icons alone cannot ground skill-gap explanations. Resolve reuse terms before publishing source-derived fixtures; synthetic fixtures can unblock development while that remains open.
 
-Freeze profile/job versions, requirement IDs, draft/confirmed states, preference filters, error shapes and invalidation events from [api.md](api.md). Agree one embedding model/configuration and dimension shared by A and B. Provide success, no-match, missing-requirements, stale-version and provider-failure adapter fixtures. Proposed schema modules: A `profiles.ts`; B `catalog.ts`/`matches.ts`; C user/shared/`operations.ts`. C owns migration ordering, not every domain implementation.
+Agree path/checkpoint states, coverage calculation, versioned checklist definitions and saved-action contracts from [user-story.md](user-story.md). Freeze profile/job versions, requirement IDs, draft/confirmed states, preference filters, error shapes and invalidation events from [api.md](api.md). Agree one embedding model/configuration and dimension shared by A and B. Provide success, no-match, missing-requirements, stale-version and provider-failure adapter fixtures. Proposed schema modules: A `profiles.ts`; B `catalog.ts`/`matches.ts`; C user/shared/`operations.ts`. C owns migration ordering, not every domain implementation.
 
 **Exit:** the scaffold runs, contract fixtures validate, each owner can exercise their slice using adapters, and a reviewed catalog batch is ready. Contract changes still require both producer and consumer review; fixtures prevent blocking, not coordination.
+
+### Shared resource-research cache (proposed, post-MVP-static feature)
+
+To avoid re-researching the same learning/certification question for every student, a shared research cache can back path-checkpoint recommendations (certificates, courses, communities) beyond the M0 static seed set. This is separate from per-user Backboard coaching memory and holds no résumé content or personal search history.
+
+- **Key**: normalized `(subdomain, resource query, locale)` — e.g. `("cloud-infrastructure", "cloud deployment certificate", "en-US")`.
+- **Value**: candidate resource(s) with source URL, checked date, an expiry/refresh interval, and a review status (`pending` / `reviewed` / `rejected`).
+- **Cache miss** queues a bounded research pass — it does not trigger a live, unreviewed answer shown directly to the user. Gemini/Backboard may assist the research pass, but the raw result stays in the cache as unreviewed until a review step promotes it.
+- **Backboard is not the authority for factual truth.** It may hold the reusable research/candidate data with its source metadata; the application database is authoritative for what's actually shown — it records the reviewed resource's ID and version, not Backboard's raw cache entry.
+- **Refresh before stale reuse**: an entry past its expiry is re-checked before being served again, not served silently stale.
+- This feature is explicitly deferred past the MVP's static seed set (see M0 above) — implementation needs its own retrieval/refresh contract and verification of Backboard retrieval, updates and isolation before building.
 
 ### M1 — Three parallel vertical slices
 
 | Owner | Deliverables and boundaries | Acceptance gate |
 | --- | --- | --- |
-| A — Profile | PDF/text intake, Gemini extraction, evidence validation, review/correction UI, confirmed versioned profiles and profile embeddings; owns résumé routes | Synthetic cases cover supported facts, absent evidence, malformed input and corrections; exact excerpts resolve; only confirmed current profiles feed matching |
-| B — Opportunities | Static seed/import, role embeddings, pgvector retrieval, requirement comparison, grounded explanations, results/detail UI, next steps, contextual resources; owns job/resource/match routes | Repeat seeds create no duplicates; filters and source status respected; no invented gaps for missing requirements; unknown eligibility visible; profile edits invalidate results |
+| A — Profile | PDF/text intake, Gemini extraction, evidence validation, review/correction UI, truthful path-specific résumé suggestions, confirmed versioned profiles and profile embeddings; owns résumé routes | Synthetic cases cover supported facts, absent evidence, malformed input and corrections; exact excerpts resolve; only confirmed current profiles feed matching |
+| B — Opportunities | Static seed/import, role embeddings, pgvector retrieval, requirement comparison, grounded explanations, path checklists and progress/tree/results UI, next steps, contextual learning/community resources; owns job/resource/match routes | Repeat seeds create no duplicates; filters and source status respected; no invented gaps for missing requirements; unknown eligibility visible; profile edits invalidate results |
 | C — Platform | Auth0, app navigation/layout, shared database/migration integration, ownership helpers, CSRF, operation/idempotency primitives, CI and Vercel preview; owns shared config | Two synthetic users cannot access each other's records; retries do not duplicate completed operations; provider keys stay server-side; preview/build/checks pass |
 
 A and B integrate C's shared primitives into their own routes and test ownership locally; C does not become the author of every route. B can build against A's confirmed-profile fixture while A builds against B's sample results. C provides development adapters early; authentication and ownership must be real before M2 acceptance. A may start optional coaching only after their core slice integrates.

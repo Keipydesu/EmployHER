@@ -7,6 +7,7 @@ A HackHers-focused career navigator: upload a résumé, review extracted skills,
 ## Implementation brain dump
 
 - [Product, scope, backlog, and demo](docs/product.md)
+- [Student journey and career-path user story](docs/user-story.md)
 - [Architecture and data flow](docs/architecture.md)
 - [Relational schema and semantic matching](docs/data-model.md)
 - [API contracts](docs/api.md)
