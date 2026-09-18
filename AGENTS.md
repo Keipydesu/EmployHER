@@ -26,7 +26,7 @@ No test framework or coverage threshold is established. For documentation, verif
 
 ## Commits & Pull Requests
 
-History uses imperative subjects such as `Add ...`, `Fix ...`, and occasionally `docs: ...`; no mandatory prefix scheme exists. Keep commits focused. Develop features on feature branches and submit pull requests; never commit directly to `main`. PRs should explain the problem, changed behavior, verification, and unresolved assumptions; link relevant issues or decisions. Include screenshots for UI changes once a UI exists.
+History uses imperative subjects such as `Add ...`, `Fix ...`, and occasionally `docs: ...`; no mandatory prefix scheme exists. Keep commits focused. Develop features on feature branches and submit pull requests; never commit directly to `main` or `master`. PRs should explain the problem, changed behavior, verification, and unresolved assumptions; link relevant issues or decisions. Include screenshots for UI changes once a UI exists.
 
 ## Security & Agent Coordination
 

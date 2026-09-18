@@ -45,7 +45,7 @@ Key architectural boundaries a future implementer must preserve:
 
 ## Workflow
 
-Develop features on feature branches and open pull requests; never commit directly to `main`.
+Develop features on feature branches and open pull requests; never commit directly to `main` or `master`.
 
 ## Shared-workspace note
 
