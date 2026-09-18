@@ -11,7 +11,7 @@ Status: user-selected direction for future implementation, recorded 2026-09-18. 
 | ORM / validation | Drizzle / Zod | Versioned schema and runtime validation |
 | AI | Gemini | Structured résumé extraction, embeddings, grounded gap analysis |
 | Coaching | Backboard.io | Persistent conversations and opted-in coaching memory |
-| Ingestion | GitHub API + Octokit | Read a curated repository and update opportunities |
+| Ingestion | GitHub API + Octokit | Read the two selected SimplifyJobs repositories and update opportunities |
 | Hosting | Vercel | Next.js deployment and server-side integration |
 
 Use server-only provider adapters. Pin mutually compatible supported runtime, framework, SDK, and model versions during implementation. No agent-to-agent authentication is needed. An optional independent ingestion worker may use Auth0 Client Credentials and the narrow `opportunities:ingest` scope.

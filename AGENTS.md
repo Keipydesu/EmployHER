@@ -26,10 +26,14 @@ No test framework or coverage threshold is established. For documentation, verif
 
 ## Commits & Pull Requests
 
-History uses imperative subjects such as `Add ...`, `Fix ...`, and occasionally `docs: ...`; no mandatory prefix scheme exists. Keep commits focused. Develop features on feature branches and submit pull requests; never commit directly to `main` or `master`. PRs should explain the problem, changed behavior, verification, and unresolved assumptions; link relevant issues or decisions. Include screenshots for UI changes once a UI exists.
+Use focused, imperative commits (`Add ...`, `Fix ...`, or `docs: ...`). Develop features on feature branches and submit pull requests; never commit directly to `main` or `master`. PRs should explain the problem, changed behavior, verification, and unresolved assumptions; link relevant issues or decisions. Include screenshots for UI changes.
+
+Do not push automatically. Keep changes and commits local unless the operator explicitly requests a push; permission to edit or commit is not permission to push.
 
 ## Security & Agent Coordination
 
 Never commit credentials or real résumés. Keep examples synthetic and configuration placeholders explicit. Requirement-level gap claims need sourced requirement evidence, not inferred job-title skills.
+
+Prefer stable npm versions published at least 7-14 days earlier. A newer release is allowed after documented security review of the exact version (advisories, publisher/provenance, release/changelog, install scripts, changed dependencies). Pin the reviewed version and commit the lockfile. Age or a clean audit alone does not prove safety; never use a known-compromised version.
 
 In Talking Stick sessions, acquire a live writer turn before edits or builds, verify changes, and release with a concrete handoff. Follow current operator instructions over historical notes.

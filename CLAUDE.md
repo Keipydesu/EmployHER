@@ -47,6 +47,10 @@ Key architectural boundaries a future implementer must preserve:
 
 Develop features on feature branches and open pull requests; never commit directly to `main` or `master`.
 
+Do not push automatically. Keep changes and commits local unless the operator explicitly requests a push; permission to edit or commit is not permission to push.
+
+Prefer stable npm versions published at least 7-14 days earlier. A newer release is allowed after documented security review of the exact version (advisories, publisher/provenance, release/changelog, install scripts, changed dependencies). Pin the reviewed version and commit the lockfile. Age or a clean audit alone does not prove safety; never use a known-compromised version.
+
 ## Shared-workspace note
 
 This repository is sometimes edited by multiple coordinating agent sessions (Talking Stick). If you are in such a session, acquire a live writer turn before editing files, verify your change, and release with a concrete handoff — see `AGENTS.md`'s "Security & Agent Coordination" section.

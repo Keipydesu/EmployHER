@@ -9,7 +9,7 @@ This repository is documentation-only. There is no package manifest, app, migrat
 3. Create a development Auth0 Regular Web Application with exact localhost callback/logout URLs according to the pinned SDK. Keep preview and production clients/settings isolated.
 4. Provision a development Tiger Data database (or compatible local PostgreSQL with pgvector). Review Drizzle migrations, enable vector, and seed synthetic fixtures. Use TLS with certificate verification and a small connection pool.
 5. Copy the placeholder inventory below into an ignored local environment file and populate privately. Validate configuration at startup; fail on missing required secrets. Never expose provider secrets with `NEXT_PUBLIC_`.
-6. Implement contracts, ownership, extraction/review, ingestion, matching, resources, then coaching. Add actual setup/server/migrate/seed/lint/typecheck/test scripts and document them when they exist.
+6. Follow the M0–M3 parallel roadmap in `docs/product.md`: foundation, profile/opportunity/platform slices, integration, then pilot hardening. Coaching is optional P1. Add actual setup/server/migrate/seed/lint/typecheck/test scripts and document them when they exist.
 
 ## Environment template
 
@@ -29,10 +29,10 @@ GEMINI_EMBEDDING_DIMENSIONS=<SUPPORTED_DIMENSION_MATCHING_SCHEMA>
 BACKBOARD_API_KEY=<BACKBOARD_API_KEY>
 BACKBOARD_MODEL=<SUPPORTED_COACH_MODEL_ID>
 GITHUB_TOKEN=<READ_ONLY_SOURCE_TOKEN_IF_NEEDED>
-GITHUB_SOURCE_OWNER=<CURATED_REPOSITORY_OWNER>
-GITHUB_SOURCE_REPO=<CURATED_REPOSITORY_NAME>
-GITHUB_SOURCE_REF=<SOURCE_BRANCH_OR_COMMIT>
-GITHUB_SOURCE_PATH=<SOURCE_FILE_OR_DIRECTORY>
+GITHUB_SOURCE_OWNER=<SIMPLIFYJOBS_ORG>
+GITHUB_SOURCE_REPOS=<SUMMER2027_INTERNSHIPS_AND_NEW_GRAD_POSITIONS_REPO_NAMES>
+GITHUB_SOURCE_REF=<SOURCE_BRANCH_OR_COMMIT_PER_REPO>
+GITHUB_SOURCE_PATH=<SOURCE_FILE_OR_DIRECTORY_PER_REPO>
 ENABLE_REAL_RESUMES=<BOOLEAN_DEFAULT_FALSE>
 ENABLE_COACH=<BOOLEAN>
 DAILY_USER_AI_LIMIT=<REQUEST_LIMIT>
@@ -50,14 +50,23 @@ Connect this repository when runnable application code exists. Configure server-
 
 Place app and database near each other. Set connection pool and concurrency limits against the database budget. Run reviewed migrations as a controlled release step, not on every server startup. Test on staging, then deploy; roll back application releases without destructive schema rollback. Use additive migrations and keep backups/retention documented.
 
-Set exact Auth0 callback/logout origins. Confirm provider entitlements/model availability and budgets. Run a small authenticated manual ingestion first; add a scheduled independent worker only after repeat-run behavior works. Configure recurring expiry and deletion cleanup with a durable scheduler before real data is enabled; choose and document the concrete scheduler at implementation.
+Set exact Auth0 callback/logout origins. Confirm provider entitlements/model availability and budgets. Load and verify the reviewed static snapshot for the MVP; a scheduled ingestion worker is a later feature. Configure recurring expiry and deletion cleanup with a durable scheduler before real data is enabled; choose and document the concrete scheduler at implementation.
+
+## Execution milestones
+
+See `docs/product.md`'s "Three-person parallel MVP roadmap" for the full three-person, milestone-gated work split (M0 foundation → M1 parallel vertical slices → M2 integration/demo → M3 parallel hardening). M2 includes demo reliability/security checks; M3 adds the real-data pilot gates. The roadmap assigns each check group to A, B or C. Optional-feature checks apply only when that feature is enabled.
 
 ## Verification gates
 
 Documentation checks today: internal links, whitespace/diff review, placeholder-only configuration, and staged scope review. No runtime claims.
 
-Future implementation checks: two-user ownership and CSRF; PDF/text limits; five synthetic evidence fixtures; user correction and match invalidation; wrong-dimension vectors; duplicate ingestion; partial snapshot preservation; unknown eligibility; missing inclusion signals; prompt injection; idempotency and timeout recovery; provider outage; Backboard user isolation; memory opt-out; deletion/late-result races; expiry cleanup; no sensitive logs; production build and browser happy/error paths. Live-provider smoke tests require bounded cost and synthetic data.
+- M2 core demo: two-user ownership/CSRF; PDF/text limits; five synthetic evidence fixtures; corrections/invalidation; wrong-dimension vectors; repeatable static seeds; unknown eligibility and missing requirements; prompt injection; idempotency, timeouts and provider outage states; quotas; no sensitive logs; production build and browser happy/error paths.
+- M3 real-data pilot: verified provider handling/consent, deletion and late-result races, expiry cleanup and durable cleanup retries, plus regression of M2 checks.
+- Coaching, when enabled: Backboard user isolation, memory opt-in/opt-out, correction and external deletion reconciliation.
+- Later automated refresh: duplicate/changed records, partial snapshot preservation, source closures and stale-data presentation.
 
-Open implementation inputs: exact curated GitHub source and reuse terms, model IDs/embedding config, approved inclusion-resource seed set, provider data-handling terms, hosting limits, and cleanup scheduler. These do not block publishing the documentation.
+Live-provider smoke tests require bounded cost and synthetic data. No runtime check has been performed in this documentation task.
+
+Selected job sources: `SimplifyJobs/Summer2027-Internships` and `SimplifyJobs/New-Grad-Positions`. Open implementation inputs: snapshot commits and reuse terms, model IDs/embedding config, approved inclusion-resource seed set, provider data-handling terms, hosting limits, and cleanup scheduler. These do not block publishing the documentation.
 
 Reference: [Vercel function limits](https://vercel.com/docs/functions/limitations). Verify account-specific limits at deployment.
