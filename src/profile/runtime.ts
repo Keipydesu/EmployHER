@@ -3,9 +3,37 @@ import { MemoryOperations, MemoryProfileRepository } from './adapters/memory';
 import { FixtureProfileAI } from './adapters/fixture-ai';
 import { GeminiProfileAI } from './adapters/gemini';
 import { demoPaths, resumeFixtures } from './fixtures';
-import { prepareText } from './evidence';
+import { prepareText, factLine } from './evidence';
 import { ProfileError } from './errors';
 import { ProfileService } from './service';
+import type { ProfileAI } from './ports';
+import type { Embedding } from './contracts';
+
+// Only exact approved summary text may reach the live provider. Other summaries
+// use simulated vectors, preserving correction UX without sending arbitrary text.
+export class GuardedEmbeddingAI implements ProfileAI {
+  readonly model: string;
+  constructor(
+    private live: ProfileAI,
+    private fallback: ProfileAI,
+    private allowedSummaries: ReadonlySet<string>,
+  ) {
+    this.model = live.model;
+  }
+  extract(text: string, signal: AbortSignal) {
+    return this.live.extract(text, signal);
+  }
+  embed(summary: string, signal: AbortSignal): Promise<Embedding> {
+    return this.allowedSummaries.has(summary)
+      ? this.live.embed(summary, signal)
+      : this.fallback.embed(summary, signal);
+  }
+}
+export function allowedFixtureSummaries(): Set<string> {
+  return new Set(
+    resumeFixtures.map((fixture) => fixture.facts.map(factLine).join('\n')),
+  );
+}
 
 export type ProfileRuntime = {
   service: ProfileService;
@@ -39,10 +67,14 @@ function demoState() {
     const sessions = new Map<string, DemoSession>();
     const ai =
       process.env.PROFILE_DEMO_GEMINI === 'true'
-        ? new GeminiProfileAI(
-            process.env.GEMINI_API_KEY ?? '',
-            process.env.GEMINI_MODEL ?? '',
-            process.env.GEMINI_EMBEDDING_MODEL ?? '',
+        ? new GuardedEmbeddingAI(
+            new GeminiProfileAI(
+              process.env.GEMINI_API_KEY ?? '',
+              process.env.GEMINI_MODEL ?? '',
+              process.env.GEMINI_EMBEDDING_MODEL ?? '',
+            ),
+            new FixtureProfileAI(),
+            allowedFixtureSummaries(),
           )
         : new FixtureProfileAI();
     state.employherProfileDemo = {

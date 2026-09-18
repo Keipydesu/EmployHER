@@ -104,8 +104,11 @@ export function applyCorrections(previous: Fact[], updates: ProfileUpdate['corre
     return { ...input, id, evidence: same ? old.evidence : { source: 'user_reported' } };
   });
 }
+export function factLine(f: Pick<Fact, 'kind' | 'label' | 'detail'>): string {
+  return `${f.kind}: ${f.label}${f.detail ? ` — ${f.detail}` : ''}`;
+}
 export function summaryForEmbedding(facts: Fact[]): string {
-  return facts.map((f) => `${f.kind}: ${f.label}${f.detail ? ` — ${f.detail}` : ''}`).join('\n');
+  return facts.map(factLine).join('\n');
 }
 export function validateEmbedding(embedding: Embedding): Embedding {
   if (
