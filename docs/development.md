@@ -1,6 +1,6 @@
 # Development and deployment plan
 
-The Next.js foundation is implemented for review. It contains a public App Router landing page, shared layout/navigation, a custom 404, Tailwind styling, strict TypeScript, ESLint, and Prettier. There are no personal-data routes, authentication, database, migrations, provider adapters, CI, or deployment yet. shadcn components will be added when an interactive feature needs them.
+The Next.js foundation is implemented for review. It contains a public App Router landing page, shared layout/navigation, a custom 404, Tailwind styling, strict TypeScript, ESLint, and Prettier. There are no personal-data routes, authentication, database, migrations, provider adapters or deployment yet. A GitHub Actions CI workflow is configured. shadcn components will be added when an interactive feature needs them.
 
 ## Foundation setup
 
@@ -26,7 +26,15 @@ Open http://localhost:3000. The page labels future features as planned; there is
 
 Source lives in `src/app`; `@/*` resolves to `src/*`. Keep provider code server-only when integrations are added. Generated Next.js types, builds, local tools, credentials, and dependency directories are ignored. Direct dependencies are exact-pinned and `package-lock.json` fixes the dependency tree. See [dependency review](dependency-review.md).
 
-No test runner is introduced for this static shell. Choose and document one before adding behavioral tests. Auth0, ownership, CSRF, database/migrations, CI, and Vercel are the next platform phase after foundation review.
+No test runner is introduced for this static shell. Choose and document one before adding behavioral tests. Auth0, ownership, CSRF, database/migrations and Vercel are the next platform phase after foundation review.
+
+## Continuous integration
+
+[GitHub Actions workflow](../.github/workflows/ci.yml) runs on pull requests, pushes to `main`, and manual dispatch. One Ubuntu 24.04 job reads Node.js from `.nvmrc`, caches npm downloads using the lockfile, installs with `npm ci --ignore-scripts`, runs `npm run check`, then `npm run build`.
+
+Actions are pinned to commit hashes. The workflow uses read-only repository permissions, does not persist Git credentials, requires no provider secrets, times out after 15 minutes, and cancels superseded runs for the same branch or PR. It performs no deployment. There is no test command until a test runner is selected.
+
+Local checks and build pass; the hosted workflow has not yet run. Once published and passing, repository maintainers can require `Lint, types, format, and build` in branch protection.
 
 ## Remaining integration plan
 
