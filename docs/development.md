@@ -1,6 +1,6 @@
 # Development and deployment plan
 
-This repository is documentation-only. There is no package manifest, app, migration, test suite, or runnable setup command yet. The following is an implementation plan, not completed setup.
+Person A's profile slice now includes a runnable Next.js sample harness, pinned dependencies, tests, and proposed domain SQL. See [the implemented setup and handoff](implementation/person-a.md). The broader deployment steps below remain an integration plan, not a completed production setup.
 
 ## Local development
 
@@ -58,14 +58,14 @@ See `docs/product.md`'s "Three-person parallel MVP roadmap" for the full three-p
 
 ## Verification gates
 
-Documentation checks today: internal links, whitespace/diff review, placeholder-only configuration, and staged scope review. No runtime claims.
+Profile checks: `npm test`, `npm run typecheck`, `npm run build`, and `npm run test:browser`. Documentation checks: internal links, whitespace/diff review, placeholder-only configuration, and staged scope review.
 
 - M2 core demo: two-user ownership/CSRF; PDF/text limits; five synthetic evidence fixtures; corrections/invalidation; wrong-dimension vectors; repeatable static seeds; unknown eligibility and missing requirements; prompt injection; idempotency, timeouts and provider outage states; quotas; no sensitive logs; production build and browser happy/error paths.
 - M3 real-data pilot: verified provider handling/consent, deletion and late-result races, expiry cleanup and durable cleanup retries, plus regression of M2 checks.
 - Coaching, when enabled: Backboard user isolation, memory opt-in/opt-out, correction and external deletion reconciliation.
 - Later automated refresh: duplicate/changed records, partial snapshot preservation, source closures and stale-data presentation.
 
-Live-provider smoke tests require bounded cost and synthetic data. No runtime check has been performed in this documentation task.
+Live-provider smoke tests require bounded cost and synthetic data. A's fixture-backed checks do not establish the unimplemented B/C gates or live-provider quality.
 
 Selected job sources: `SimplifyJobs/Summer2027-Internships` and `SimplifyJobs/New-Grad-Positions`. Open implementation inputs: snapshot commits and reuse terms, model IDs/embedding config, approved inclusion-resource seed set, provider data-handling terms, hosting limits, and cleanup scheduler. These do not block publishing the documentation.
 

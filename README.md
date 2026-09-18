@@ -2,7 +2,16 @@
 
 A HackHers-focused career navigator: upload a résumé, review extracted skills, discover relevant internships and jobs, understand qualification gaps, and choose actionable next steps.
 
-**Status: documentation only. No application has been scaffolded, deployed, or tested.**
+**Status: Person A’s profile slice is implemented with a local synthetic-data demo.** Production Auth0/database wiring, the opportunity flow, and deployment remain integration work. See the [profile implementation and handoff](docs/implementation/person-a.md).
+
+## Run the profile demo
+
+```sh
+npm ci --ignore-scripts
+PROFILE_DEMO_MODE=true npm run dev
+```
+
+Open `http://127.0.0.1:3000/profile`. Use a supplied sample; real résumé intake is disabled. Run `npm test`, `npm run typecheck`, and `npm run build` for local verification. [Browser checks and integration boundaries](docs/implementation/person-a.md) are documented separately.
 
 ## Implementation brain dump
 

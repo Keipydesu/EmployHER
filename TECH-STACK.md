@@ -1,6 +1,6 @@
 # EmployHER — current stack
 
-Status: user-selected direction for future implementation, recorded 2026-09-18. Nothing is installed or provisioned. Supersedes the previous Rails stack through [decision 002](docs/decisions/002-hackhers-career-navigator.md).
+Status: user-selected direction for future implementation, recorded 2026-09-18. Person A's Next.js/TypeScript profile slice, Zod validation, Drizzle adapter, and Gemini REST integration are implemented locally. Provider infrastructure and production integration remain unprovisioned. See [the profile handoff](docs/implementation/person-a.md). Supersedes the previous Rails stack through [decision 002](docs/decisions/002-hackhers-career-navigator.md).
 
 | Layer | Choice | Responsibility |
 | --- | --- | --- |

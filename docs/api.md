@@ -1,12 +1,14 @@
-# Proposed API contracts
+# API contracts
 
-All routes below require an Auth0 session except the separately authenticated optional ingestion route. Provider credentials and IDs remain server-side. Zod validates request and response payloads; reject unknown mutation fields. UUIDs are opaque references, never authorization.
+Person A's résumé endpoints now have executable contracts in `src/profile/contracts.ts`; see [profile handoff](implementation/person-a.md). Their implementation returns one `facts[]` list with a `kind` discriminator, not separate skill/experience/education arrays. The standalone runtime is a gated synthetic local harness; production requires C's Auth0 binding. Other routes below remain proposals.
+
+All production routes below require an Auth0 session except the separately authenticated optional ingestion route. Provider credentials and IDs remain server-side. Zod validates request and response payloads; reject unknown mutation fields. UUIDs are opaque references, never authorization.
 
 | Method / route | Input | Result |
 | --- | --- | --- |
 | `GET /api/me` | Session | User ID, consent state, preferences |
 | `PATCH /api/me/preferences` | Validated locations, remote mode, role types, inclusion categories, memory opt-in | Updated preferences; invalidates affected recommendations |
-| `POST /api/resumes` | Multipart PDF or JSON `{text}`; idempotency header | `201 {profileId, version, status:"draft", skills, experience, education}` after bounded extraction |
+| `POST /api/resumes` | Multipart PDF or JSON `{text}`; idempotency header | `201 {profileId, version, status:"draft", facts, embedding:null}` after bounded extraction |
 | `GET /api/resumes/:id` | Owned profile ID | Reviewed structured profile, evidence, version |
 | `PATCH /api/resumes/:id` | `{expectedVersion, corrections, confirm}` | New profile version; re-embed before matching; stale version returns 409 |
 | `POST /api/matches` | `{profileId, profileVersion}` + idempotency header | `201 {matches:[Match], catalogCheckedAt}`; only confirmed current profile |

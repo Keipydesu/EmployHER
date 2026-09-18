@@ -2,7 +2,7 @@
 
 ## Project Structure & Current Status
 
-EmployHER is a documentation-only career navigator for early-career tech roles. No application source, tests, assets, or package manifest exists yet. Start with `README.md` and `TECH-STACK.md`. `docs/product.md` owns scope; `docs/architecture.md`, `docs/data-model.md`, and `docs/api.md` define proposed contracts. Read `docs/development.md` for implementation gates and `docs/privacy.md` for data handling. Number architecture decisions under `docs/decisions/`; decision `002` supersedes the historical Rails baseline.
+EmployHER is a career navigator for early-career tech roles. Person A's profile slice and a synthetic local Next.js harness now exist; production Auth0/database wiring, catalog matching and deployment remain integration work. See `docs/implementation/person-a.md`. Start with `README.md` and `TECH-STACK.md`. `docs/product.md` owns scope; `docs/architecture.md`, `docs/data-model.md`, and `docs/api.md` define proposed contracts. Read `docs/development.md` for implementation gates and `docs/privacy.md` for data handling. Number architecture decisions under `docs/decisions/`; decision `002` supersedes the historical Rails baseline.
 
 The planned stack is Next.js/TypeScript, Tailwind/shadcn, Auth0, Tiger Data PostgreSQL/pgvector, Drizzle, Zod, Gemini, Backboard, and Vercel.
 
@@ -12,7 +12,7 @@ The planned stack is Next.js/TypeScript, Tailwind/shadcn, Auth0, Tiger Data Post
 - `git diff --check`: check tracked changes for whitespace errors.
 - `git diff --stat`: review change scope before submitting.
 
-There are no runnable build, development, lint, or test commands yet. Do not claim `npm test` or `npm run build` works. When scaffolding is authorized, add scripts and a lockfile, then document verified commands in `docs/development.md`.
+Profile verification: `npm test`, `npm run typecheck`, `npm run build`, `npm run format:check`, and `npm run test:browser` (requires Playwright Chromium). Start the local-only synthetic harness with `PROFILE_DEMO_MODE=true npm run dev`. Never enable this harness in production.
 
 ## Style & Naming
 
@@ -22,7 +22,7 @@ For future TypeScript, use two-space indentation, camelCase variables/functions,
 
 ## Testing Guidelines
 
-No test framework or coverage threshold is established. For documentation, verify relative links, contract consistency, and whitespace. For implementation, choose a framework and document its runner and naming convention before adding tests. Prioritize evidence grounding, profile corrections, two-user isolation, ingestion failures, provider timeouts, and deletion races. Use synthetic fixtures; report checks actually run and remaining limitations.
+Profile tests use Node's test runner with tsx and Playwright browser tests. No coverage threshold is established. For documentation, verify relative links, contract consistency, and whitespace. Prioritize evidence grounding, profile corrections, two-user isolation, ingestion failures, provider timeouts, and deletion races. Use synthetic fixtures; report checks actually run and remaining limitations.
 
 ## Commits & Pull Requests
 
@@ -37,3 +37,13 @@ Never commit credentials or real résumés. Keep examples synthetic and configur
 Prefer stable npm versions published at least 7-14 days earlier. A newer release is allowed after documented security review of the exact version (advisories, publisher/provenance, release/changelog, install scripts, changed dependencies). Pin the reviewed version and commit the lockfile. Age or a clean audit alone does not prove safety; never use a known-compromised version.
 
 In Talking Stick sessions, acquire a live writer turn before edits or builds, verify changes, and release with a concrete handoff. Follow current operator instructions over historical notes.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

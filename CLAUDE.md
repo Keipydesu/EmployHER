@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Status
 
-Documentation-only. There is no application source, package manifest, lockfile, migrations, or test suite yet. Everything under `docs/` and in `TECH-STACK.md` is a proposal for a future implementation, not a description of running code. Do not claim a build, lint, or test command works — none exist. See `AGENTS.md` for the current (empty) command set and contributor conventions.
+Person A's profile slice now has a local synthetic Next.js harness, executable contracts, a Gemini adapter, PostgreSQL domain adapter/schema, and unit/browser tests. Production Auth0/database wiring, B's catalog, and deployment remain integration work. See `docs/implementation/person-a.md` and `AGENTS.md` for verified commands and boundaries. Never treat sample sessions or simulated vectors as production integrations.
 
 ## Where to start reading
 
