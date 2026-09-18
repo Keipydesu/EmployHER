@@ -1,15 +1,41 @@
 # Development and deployment plan
 
-This repository is documentation-only. There is no package manifest, app, migration, test suite, or runnable setup command yet. The following is an implementation plan, not completed setup.
+The Next.js foundation is implemented for review. It contains a public App Router landing page, shared layout/navigation, a custom 404, Tailwind styling, strict TypeScript, ESLint, and Prettier. There are no personal-data routes, authentication, database, migrations, provider adapters, CI, or deployment yet. shadcn components will be added when an interactive feature needs them.
 
-## Local development
+## Foundation setup
 
-1. Select supported compatible Node.js, Next.js, TypeScript, and SDK versions; record them in the future package manifest and lockfile.
-2. Create the Next.js application only when implementation is requested. Add Tailwind/shadcn, Auth0, Drizzle/Postgres driver, Zod, Octokit, Gemini SDK, and a Backboard server adapter.
+Use Node.js 24.21.0 (see `.nvmrc`) and npm 11. No environment variables or provider accounts are required for this shell.
+
+```sh
+npm ci --ignore-scripts
+npm run dev
+```
+
+Open http://localhost:3000. The page labels future features as planned; there is no upload or login flow.
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Local development server |
+| `npm run build` | Production compilation and static generation |
+| `npm start` | Serve the production build |
+| `npm run lint` | ESLint with zero warnings |
+| `npm run typecheck` | Generate route types, then strict TypeScript checking |
+| `npm run format:check` | Check source/config formatting; existing Markdown is excluded |
+| `npm run format` | Format source/config files |
+| `npm run check` | Lint, types, and formatting |
+
+Source lives in `src/app`; `@/*` resolves to `src/*`. Keep provider code server-only when integrations are added. Generated Next.js types, builds, local tools, credentials, and dependency directories are ignored. Direct dependencies are exact-pinned and `package-lock.json` fixes the dependency tree. See [dependency review](dependency-review.md).
+
+No test runner is introduced for this static shell. Choose and document one before adding behavioral tests. Auth0, ownership, CSRF, database/migrations, CI, and Vercel are the next platform phase after foundation review.
+
+## Remaining integration plan
+
+1. Keep the foundation runtime/framework pins reviewed; select compatible SDK versions as each integration is added.
+2. After foundation review, add Auth0, Drizzle/Postgres driver, Zod, and feature-needed shadcn components. Domain owners add Octokit, Gemini, and Backboard adapters with their slices.
 3. Create a development Auth0 Regular Web Application with exact localhost callback/logout URLs according to the pinned SDK. Keep preview and production clients/settings isolated.
 4. Provision a development Tiger Data database (or compatible local PostgreSQL with pgvector). Review Drizzle migrations, enable vector, and seed synthetic fixtures. Use TLS with certificate verification and a small connection pool.
 5. Copy the placeholder inventory below into an ignored local environment file and populate privately. Validate configuration at startup; fail on missing required secrets. Never expose provider secrets with `NEXT_PUBLIC_`.
-6. Follow the M0–M3 parallel roadmap in `docs/product.md`: foundation, profile/opportunity/platform slices, integration, then pilot hardening. Coaching is optional P1. Add actual setup/server/migrate/seed/lint/typecheck/test scripts and document them when they exist.
+6. Follow the M0–M3 parallel roadmap in `docs/product.md`: foundation, profile/opportunity/platform slices, integration, then pilot hardening. Coaching is optional P1. Add migrate/seed/test scripts as those features land and document verified usage.
 
 ## Environment template
 
@@ -58,15 +84,28 @@ See `docs/product.md`'s "Three-person parallel MVP roadmap" for the full three-p
 
 ## Verification gates
 
-Documentation checks today: internal links, whitespace/diff review, placeholder-only configuration, and staged scope review. No runtime claims.
+Foundation verification is recorded below. The following integration gates remain unmet.
 
 - M2 core demo: two-user ownership/CSRF; PDF/text limits; five synthetic evidence fixtures; corrections/invalidation; wrong-dimension vectors; repeatable static seeds; unknown eligibility and missing requirements; prompt injection; idempotency, timeouts and provider outage states; quotas; no sensitive logs; production build and browser happy/error paths.
 - M3 real-data pilot: verified provider handling/consent, deletion and late-result races, expiry cleanup and durable cleanup retries, plus regression of M2 checks.
 - Coaching, when enabled: Backboard user isolation, memory opt-in/opt-out, correction and external deletion reconciliation.
 - Later automated refresh: duplicate/changed records, partial snapshot preservation, source closures and stale-data presentation.
 
-Live-provider smoke tests require bounded cost and synthetic data. No runtime check has been performed in this documentation task.
+Live-provider smoke tests require bounded cost and synthetic data. Live-provider checks have not been performed.
 
 Selected job sources: `SimplifyJobs/Summer2027-Internships` and `SimplifyJobs/New-Grad-Positions`. Open implementation inputs: snapshot commits and reuse terms, model IDs/embedding config, approved inclusion-resource seed set, provider data-handling terms, hosting limits, and cleanup scheduler. These do not block publishing the documentation.
 
 Reference: [Vercel function limits](https://vercel.com/docs/functions/limitations). Verify account-specific limits at deployment.
+
+## Foundation verification (2026-09-18)
+
+Verified on Windows with Node.js 24.21.0 / npm 11.19.0:
+
+- Clean `npm ci --ignore-scripts --offline --cache .tools/npm-cache` reproduced the lockfile from the populated local cache. Stop running Next.js before reinstalling on Windows; its native binary is locked while the server runs.
+- `npm run check`: ESLint, strict type checking, and formatting passed.
+- `npm run build`: production build passed; `/` and the not-found page are statically generated.
+- `npm start`: HTTP 200 for `/`, HTTP 404 for an unknown route, and the foundation disclosure is present.
+- `npm run dev`: started successfully and served `/` with HTTP 200.
+- Desktop and narrow-layout screenshots visually inspected: [desktop](review/foundation-desktop.png), [mobile layout](review/foundation-mobile.png).
+
+Relative Markdown file links and `git diff --check` passed. No domain tests, live-provider checks, authentication/ownership checks, CI runs, or deployment have occurred. The ESLint compatibility limitation is recorded in the dependency review. Automatic Next.js agent-rule generation is disabled to keep development startup from rewriting repository instructions.

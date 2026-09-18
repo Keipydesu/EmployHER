@@ -4,3 +4,10 @@
 !.env.example
 node_modules/
 .talking-stick/
+.next/
+out/
+.vercel/
+next-env.d.ts
+*.tsbuildinfo
+npm-debug.log*
+.tools/

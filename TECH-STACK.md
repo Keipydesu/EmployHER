@@ -1,6 +1,6 @@
 # EmployHER — current stack
 
-Status: user-selected direction for future implementation, recorded 2026-09-18. Nothing is installed or provisioned. Supersedes the previous Rails stack through [decision 002](docs/decisions/002-hackhers-career-navigator.md).
+Status: user-selected direction for future implementation, recorded 2026-09-18. Next.js, React, TypeScript, Tailwind, ESLint, and Prettier are installed in the foundation. Other integrations remain unimplemented; nothing is provisioned. Supersedes the previous Rails stack through [decision 002](docs/decisions/002-hackhers-career-navigator.md).
 
 | Layer | Choice | Responsibility |
 | --- | --- | --- |

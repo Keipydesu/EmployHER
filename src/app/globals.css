@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: Arial, Helvetica, sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+a:focus-visible {
+  outline: 3px solid #7e22ce;
+  outline-offset: 5px;
+}
+
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 1rem;
+  z-index: 50;
+  padding: 0.75rem 1rem;
+  background: white;
+}
+
+.skip-link:focus {
+  top: 1rem;
+}

@@ -2,7 +2,9 @@
 
 A HackHers-focused career navigator: upload a résumé, review extracted skills, discover relevant internships and jobs, understand qualification gaps, and choose actionable next steps.
 
-**Status: documentation only. No application has been scaffolded, deployed, or tested.**
+**Status: Next.js foundation created for review. Product features and platform integrations remain planned; nothing is deployed.**
+
+Run `npm ci --ignore-scripts`, then `npm run dev` with Node.js 24.21.0. See [development](docs/development.md) for commands and scope.
 
 ## Implementation brain dump
 

@@ -1,0 +1,9 @@
+node_modules/
+.next/
+out/
+package-lock.json
+next-env.d.ts
+*.tsbuildinfo
+# Existing planning documents have independent owners.
+*.md
+docs/
