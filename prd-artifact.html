@@ -277,11 +277,20 @@ RoadmapTask { id, primaryGapId, week: 1..4, title, hours,
 OutreachDraft { mentorId, gapId, text }</code></pre>
   <p>Validate required fields, enum values, source spans, foreign-key references, finite positive hours, weekly totals, and acyclic dependencies. Treat model output as untrusted data. Retry schema or grounding failure once; if still invalid, show a recoverable error and no factual gap claims from the invalid output. Set an overall generation timeout and bounded retries; initial design budget is 60 seconds. Never silently replace a failed live run with a sample result.</p>
   <div class="callout warn">
-    <p><span class="label">Generation must not run in-process</span>On request-based billing Cloud Run disables or severely limits CPU outside a request, so a job started in the web process is not guaranteed to finish after the response is sent. Use one durable execution model and only one: a Cloud Tasks queue dispatching to an authenticated, owner-scoped Cloud Run endpoint. Cloud Tasks is then the single retry authority, and the handler must be idempotent, keyed on the analysis ID, so a redelivered task cannot produce a duplicate plan. A Solid Queue worker on an always-allocated-CPU service is a valid alternative, but it is a choice between the two, not an addition, and it carries continuous cost against the spend cap. The client polls for status; F10&rsquo;s processing display reports that real state.</p>
+    <p><span class="label">Generation must not run in-process</span>On request-based billing Cloud Run disables or severely limits CPU outside a request, so a job started in the web process is not guaranteed to finish after the response is sent. Use one durable execution model and only one: a Cloud Tasks queue dispatching to an authenticated Cloud Run endpoint. A Solid Queue worker on an always-allocated-CPU service is a valid alternative, but it is a choice between the two, not an addition, and it carries continuous cost against the spend cap.</p>
   </div>
   <div class="callout">
     <p><span class="label">Injection posture</span>Resume and JD contents are data, not instructions. Give the model no tools or browsing capability for these steps. Do not execute embedded commands or follow document instructions. Render generated content as escaped text; validate any curated URLs separately. Version prompts and model configuration with every analysis for reproducibility.</p>
   </div>
+  <h3>Request identity and idempotency</h3>
+  <p>The unit of work is a persisted <code>GenerationRequest { id, ownerId, operation: analysis|roadmap|outreach, analysisId?, intendedRoadmapVersion?, state, attempts, createdAt }</code>, written before the task is enqueued. Idempotency is keyed on request ID and operation, <em>not</em> on the analysis ID: one analysis legitimately produces several operations, and F9&rsquo;s explicit regeneration is supposed to create a new roadmap version. A transport redelivery reuses the request ID and must not produce a second plan; an explicit regeneration mints a new request ID and version.</p>
+  <h3>Authorization in the worker</h3>
+  <p>The task&rsquo;s service identity authenticates the caller; it does not establish who owns the work. The worker resolves the owner from the stored <code>GenerationRequest</code>, never from the task payload and never from a browser cookie, and re-checks that the owner&rsquo;s records still exist before writing. Callbacks arriving after an owner deletion are rejected, not applied.</p>
+  <h3>Input handoff</h3>
+  <p>A queued task cannot read the originating request&rsquo;s memory, so inputs must be staged, not held. Write the resume PDF or pasted resume text and the job description to private owner-scoped Cloud Storage objects before enqueueing, and put only opaque request and object identifiers in the task payload. Pasted text is staged exactly as an uploaded file is; it is not exempt because it never was a file.</p>
+  <h3>Two retry budgets, kept apart</h3>
+  <p>Schema or grounding repair is one internal model retry inside a single attempt and resets nothing. Transport redelivery by the queue is separate and explicitly bounded, with a per-request deadline and maximum attempt count recorded on the request. The 60-second design budget applies to one attempt, not to a redelivered task&rsquo;s lifetime. A permanent validation failure is terminal: record the failed state and return a <em>successful</em> transport acknowledgement so the queue stops redelivering a deterministic failure. Only genuinely transient faults may consume redeliveries.</p>
+  <p>The client polls for status; F10&rsquo;s processing display reports that real state.</p>
 </section>
 
 <section>
@@ -289,7 +298,7 @@ OutreachDraft { mentorId, gapId, text }</code></pre>
   <div class="callout warn">
     <p><span class="label">Design, not deployment</span>These are design choices, not verified deployment claims. Confirm supported gem, SDK, and model versions and deployment settings during implementation.</p>
   </div>
-  <p>The application framework is <strong>Ruby on Rails</strong>, set by the operator. Rails supplies the request layer, ActiveRecord persistence, ActiveStorage file handling, and encrypted signed sessions; the list below records how each cloud dependency maps onto it. A companion tech-stack document accompanies this PRD in the repository.</p>
+  <p>The application framework is <strong>Ruby on Rails</strong>, set by the operator. Rails supplies the request layer, ActiveRecord persistence, ActiveStorage file handling, and encrypted signed sessions. Background generation deliberately runs outside the web process on Cloud Tasks rather than on an in-process job backend, for the reasons in section 6. The list below records how each cloud dependency maps onto it. A companion tech-stack document accompanies this PRD in the repository.</p>
   <ul>
     <li><strong>Cloud Run:</strong> containerized Rails application and authenticated backend endpoints; server-side Gemini calls and PDF extraction. Recent Rails versions generate a production Dockerfile; confirm for the version actually used.</li>
     <li><strong>Rails encrypted signed session:</strong> creates a per-browser identity for ownership without requiring email registration, replacing the managed anonymous-auth service. Same ownership semantics and the same browser-only recovery limitation already disclosed in F9, with one less external dependency. Rate-limit generation and impose a per-session quota (initially five analyses/day) plus a global spend limit. The per-browser quota deters casual overuse but is not a security control, since a user can reset the browser identity; the global spend limit is the actual enforcement boundary.</li>
@@ -311,7 +320,7 @@ OutreachDraft { mentorId, gapId, text }</code></pre>
       </tbody>
     </table>
   </div>
-  <p>Full raw resumes and full raw text are not persisted in the database. Minimal supporting resume excerpts remain sensitive structured data and follow the same retention policy as profiles. JDs and source text needed for validation exist only during processing; retain only cited requirement excerpts afterward. Outreach drafts may remain local until copied rather than adding another retained record.</p>
+  <p>Full raw resumes and full raw text are not persisted in the database. Minimal supporting resume excerpts remain sensitive structured data and follow the same retention policy as profiles. Because generation is asynchronous, the resume text or PDF and the job description are staged as private owner-scoped Cloud Storage objects for the duration of the request rather than existing only in process memory; they are purged on terminal success or failure, and in all cases within 24 hours. Retain only cited requirement excerpts afterward. Outreach drafts may remain local until copied rather than adding another retained record.</p>
 </section>
 
 <section>
@@ -322,11 +331,11 @@ OutreachDraft { mentorId, gapId, text }</code></pre>
   </div>
   <h3>Application policy for pilot</h3>
   <ul>
-    <li>Delete raw PDF and extracted full text immediately after successful analysis or terminal failure. A cleanup job removes abandoned uploads within 24 hours; no real-data pilot without that job.</li>
+    <li>Delete the staged inputs &mdash; raw PDF, extracted full text, pasted resume text, and the job-description object &mdash; immediately after successful analysis or terminal failure. A cleanup job removes abandoned staged objects within 24 hours; no real-data pilot without that job. Queue tasks must expire no later than the purge horizon, so a task can never outlive the inputs it references.</li>
     <li>Structured profiles, excerpts, analyses, plans, and progress expire 30 days after creation. No automatic extension unless the product later introduces an explicit policy.</li>
     <li>&ldquo;Delete my data&rdquo; removes owned application records and storage objects; make them inaccessible immediately and complete application deletion within 24 hours. Show completion and failure status and retry failures. Document backup retention separately before launch.</li>
     <li>Authorization covers every read, write, delete, and upload. Test cross-user access denial, including direct object access. ActiveStorage&rsquo;s default signed routes are bearer access, not owner authorization; serve resume files through authenticated owner-scoped controllers. Disable ActiveStorage preview and analysis jobs for temporary resume uploads so deletion scope and queue surface stay no wider than intended.</li>
-    <li>Never log raw resume or JD bodies, sensitive excerpts, or generated outreach. Log request IDs, timing, validation failures, and model versions.</li>
+    <li>Never log raw resume or JD bodies, sensitive excerpts, or generated outreach. Log request IDs, timing, validation failures, and model versions. Task payloads carry opaque request and object identifiers only; no resume or job-description content ever enters a queue payload or a queue log.</li>
     <li>Mentor content for a real pilot requires documented permission and a removal path. Product owner recruits at least three opted-in mentors before presenting a populated live directory. Synthetic profiles remain a separate demo dataset.</li>
   </ul>
 </section>

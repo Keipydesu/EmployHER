@@ -26,7 +26,7 @@ The original concept named Firestore. We propose replacing it, and the operator 
 
 The PRD's logical records are already relational. A roadmap references an analysis; progress references a roadmap version and a task; a match references a mentor and a set of gap IDs. PRD section 6 requires foreign-key reference validation as a hard rule. A relational store enforces that with constraints and cascading deletes instead of hand-written application checks, and it makes the access-and-deletion gates in section 9 materially easier to prove.
 
-Rails without ActiveRecord also gives up migrations, validations, and associations, which is most of what the framework is for. There is no mature ActiveRecord adapter for Firestore. Driving Firestore from the `google-cloud-firestore` gem remains possible if the operator prefers to keep the original choice; the cost is that trade, not a technical impossibility.
+Rails without ActiveRecord also gives up migrations, validations, and associations, which is most of what the framework is for. No ActiveRecord adapter for Firestore has been selected or evaluated; Firestore would need explicit persistence integration. Driving it from the `google-cloud-firestore` gem remains possible if the operator prefers to keep the original choice; the cost is that trade, not a technical impossibility.
 
 ## 3. Background execution — pick exactly one
 
@@ -34,7 +34,17 @@ This is the stack's sharpest constraint and the easiest thing to get wrong.
 
 On request-based billing, Cloud Run disables or severely limits CPU outside of a request ([Cloud Run general tips](https://docs.cloud.google.com/run/docs/tips/general)). A generation job started in the web process is therefore **not guaranteed to continue after the response is sent**. Any design that says "run it in ActiveJob and poll" without naming a durable backend is claiming reliability it does not have.
 
-**Plan of record:** a Cloud Tasks queue dispatching to an authenticated, owner-scoped Cloud Run endpoint that invokes the generation service ([Cloud Tasks with Cloud Run](https://docs.cloud.google.com/run/docs/triggering/using-tasks)). Cloud Tasks owns retry. The handler must be idempotent, keyed on the analysis ID, so a redelivered task cannot create a duplicate plan. The client polls for status, which is what PRD F10's processing display reports.
+**Plan of record:** a Cloud Tasks queue dispatching to an authenticated Cloud Run endpoint that invokes the generation service ([Cloud Tasks with Cloud Run](https://docs.cloud.google.com/run/docs/triggering/using-tasks)). The client polls for status, which is what PRD F10's processing display reports.
+
+Four contract details decide whether this is correct or merely plausible.
+
+**Idempotency key.** A persisted `GenerationRequest` carries the ID, owner, operation kind (`analysis`, `roadmap`, or `outreach`), an analysis reference, and the intended roadmap version. Idempotency is keyed on request ID plus operation — *not* on the analysis ID, because one analysis legitimately produces several operations and PRD F9's explicit regeneration is supposed to produce a new roadmap version. Transport redelivery reuses the request ID and must not yield a second plan; an explicit regenerate mints a new request ID and version.
+
+**Authorization.** The task's service identity authenticates the caller. It does not establish the owner. The worker reads the owner from the stored request record, never from the task payload and never from a browser cookie, and rejects callbacks that arrive after the owner's data has been deleted.
+
+**Input handoff.** A queued task cannot read the web request's memory. Stage the resume (uploaded PDF or pasted text, treated identically) and the job description as private owner-scoped Cloud Storage objects before enqueueing, and put only opaque request and object IDs in the task payload. No resume or job-description content in a task payload or a queue log, ever.
+
+**Two retry budgets, kept apart.** Schema or grounding repair is one internal model retry inside a single attempt; it resets nothing. Queue redelivery is a separate, explicitly bounded budget with a per-request deadline and maximum attempt count recorded on the request. The 60-second design budget applies to a single attempt, not to a redelivered task's lifetime. A permanent validation failure records a terminal failed state and returns a *successful* transport acknowledgement, so the queue stops redelivering a deterministic failure; only transient faults are allowed to consume redeliveries.
 
 **Valid alternative:** Solid Queue — the ActiveJob default from Rails 8 ([Active Job basics](https://guides.rubyonrails.org/active_job_basics.html)) — running on a worker service with CPU always allocated. This costs a continuously running instance, which is why it is the second choice against the PRD's spend cap.
 
@@ -49,7 +59,7 @@ Two requirements that are easy to miss and that the PRD's privacy gates depend o
 - ActiveStorage's default signed routes grant **bearer access** to anyone holding the URL. That is not owner authorization. Serve resume files through authenticated, owner-scoped controllers instead.
 - Disable preview and analysis jobs for temporary resume uploads. Otherwise deletion scope and background-queue surface grow wider than the retention policy in PRD section 8 describes.
 
-Raw PDFs and extracted full text are deleted immediately after successful analysis or terminal failure; a cleanup job removes abandoned uploads within 24 hours.
+Staged inputs — raw PDF, extracted full text, pasted resume text, and the job-description object — are deleted immediately after successful analysis or terminal failure; a cleanup job removes abandoned staged objects within 24 hours. Queue tasks expire no later than that purge horizon, so a task can never outlive the inputs it references.
 
 ## 5. Model access from Ruby
 
