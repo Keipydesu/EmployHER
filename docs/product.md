@@ -2,7 +2,7 @@
 
 ## Concept
 
-EmployHER helps HackHers participants turn existing experience into a practical career search. A user uploads a résumé; Gemini extracts skills, experience, and education; the user reviews the result; the app matches curated GitHub internships/jobs and explains both relevant evidence and qualifications not yet evidenced. Each gap leads to a concrete next step, such as building a small SQL project, revising a résumé bullet, or checking a program's eligibility.
+EmployHER helps HackHers participants turn existing experience into a practical search for tech internships and new-grad roles. A user uploads a résumé; Gemini extracts skills, experience, and education; the user reviews the result; the app matches curated GitHub internships/jobs and explains both relevant evidence and qualifications not yet evidenced. Each gap leads to a concrete next step, such as building a small SQL project, revising a résumé bullet, or checking a program's eligibility.
 
 Audience focus does not require gender inference or gender-based access restrictions. Users choose whether to see documented women's employee groups, mentorship programs, inclusive benefits, scholarships, communities, and organizations. Evidence and source dates accompany suggestions; lack of a documented signal is unknown, not a negative employer judgment.
 
@@ -22,48 +22,76 @@ A ranking value is a retrieval aid, not a probability of hiring. Do not show a m
 
 | Priority | Deliverable | Acceptance gate |
 | --- | --- | --- |
-| P0 / 1 | Freeze contracts, synthetic fixtures, allowlisted source | One résumé and a small role set exercise success, missing data, and no matches |
+| P0 / 1 | Freeze contracts, synthetic fixtures, allowlisted source | Five synthetic résumé cases and reviewed catalog fixtures exercise success, missing data, and no matches |
 | P0 / 2 | Auth0 + database + ownership | Login/logout work; two users cannot access each other's records |
 | P0 / 3 | Résumé extraction and review | Skills/education/experience validated; excerpts resolve; user corrections persist |
-| P0 / 4 | GitHub ingestion | Repeat run is idempotent; changed rows update; failed fetch never closes all jobs |
+| P0 / 4 | Static catalog import from two selected sources | Versioned snapshot, reviewed requirement excerpts, repeatable seed without duplicates; missing requirements stay unavailable |
 | P0 / 5 | Semantic retrieval and gap explanation | Active roles only; grounded evidence; useful empty/error states; corrections invalidate old matches |
 | P0 / 6 | Next steps + inclusion resources | Three bounded actions; each factual resource claim has a checked source |
-| P1 / 7 | Backboard coach | Separate user assistants; continued conversation; explicit memory opt-in and deletion |
-| P1 / 8 | Demo and pilot hardening | Rate limits, timeout UX, refresh, deletion races, and provider outages checked |
-| P2 | Scheduled worker, Discord bot, richer resource curation | Only after the core flow is reliable |
+| P0 / 7 | Integrated synthetic demo | M2 gates pass; real résumé intake stays disabled |
+| P1 | Backboard coach | Separate user assistants; continued conversation; explicit memory opt-in and deletion |
+| P1 | Real-data pilot readiness | M3 privacy, deletion, ownership and reliability gates pass before real input |
+| P2 | Automated catalog refresh, scheduled worker, Discord bot, richer resource curation | Separate follow-up PRs after the core flow is reliable |
 
 See "Three-person parallel MVP roadmap" below for the current milestone-gated work split; this is a proposed human work split, not a claim that work has started.
 
 ## Demo script and pitch
 
-Three-minute story: sign in with a demo account, choose a synthetic student résumé, show extracted Python/SQL skills and correct one item, retrieve an internship, point to one supported qualification and one uncertain qualification, show a small project that could provide evidence, then open a sourced mentorship/community resource. If coaching is implemented, ask it to remember a learning preference and demonstrate continuity. Label cached or fixture results and disclose incomplete features.
+Three-minute story: sign in with a demo account, choose a synthetic student résumé, correct one extracted item, and compare two tech roles. For one, show evidence supporting an application and an honest résumé improvement. For the other, clarify a qualification not yet evidenced before suggesting a learning action. Open a sourced support resource relevant to the role or user goal. If coaching is implemented, ask it to remember a learning preference and demonstrate continuity. Label cached or fixture results and disclose incomplete features.
 
 Pitch: “EmployHER connects what you have done to what you can do next. It turns a résumé into explainable opportunities, practical skill-building steps, and documented support resources—so an early-career job seeker has a next action instead of another overwhelming job list.”
 
 ## Decisions and non-goals
 
-One web app, one database, one curated ingestion source, a small corpus, and bounded model calls. Normal login is required for saved personal state. Backboard remains in the chosen architecture but its outage must not block matching. Demo fixtures may be used while real-data gates remain closed.
+One web app, one database, two allowlisted job sources with a reviewed static snapshot for the MVP, a small corpus, and bounded model calls. Normal login is required for saved personal state. Backboard remains in the chosen architecture but its outage must not block matching. Demo fixtures may be used while real-data gates remain closed.
 
 No application scaffold in this documentation task. No automated applications, outreach, employer quality scores, gender inference, hiring guarantees, unrestricted scraping, agent swarm, agent-to-agent auth, payments, blockchain, OCR, or mentor marketplace. A full four-week curriculum is deferred in favor of three concrete next steps.
 
 ## Three-person parallel MVP roadmap
 
-Splits the P0/P1 backlog above into three vertical workstreams that can run concurrently after a short shared foundation session. Supersedes the "Build owners" line above with a milestone-gated plan.
+The MVP is a working synthetic-data web demo: profile review → relevant tech roles → evidence and up to three next actions → contextual support resources. Backboard coaching remains P1; real résumé intake is a separate pilot gate. Milestones express dependencies, not time estimates. A/B/C are proposed owners to map to the three people at kickoff.
 
-**M0 — Foundation (all three together, one session).** Freeze the Zod/API contracts in `docs/api.md`. Draft per-domain Drizzle schema files so parallel edits don't collide: `profiles.ts` (Track A), `catalog.ts`/`matches.ts` (Track B), `operations.ts`/user/session tables (Track C). Produce committed fixtures: 5 synthetic résumés; a one-time parse of the two SimplifyJobs source repos into ≥15 curated roles that include real, reviewed requirement excerpts (not just title/legend-icon data — see `docs/architecture.md`'s ingestion contract for why bare rows can't support a grounded gap claim); and the inclusion-resource seed set (each entry sourced, dated, per `docs/privacy.md`). Gate: all three can build independently against frozen contracts and fixtures without further sync.
+### M0 — Shared foundation and contracts
 
-**M1 — Parallel vertical slices.**
-- **Track A — Profile intake.** Résumé upload, Gemini structured extraction, review/correction UI, profile confirmation and versioning, embedding generation. Stretch (after this track's core is integrated): Backboard coaching (P1) — not required for the MVP demo.
-- **Track B — Catalog and matching.** Loads the M0 static snapshot into `jobs`/`job_requirements`/`inclusion_resources`; semantic retrieval via pgvector; grounded gap explanation restricted to roles with a reviewed requirement excerpt (roles without one show as discovery candidates with requirements marked unavailable, not an inferred gap); next-steps generation; match persistence and invalidation on profile correction.
-- **Track C — Platform.** Next.js/Tailwind/shadcn app shell; Auth0 integration and session/ownership middleware; Tiger Data provisioning and migration ordering across A's and B's schema files; `operations`/idempotency table and CSRF protection; Vercel deployment config.
+Begin concurrently: **A** owns profile/evidence DTOs and five synthetic résumé cases; **B** owns job/requirement/match/resource DTOs and the catalog manifest; **C** creates the minimal runnable Next.js shell, lockfile, CI checks, database connection and adapter interfaces. All three review the API/Zod contracts together and share curation work; B signs off the catalog.
 
-Each track's acceptance gate is its corresponding row in the backlog table above (e.g. Track B: "active roles only, grounded evidence, useful empty/error states").
+Use static snapshots from [Summer2027-Internships](https://github.com/SimplifyJobs/Summer2027-Internships) and [New-Grad-Positions](https://github.com/SimplifyJobs/New-Grad-Positions). Target at least 15 reviewed tech roles spanning internship/new-grad tracks and three sourced support resources. Store repository/ref/commit, source and application URLs, review date, per-role cohort, and explicit requirements. Titles/icons alone cannot ground skill-gap explanations. Resolve reuse terms before publishing source-derived fixtures; synthetic fixtures can unblock development while that remains open.
 
-**M2 — Integration and demo.** Wire the three tracks together and remove mocks/fixture-only paths. Gate: the demo script below runs end-to-end against real (non-mock) endpoints — one apply-ready role, one role with a genuine gap, and one inclusion resource shown contextually on a matched role card (not a disconnected generic list).
+Freeze profile/job versions, requirement IDs, draft/confirmed states, preference filters, error shapes and invalidation events from [api.md](api.md). Agree one embedding model/configuration and dimension shared by A and B. Provide success, no-match, missing-requirements, stale-version and provider-failure adapter fixtures. Proposed schema modules: A `profiles.ts`; B `catalog.ts`/`matches.ts`; C user/shared/`operations.ts`. C owns migration ordering, not every domain implementation.
 
-**M3 — Parallel hardening.** Split again across three people using `docs/development.md`'s verification-gate list (two-user ownership/CSRF, idempotency and timeout recovery, deletion races, provider outages, no sensitive logs, etc.) as the acceptance bar. Backboard coaching, if not already done in Track A's stretch slot, lands here as an explicit stretch item — never a blocker for the core demo.
+**Exit:** the scaffold runs, contract fixtures validate, each owner can exercise their slice using adapters, and a reviewed catalog batch is ready. Contract changes still require both producer and consumer review; fixtures prevent blocking, not coordination.
 
-The one-time source snapshot in M0 is a static fixture, not a live/scheduled ingestion pipeline; the fuller ingestion contract in `docs/architecture.md` (pagination, ETag, retry, dedup) is explicitly deferred past the MVP.
+### M1 — Three parallel vertical slices
+
+| Owner | Deliverables and boundaries | Acceptance gate |
+| --- | --- | --- |
+| A — Profile | PDF/text intake, Gemini extraction, evidence validation, review/correction UI, confirmed versioned profiles and profile embeddings; owns résumé routes | Synthetic cases cover supported facts, absent evidence, malformed input and corrections; exact excerpts resolve; only confirmed current profiles feed matching |
+| B — Opportunities | Static seed/import, role embeddings, pgvector retrieval, requirement comparison, grounded explanations, results/detail UI, next steps, contextual resources; owns job/resource/match routes | Repeat seeds create no duplicates; filters and source status respected; no invented gaps for missing requirements; unknown eligibility visible; profile edits invalidate results |
+| C — Platform | Auth0, app navigation/layout, shared database/migration integration, ownership helpers, CSRF, operation/idempotency primitives, CI and Vercel preview; owns shared config | Two synthetic users cannot access each other's records; retries do not duplicate completed operations; provider keys stay server-side; preview/build/checks pass |
+
+A and B integrate C's shared primitives into their own routes and test ownership locally; C does not become the author of every route. B can build against A's confirmed-profile fixture while A builds against B's sample results. C provides development adapters early; authentication and ownership must be real before M2 acceptance. A may start optional coaching only after their core slice integrates.
+
+### M2 — Integration and synthetic demo
+
+Integrate continuously as small PRs land. A verifies intake through confirmation; B verifies profile-to-role evidence and results; C runs deployment and cross-user browser checks. Replace mocked *service responses* with implemented endpoints/providers, while retaining clearly labeled synthetic résumé fixtures and the static catalog. Do not enable real résumé intake.
+
+**Exit:** deployed demo shows an application-ready example, a confirmed learning-gap example and a contextual sourced resource. Also verify correction invalidation, no matches, missing requirements, unknown eligibility, timeout/retry states, quotas, escaped output and no sensitive logs. No hiring probabilities or implication that repository freshness proves a vacancy is open. The model may suggest an application action without making further learning a prerequisite. Each owner cross-reviews another track (A reviews B, B reviews C, C reviews A).
+
+### M3 — Parallel pilot hardening and optional coaching
+
+- **A:** extraction quality, upload limits, provider failure recovery, malicious résumé inputs; optional Backboard adapter/UI with per-user isolation, explicit memory opt-in and deletion checks.
+- **B:** ranking/evidence regression fixtures, filter behavior, wrong-dimension vectors, version invalidation, catalog provenance and resource expiry. Check that learning advice follows clarification of missing evidence.
+- **C:** retention/expiry scheduler, deletion reconciliation and late-write prevention, authorization/CSRF, quotas and operational observability. A/B implement domain cleanup hooks against C's lifecycle contract.
+
+**Exit for real-data pilot:** [privacy.md](privacy.md) consent, provider handling, retention and deletion are verified, plus the applicable [development checks](development.md#verification-gates). Coaching checks are required only if enabled; automated-refresh checks belong to its later milestone. Keep unavailable features disabled rather than pretending their gates passed.
+
+After integration, B coordinates a proposed five-user evaluation while A/C observe: compare with the same unaided listings, measure role-choice reasoning, correct eligibility/evidence understanding and completion of a useful next action. Record results and revise the product; confidence ratings alone do not establish value.
+
+### Delivery and follow-up
+
+Use feature branches and PRs; never commit directly to `main` or `master`. Merge the foundation PR first, then separate A/profile, B/opportunities and C/platform PRs, followed by integration and domain hardening PRs. Each PR names its contract dependencies, verification and remaining mocks. C integrates shared configuration and migrations; no simultaneous edits to shared schema/config files without coordination. Independent clones/worktrees allow concurrent coding; a shared Talking Stick workspace still has one writer at a time.
+
+After core acceptance, P2 adds automated snapshot refresh with pagination/retry/deduplication and partial-failure preservation, then scheduled workers or Discord as separately scoped features. Static-source curation is part of this MVP; a live ingestion pipeline is not.
 
 ## Future Discord integration
 
