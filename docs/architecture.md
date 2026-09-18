@@ -16,6 +16,8 @@ Auth0 authenticates people; each backend route still checks ownership. Resolve a
 
 Tiger Data is the source of truth. Gemini suggests structured facts, semantic representations, and explanations; deterministic validators and user confirmation govern what is stored. Backboard owns conversational continuity, not authoritative skills, eligibility, permissions, or match state. Use a separate assistant per user because assistant memory may span threads. Resolve provider IDs on the server.
 
+A separate, proposed shared resource-research cache (see [product.md](product.md)) may use Backboard to hold reusable, non-personal research (candidate certificates/courses/communities per subdomain) with source metadata, keyed by normalized subdomain/query/locale — never keyed by user or containing résumé content. Backboard still is not authoritative there either: the application database records the reviewed resource's ID and version once a research candidate is checked, and only reviewed records are shown to users.
+
 ## End-to-end flow
 
 1. Verify the session, consent, upload size/type, and quotas. Proposed MVP upload cap: 2 MB, five pages, or 20,000 text characters. Treat these as application limits to validate against hosting limits.
