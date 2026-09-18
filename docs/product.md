@@ -100,6 +100,8 @@ Integrate continuously as small PRs land. A verifies intake through confirmation
 
 After integration, B coordinates a proposed five-user evaluation while A/C observe: compare with the same unaided listings, measure role-choice reasoning, correct eligibility/evidence understanding and completion of a useful next action. Record results and revise the product; confidence ratings alone do not establish value.
 
+See the [Developer B execution plan](plans/developer-b-opportunities.md) for ordered Opportunities work packages, proposed contract additions, dependencies and verification.
+
 ### Delivery and follow-up
 
 Use feature branches and PRs; never commit directly to `main` or `master`. Merge the foundation PR first, then separate A/profile, B/opportunities and C/platform PRs, followed by integration and domain hardening PRs. Each PR names its contract dependencies, verification and remaining mocks. C integrates shared configuration and migrations; no simultaneous edits to shared schema/config files without coordination. Independent clones/worktrees allow concurrent coding; a shared Talking Stick workspace still has one writer at a time.

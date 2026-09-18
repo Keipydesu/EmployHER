@@ -16,6 +16,7 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci --ignore-scripts
+      - run: npm test
       - run: npm run check
       - run: npm run build
       - name: Smoke test the production app
@@ -26,6 +27,7 @@ jobs:
           for attempt in $(seq 1 30); do
             if curl --fail --silent http://127.0.0.1:3000/ > /dev/null; then
               npm run smoke
+              npm run smoke:opportunities
               exit 0
             fi
             sleep 1

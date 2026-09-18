@@ -18,3 +18,7 @@ Checked registry metadata and Next.js peer requirements. The [Next.js security r
 ESLint 9 is deprecated upstream but is retained for compatibility with the React, import, and accessibility plugins in the pinned Next.js lint configuration; those plugins do not declare ESLint 10 support. Revisit the lint stack together when upgrading. This limitation affects development tooling, not the app runtime.
 
 Docker was removed from the current MVP workflow. Node 24 is selected through `.nvmrc`; CI uses pinned checkout and setup-node action commits.
+
+## Opportunities validator — 2026-09-18
+
+Added direct dependency `zod@4.1.5`, an older exact version, with lockfile integrity verification through npm. Registry metadata inspected; no install lifecycle scripts are defined (build/test/prepublish scripts are not invoked by `npm ci --ignore-scripts`). Installation used `--ignore-scripts`; npm audit reported zero vulnerabilities at this check. No new test framework: Node 24 built-in `node:test` and type stripping run TypeScript domain tests. Audit cleanliness and age do not prove absence of malicious code. No newer-release exception requested.

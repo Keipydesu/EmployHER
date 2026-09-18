@@ -43,3 +43,7 @@ No arbitrary URLs from model output. Resource IDs must resolve to reviewed catal
 Use 400 for invalid input, 401 unauthenticated, 403 insufficient service scope, 404 absent/foreign private record, 409 stale version/idempotency conflict, 413 oversized upload, 415 unsupported file, 422 unreadable/no-evidence input, 429 quota, and 502/504 provider failure/timeout. Never return provider credentials or raw upstream errors. Empty matches return 200 with an empty array on reads, or 201 with an empty array after a completed creation.
 
 Expensive POST requests require an `Idempotency-Key`. Bind it to authenticated user, operation, and input digest. A replay returns the stored result; in-flight requests return 409 with safe retry guidance. Provider timeouts with unknown outcome require reconciliation before repeating side effects, especially coaching/thread creation. Do not promise exactly-once external calls.
+
+## Implemented synthetic Opportunities API
+
+The local fixture workflow is isolated at `/api/demo/opportunities`; see [implementation and adapter contract](opportunities-implementation.md). Its anonymous demo cookie is not an Auth0 session, and the production routes above remain proposals. Exact command schemas live in `src/opportunities/contracts.ts`. Saved path/actions and explicit profile/checklist-versioned learning-gap confirmations live in server-side demo state; the A/C-backed production schema remains an integration gate.

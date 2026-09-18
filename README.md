@@ -2,7 +2,7 @@
 
 A HackHers-focused career navigator: upload a résumé, review extracted skills, discover relevant internships and jobs, understand qualification gaps, and choose actionable next steps.
 
-**Status: local Next.js foundation.** A minimal Next.js page is implemented. Authentication, résumé intake, matching, and coaching remain planned.
+**Status: local synthetic Opportunities demo.** Explore paths, evidence, ranked fixture roles, saved next steps and reviewed resources at `/opportunities`. Authentication, real résumé intake, database/provider adapters and coaching remain integration work. See [implementation status](docs/opportunities-implementation.md).
 
 ## Run locally
 
@@ -20,6 +20,7 @@ See [development](docs/development.md) for Node selection, ports, checks, and re
 ## Product and implementation plan
 
 - [Product, scope, backlog, and demo](docs/product.md)
+- [Developer B: Opportunities implementation plan](docs/plans/developer-b-opportunities.md)
 - [Student journey and career-path user story](docs/user-story.md)
 - [Architecture and data flow](docs/architecture.md)
 - [Relational schema and semantic matching](docs/data-model.md)
