@@ -35,3 +35,7 @@ Start with exact cosine distance search on the small catalog, filtered to active
 Use semantic similarity to retrieve up to 20 candidates, then deterministically compare evidenced/user-confirmed skills and source requirements. Return at most 10 roles with a stable ID tie-break. Unknown eligibility is a visible check, not an invented rejection. Inclusion preferences surface sourced resources separately; absence of evidence does not penalize an employer. Explanations cite requirement IDs and résumé excerpts or user-reported evidence. A missing skill is “not evidenced,” with user confirmation before treating it as a learning gap.
 
 Official references: [Tiger Data extensions](https://docs.tigerdata.com/use-timescale/latest/extensions), [Drizzle vector search](https://orm.drizzle.team/docs/guides/vector-similarity-search), and [Gemini embeddings](https://ai.google.dev/gemini-api/docs/embeddings). Dimension, indexing, and ranking choices above are project proposals, not provider guarantees.
+
+## Opportunities implementation boundary
+
+The [B implementation handoff](opportunities-implementation.md) documents current typed catalog/checklist/action/confirmation records and the `OpportunitiesPorts` persistence boundary. The running synthetic demo uses isolated local JSON sessions, not these proposed relational tables. A/C review and Drizzle migration integration are still required before production-backed matching; the fixture's 11-dimensional basis must not be used with the proposed Gemini embedding space.

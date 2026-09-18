@@ -47,7 +47,7 @@ Pitch: “EmployHER connects what you have done to what you can do next. It turn
 
 One web app, one database, two allowlisted job sources with a reviewed static snapshot for the MVP, a small corpus, and bounded model calls. Normal login is required for saved personal state. Backboard remains in the chosen architecture but its outage must not block matching. Demo fixtures may be used while real-data gates remain closed.
 
-The local Docker foundation includes a minimal app scaffold; the product roadmap below remains to be implemented. No automated applications, outreach, employer quality scores, gender inference, hiring guarantees, unrestricted scraping, agent swarm, agent-to-agent auth, payments, blockchain, OCR, or mentor marketplace. A full four-week curriculum is deferred in favor of three concrete next steps.
+The local Node foundation includes a minimal app scaffold; the product roadmap below remains to be implemented. No automated applications, outreach, employer quality scores, gender inference, hiring guarantees, unrestricted scraping, agent swarm, agent-to-agent auth, payments, blockchain, OCR, or mentor marketplace. A full four-week curriculum is deferred in favor of three concrete next steps.
 
 ## Three-person parallel MVP roadmap
 
@@ -99,6 +99,8 @@ Integrate continuously as small PRs land. A verifies intake through confirmation
 **Exit for real-data pilot:** [privacy.md](privacy.md) consent, provider handling, retention and deletion are verified, plus the applicable [development checks](development.md#verification-gates). Coaching checks are required only if enabled; automated-refresh checks belong to its later milestone. Keep unavailable features disabled rather than pretending their gates passed.
 
 After integration, B coordinates a proposed five-user evaluation while A/C observe: compare with the same unaided listings, measure role-choice reasoning, correct eligibility/evidence understanding and completion of a useful next action. Record results and revise the product; confidence ratings alone do not establish value.
+
+See the [Developer B execution plan](plans/developer-b-opportunities.md) for ordered Opportunities work packages, proposed contract additions, dependencies and verification.
 
 ### Delivery and follow-up
 

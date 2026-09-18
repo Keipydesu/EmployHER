@@ -2,25 +2,25 @@
 
 A HackHers-focused career navigator: upload a résumé, review extracted skills, discover relevant internships and jobs, understand qualification gaps, and choose actionable next steps.
 
-**Status: local Docker foundation.** A minimal Next.js page and PostgreSQL/pgvector environment are implemented. Authentication, résumé intake, matching, and coaching remain planned.
+**Status: local synthetic Opportunities demo.** Explore paths, evidence, ranked fixture roles, saved next steps and reviewed resources at `/opportunities`. Authentication, real résumé intake, database/provider adapters and coaching remain integration work. See [implementation status](docs/opportunities-implementation.md).
 
 ## Run locally
 
-Requires Docker with Compose v2 or newer.
+Use Node 24 (see `.nvmrc`). No Docker, database, or credentials are needed for this initial page.
 
 ```sh
-cp .env.example .env
-# Set POSTGRES_PASSWORD to a private local value in .env.
-docker compose up --build --wait
+npm ci --ignore-scripts
+npm run dev
 ```
 
-Open [localhost:3000](http://localhost:3000). Source changes in `app/` reload automatically. Run `sh scripts/smoke.sh` to check the page and vector queries. Stop with `docker compose down`; database data is preserved.
+Open [localhost:3000](http://localhost:3000). Source changes reload automatically. In another terminal, run `npm run smoke` to check the homepage and its static assets. Stop the server with Ctrl+C.
 
-See [development](docs/development.md) for ports, checks, rebuilding, and database access.
+See [development](docs/development.md) for Node selection, ports, checks, and remaining integrations.
 
 ## Product and implementation plan
 
 - [Product, scope, backlog, and demo](docs/product.md)
+- [Developer B: Opportunities implementation plan](docs/plans/developer-b-opportunities.md)
 - [Student journey and career-path user story](docs/user-story.md)
 - [Architecture and data flow](docs/architecture.md)
 - [Relational schema and semantic matching](docs/data-model.md)

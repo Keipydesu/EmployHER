@@ -38,6 +38,9 @@ export default function Home() {
           Discover where your skills can take you—and a practical next step
           toward a career in tech.
         </p>
+        <Link className="demo-link" href="/opportunities">
+          Explore the synthetic demo →
+        </Link>
       </section>
       <section className="steps" aria-label="The planned journey">
         {steps.map(([number, title, description]) => (
@@ -49,8 +52,8 @@ export default function Home() {
         ))}
       </section>
       <footer>
-        This is an early preview. Profile review and opportunity matching are
-        coming next.
+        Explore the working synthetic Opportunities demo. Real profile intake
+        and provider integrations remain in development.
       </footer>
     </main>
   );

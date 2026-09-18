@@ -10,4 +10,4 @@ Run the app on localhost for development and the MVP demo. Defer hosted deployme
 
 ## Consequences
 
-Platform owner C owns local setup, authentication configuration, shared infrastructure, CI, and local build/browser verification. MVP acceptance requires a working localhost demo. External service integrations remain planned; localhost does not mean offline operation. A minimal Docker app/database scaffold now supports this direction; see [development](../development.md) for verification and remaining work.
+Platform owner C owns local setup, authentication configuration, shared infrastructure, CI, and local build/browser verification. MVP acceptance requires a working localhost demo. External service integrations remain planned; localhost does not mean offline operation. A minimal Next.js scaffold runs directly on Node 24. Docker is deferred as unnecessary for the current MVP; see [development](../development.md) for verification and remaining work.

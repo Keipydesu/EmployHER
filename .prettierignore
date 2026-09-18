@@ -6,3 +6,5 @@ next-env.d.ts
 # Existing planning documents keep their established formatting.
 *.md
 docs
+
+.local/
