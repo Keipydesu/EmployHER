@@ -1,6 +1,6 @@
 # Proposed relational schema
 
-Design only; these are not executable migrations. Use UUID primary keys, `timestamptz` timestamps, foreign keys, constrained enums/checks, and indexes on owner and lookup fields. Public catalog data and private user data have separate access paths.
+The table below is the original conceptual design. Person A now implements profile heads, immutable versions, lifecycle tombstones, and invalidation events in `src/profile/schema.ts` and `schema.sql`; see [the integration handoff](implementation/person-a.md). C must integrate and verify those domain migrations before deployment. Other tables remain design proposals. Use UUID primary keys, `timestamptz` timestamps, foreign keys, constrained enums/checks, and indexes on owner and lookup fields. Public catalog data and private user data have separate access paths.
 
 | Table | Important columns / constraints |
 | --- | --- |

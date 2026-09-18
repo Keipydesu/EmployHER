@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "next dev --hostname 127.0.0.1",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start --hostname 127.0.0.1",
     "typecheck": "next typegen && tsc --noEmit",
     "lint": "eslint .",
@@ -16,14 +16,19 @@
     "check": "npm run format:check && npm run lint && npm run typecheck",
     "smoke": "node scripts/smoke.mjs",
     "smoke:opportunities": "node scripts/smoke-opportunities.mjs",
-    "test": "node --experimental-strip-types --test tests/*.test.ts"
+    "test": "node --import tsx --test tests/*.test.ts",
+    "test:browser": "playwright test",
+    "smoke:profile": "node scripts/smoke-profile.mjs"
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "4.29.0",
     "next": "16.3.4",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "zod": "4.1.5"
+    "zod": "4.1.5",
+    "drizzle-orm": "0.45.2",
+    "pdfjs-dist": "6.3.289",
+    "pg": "8.23.0"
   },
   "devDependencies": {
     "@types/node": "24.13.3",
@@ -32,6 +37,9 @@
     "eslint": "9.39.5",
     "eslint-config-next": "16.3.4",
     "prettier": "3.9.6",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "@playwright/test": "1.62.1",
+    "@types/pg": "8.23.1",
+    "tsx": "4.20.6"
   }
 }

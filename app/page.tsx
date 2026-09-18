@@ -61,6 +61,9 @@ export default async function Home() {
           Discover where your skills can take you—and a practical next step
           toward a career in tech.
         </p>
+        <Link className="demo-link" href="/profile">
+          Review a sample résumé →
+        </Link>
         <Link className="demo-link" href="/opportunities">
           Explore the synthetic demo →
         </Link>

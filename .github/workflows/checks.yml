@@ -28,9 +28,15 @@ jobs:
             if curl --fail --silent http://127.0.0.1:3000/ > /dev/null; then
               npm run smoke
               npm run smoke:opportunities
+              npm run smoke:profile
               exit 0
             fi
             sleep 1
           done
           cat /tmp/employher-next.log
           exit 1
+
+      - name: Install browser for profile integration checks
+        run: npx playwright install --with-deps chromium
+      - name: Check profile browser flow
+        run: npm run test:browser

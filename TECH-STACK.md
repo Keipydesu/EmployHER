@@ -19,3 +19,5 @@ Use server-only provider adapters. Pin mutually compatible supported runtime, fr
 The localhost target is recorded in [decision 003](docs/decisions/003-localhost-demo.md). Auth0, database, and AI provider integrations remain planned; localhost does not imply offline operation.
 
 See [architecture](docs/architecture.md) and [development plan](docs/development.md). Earlier stack content remains available in Git history.
+
+The local profile sample workspace is implemented alongside Opportunities. See [profile handoff](docs/implementation/person-a.md); authenticated provider/database integration remains pending.

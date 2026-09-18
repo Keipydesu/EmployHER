@@ -34,3 +34,7 @@ See [development](docs/development.md) for Node selection, ports, checks, and re
 Chosen stack: Next.js + TypeScript, Tailwind/shadcn, Auth0, Tiger Data PostgreSQL with pgvector, Gemini, Backboard.io, GitHub API/Octokit, Drizzle, and Zod. The app will run on localhost for now; hosted deployment is deferred.
 
 The latest user direction supersedes the earlier Rails/mentor-first planning baseline. Earlier PRD and formatted planning artifacts are available in Git history; [decision 001](docs/decisions/001-rails-mvp-baseline.md) remains historical context. Follow this README and current linked documents for implementation. No real résumé data or credentials belong in this repository.
+
+## Profile sample workspace
+
+Run `PROFILE_DEMO_MODE=true npm run dev` and open `/profile` to review supplied synthetic résumés. The root app also serves `/opportunities`. See [profile implementation and integration boundaries](docs/implementation/person-a.md). `npm test` runs both tracks; `npm run test:browser` runs the profile browser checks after `npx playwright install chromium`. Production profile processing stays disabled until the authenticated runtime is installed.

@@ -54,3 +54,5 @@ Prefer stable npm versions published at least 7-14 days earlier. A newer release
 ## Shared-workspace note
 
 This repository is sometimes edited by multiple coordinating agent sessions (Talking Stick). If you are in such a session, acquire a live writer turn before editing files, verify your change, and release with a concrete handoff — see `AGENTS.md`'s "Security & Agent Coordination" section.
+
+Profile routes share root `app/` with Opportunities. See `docs/implementation/person-a.md` for synthetic boundaries and A/C integration requirements. `npm test` runs both tracks through `tsx`.

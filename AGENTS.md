@@ -2,7 +2,7 @@
 
 ## Project Structure & Current Status
 
-EmployHER is an early-career tech navigator with a minimal Next.js/TypeScript scaffold running directly on Node 24. Product features remain proposed. `app/` owns the UI, `scripts/smoke.mjs` checks the local HTTP app. Start with `README.md` and `TECH-STACK.md`. `docs/product.md` owns scope; `docs/architecture.md`, `docs/data-model.md`, and `docs/api.md` define proposed contracts. Read `docs/development.md` for implementation gates and `docs/privacy.md` for data handling. Number architecture decisions under `docs/decisions/`; decision `002` supersedes the historical Rails baseline.
+EmployHER is an early-career tech navigator with synthetic profile and Opportunities demos running directly on Node 24. Production integrations remain proposed. `app/` owns the UI, `scripts/smoke.mjs` checks the local HTTP app. Start with `README.md` and `TECH-STACK.md`. `docs/product.md` owns scope; `docs/architecture.md`, `docs/data-model.md`, and `docs/api.md` define proposed contracts. Read `docs/development.md` for implementation gates and `docs/privacy.md` for data handling. Number architecture decisions under `docs/decisions/`; decision `002` supersedes the historical Rails baseline.
 
 The planned stack is Next.js/TypeScript, Tailwind/shadcn, Auth0, Tiger Data PostgreSQL/pgvector, Drizzle, Zod, Gemini, and Backboard. Run the app on localhost for now; hosted deployment is deferred under decision `003`.
 
@@ -12,7 +12,7 @@ The planned stack is Next.js/TypeScript, Tailwind/shadcn, Auth0, Tiger Data Post
 - `git diff --check`: check tracked changes for whitespace errors.
 - `git diff --stat`: review change scope before submitting.
 
-Use Node 24, `npm ci --ignore-scripts`, and `npm run dev` for local startup. `npm run smoke` checks a running server. `npm run check` runs formatting, lint, and TypeScript checks; `npm run build` builds the app. See `docs/development.md` for local commands. No unit-test framework is established.
+Use Node 24, `npm ci --ignore-scripts`, and `npm run dev` for local startup. `npm run smoke` checks a running server. `npm run check` runs formatting, lint, and TypeScript checks; `npm run build` builds the app. See `docs/development.md` for local commands. `npm test` runs both tracks using Node’s test runner through `tsx`; `npm run test:browser` runs Playwright profile checks.
 
 ## Style & Naming
 
@@ -22,7 +22,7 @@ For future TypeScript, use two-space indentation, camelCase variables/functions,
 
 ## Testing Guidelines
 
-The smoke runner is `npm run smoke` (Node built-ins); no unit-test framework or coverage threshold is established. For documentation, verify relative links, contract consistency, and whitespace. For implementation, choose a framework and document its runner and naming convention before adding tests. Prioritize evidence grounding, profile corrections, two-user isolation, ingestion failures, provider timeouts, and deletion races. Use synthetic fixtures; report checks actually run and remaining limitations.
+Unit tests use Node’s test runner through `tsx`; browser tests use Playwright. The smoke runner is `npm run smoke` (Node built-ins). No coverage threshold is established. For documentation, verify relative links, contract consistency, and whitespace. For implementation, choose a framework and document its runner and naming convention before adding tests. Prioritize evidence grounding, profile corrections, two-user isolation, ingestion failures, provider timeouts, and deletion races. Use synthetic fixtures; report checks actually run and remaining limitations.
 
 ## Commits & Pull Requests
 

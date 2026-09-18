@@ -86,3 +86,7 @@ Selected job sources: `SimplifyJobs/Summer2027-Internships` and `SimplifyJobs/Ne
 ## Verification scope
 
 The former Docker implementation passed local checks and GitHub CI at commit `a9c0c08`. Those results apply to that historical commit. The direct-host workflow passed a clean native install under Node 24.20.0 on macOS/ARM64, formatting/lint/type checks, a production build, and smoke tests against both development (15 static assets) and production (9 static assets). The local Homebrew `node@24` path pointed to Node 25, so verification used a temporary official Node 24 archive with its SHA-256 checked against the release checksum. Select a real Node 24 installation before running the commands. The replacement npm-based CI workflow has not been pushed or run remotely. Product/auth/database/provider behavior remains unimplemented and untested. Visual browser verification remains outstanding because Chrome control was not approved.
+
+## Profile integration checks
+
+`PROFILE_DEMO_MODE=true npm run dev` enables the synthetic `/profile` workspace alongside `/opportunities`. `npm test` uses `tsx` to run both tracks. `npm run test:browser` exercises profile extraction, corrections, confirmation, PDF intake and mobile layout after installing Playwright Chromium. See [profile implementation](implementation/person-a.md) for provider boundaries. Live demo embeddings accept only exact approved fixture summaries; edited summaries use simulated vectors.
