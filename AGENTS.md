@@ -2,9 +2,9 @@
 
 ## Project Structure & Current Status
 
-EmployHER is a documentation-only career navigator for early-career tech roles. No application source, tests, assets, or package manifest exists yet. Start with `README.md` and `TECH-STACK.md`. `docs/product.md` owns scope; `docs/architecture.md`, `docs/data-model.md`, and `docs/api.md` define proposed contracts. Read `docs/development.md` for implementation gates and `docs/privacy.md` for data handling. Number architecture decisions under `docs/decisions/`; decision `002` supersedes the historical Rails baseline.
+EmployHER is an early-career tech navigator with a minimal Next.js/TypeScript scaffold and local Docker Compose PostgreSQL/pgvector setup. Product features remain proposed. `app/` owns the UI, `docker/` owns database bootstrap, and `scripts/smoke.sh` checks the local stack. Start with `README.md` and `TECH-STACK.md`. `docs/product.md` owns scope; `docs/architecture.md`, `docs/data-model.md`, and `docs/api.md` define proposed contracts. Read `docs/development.md` for implementation gates and `docs/privacy.md` for data handling. Number architecture decisions under `docs/decisions/`; decision `002` supersedes the historical Rails baseline.
 
-The planned stack is Next.js/TypeScript, Tailwind/shadcn, Auth0, Tiger Data PostgreSQL/pgvector, Drizzle, Zod, Gemini, Backboard, and Vercel.
+The planned stack is Next.js/TypeScript, Tailwind/shadcn, Auth0, Tiger Data PostgreSQL/pgvector, Drizzle, Zod, Gemini, and Backboard. Run the app on localhost for now; hosted deployment is deferred under decision `003`.
 
 ## Build, Test, and Development Commands
 
@@ -12,17 +12,17 @@ The planned stack is Next.js/TypeScript, Tailwind/shadcn, Auth0, Tiger Data Post
 - `git diff --check`: check tracked changes for whitespace errors.
 - `git diff --stat`: review change scope before submitting.
 
-There are no runnable build, development, lint, or test commands yet. Do not claim `npm test` or `npm run build` works. When scaffolding is authorized, add scripts and a lockfile, then document verified commands in `docs/development.md`.
+Use `docker compose up --build --wait` for local startup and `sh scripts/smoke.sh` for container smoke checks. `npm run check` runs formatting, lint, and TypeScript checks; `npm run build` builds the app. See `docs/development.md` for container commands. No unit-test framework is established.
 
 ## Style & Naming
 
 Keep Markdown concise, use relative links, and distinguish proposals from implemented behavior. Use descriptive lowercase hyphenated documentation names and numbered decisions such as `003-topic.md`.
 
-For future TypeScript, use two-space indentation, camelCase variables/functions, and PascalCase components/types. Establish formatter/linter configuration with the scaffold; none is configured today. Keep provider adapters server-side and validate external payloads with Zod.
+For future TypeScript, use two-space indentation, camelCase variables/functions, and PascalCase components/types. Use the checked-in Prettier and ESLint configuration. Keep provider adapters server-side and validate external payloads with Zod.
 
 ## Testing Guidelines
 
-No test framework or coverage threshold is established. For documentation, verify relative links, contract consistency, and whitespace. For implementation, choose a framework and document its runner and naming convention before adding tests. Prioritize evidence grounding, profile corrections, two-user isolation, ingestion failures, provider timeouts, and deletion races. Use synthetic fixtures; report checks actually run and remaining limitations.
+The shell smoke runner is `sh scripts/smoke.sh`; no unit-test framework or coverage threshold is established. For documentation, verify relative links, contract consistency, and whitespace. For implementation, choose a framework and document its runner and naming convention before adding tests. Prioritize evidence grounding, profile corrections, two-user isolation, ingestion failures, provider timeouts, and deletion races. Use synthetic fixtures; report checks actually run and remaining limitations.
 
 ## Commits & Pull Requests
 

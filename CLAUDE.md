@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Status
 
-Documentation-only. There is no application source, package manifest, lockfile, migrations, or test suite yet. Everything under `docs/` and in `TECH-STACK.md` is a proposal for a future implementation, not a description of running code. Do not claim a build, lint, or test command works — none exist. See `AGENTS.md` for the current (empty) command set and contributor conventions.
+A minimal Next.js/TypeScript app and Docker Compose PostgreSQL/pgvector environment are implemented. Product routes, provider integrations, and domain migrations remain planned. See `AGENTS.md` and `docs/development.md` for runnable commands and verification limits.
 
 ## Where to start reading
 
@@ -15,7 +15,7 @@ Documentation-only. There is no application source, package manifest, lockfile, 
 - `docs/data-model.md` — proposed relational schema (Postgres/Drizzle), ownership patterns.
 - `docs/api.md` — proposed route contracts, shared TypeScript shapes, error codes, idempotency rules.
 - `docs/privacy.md` — retention, deletion, and inclusion-content rules (no gender inference, sourced claims only).
-- `docs/development.md` — local dev plan, env var inventory, deployment plan, verification gates.
+- `docs/development.md` — local Docker setup, env var inventory, checks, verification gates.
 - `TECH-STACK.md` — the chosen stack table.
 
 ## Product architecture (spans multiple docs)
@@ -25,7 +25,7 @@ EmployHER is a résumé-to-opportunity navigator for early-career tech roles: up
 Planned flow, synthesized across `architecture.md`, `data-model.md`, and `api.md`:
 
 ```
-Browser → Auth0 login → Next.js on Vercel
+Browser → Auth0 login → Next.js on localhost
                            ├─ Zod validation + ownership + quota checks
                            ├─ Drizzle → Tiger Data PostgreSQL / pgvector
                            ├─ Gemini: extraction, embeddings, gap analysis

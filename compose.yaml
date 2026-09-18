@@ -1,0 +1,55 @@
+name: employher
+services:
+  app:
+    build:
+      context: .
+      target: development
+    ports:
+      - "127.0.0.1:${APP_PORT:-3000}:3000"
+    environment:
+      NEXT_TELEMETRY_DISABLED: "1"
+      APP_BASE_URL: "http://localhost:${APP_PORT:-3000}"
+      PGHOST: db
+      PGPORT: "5432"
+      PGDATABASE: employher
+      PGUSER: employher
+      PGPASSWORD: "${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}"
+    volumes:
+      - ./app:/app/app
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      start_period: 40s
+      retries: 6
+  db:
+    image: pgvector/pgvector:0.8.6-pg17-bookworm@sha256:cf134a767f474095eeba57e0117be8e568e011a63f33fbf252f14c9b760f8e6f
+    environment:
+      POSTGRES_DB: employher
+      POSTGRES_USER: employher
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}"
+    ports:
+      - "127.0.0.1:${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/postgres/001-vector.sql:/docker-entrypoint-initdb.d/001-vector.sql:ro
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          'pg_isready -U employher -d employher && psql -U employher -d employher -tAc "SELECT extname FROM pg_extension WHERE extname = ''vector''" | grep -qx vector',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+volumes:
+  postgres-data:

@@ -1,7 +1,7 @@
 # Architecture and data flow
 
 ```text
-Browser → Auth0 login → Next.js on Vercel
+Browser → Auth0 login → Next.js on localhost
                            ├─ Zod validation + ownership + quotas
                            ├─ Drizzle → Tiger Data PostgreSQL / pgvector
                            ├─ Gemini: extraction, embeddings, gap analysis
@@ -20,7 +20,7 @@ A separate, proposed shared resource-research cache (see [product.md](product.md
 
 ## End-to-end flow
 
-1. Verify the session, consent, upload size/type, and quotas. Proposed MVP upload cap: 2 MB, five pages, or 20,000 text characters. Treat these as application limits to validate against hosting limits.
+1. Verify the session, consent, upload size/type, and quotas. Proposed MVP upload cap: 2 MB, five pages, or 20,000 text characters. Treat these as application limits to validate in the local runtime.
 2. Parse text locally on the server, discard contact details unnecessary for analysis, and ask Gemini for structured skills, experience, and education. Validate using Zod plus exact excerpt checks. Offer review; never silently invent missing fields.
 3. Save a versioned structured profile with minimal excerpts. Do not persist the raw PDF/full text. Process within a bounded request, dispose of temporary bytes in a finally block, and require re-upload after failure. No durable raw-file workflow is proposed for this MVP.
 4. The user confirms/corrects the profile. Embed the minimized skill/experience summary with a pinned Gemini embedding configuration.
@@ -37,7 +37,7 @@ The following refresh contract applies when automated ingestion is implemented a
 
 ## Execution and failures
 
-For the small demo, use bounded synchronous requests; do not launch unawaited work after responding. Set an overall request deadline below the verified Vercel limit, one validation repair at most, bounded transient retries, and per-user/global spending caps. Return explicit timeout/retry states. Keep model calls outside DB transactions; persist final results atomically after rechecking owner/version/deletion state.
+For the small demo, use bounded synchronous requests; do not launch unawaited work after responding. Set and verify an overall application request deadline in the local runtime, one validation repair at most, bounded transient retries, and per-user/global spending caps. Return explicit timeout/retry states. Keep model calls outside DB transactions; persist final results atomically after rechecking owner/version/deletion state.
 
 Persist operation IDs and owner-scoped idempotency keys before expensive work. A duplicate completed operation returns its result; an active duplicate returns conflict/retry information. Same key with different input is a conflict. Expired processing leases may be retried explicitly. New intentional regeneration gets a new key.
 

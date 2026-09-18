@@ -1,15 +1,41 @@
-# Development and deployment plan
+# Local development plan
 
-This repository is documentation-only. There is no package manifest, app, migration, test suite, or runnable setup command yet. The following is an implementation plan, not completed setup.
+The repository includes a minimal Next.js/TypeScript app, Docker Compose, PostgreSQL/pgvector bootstrap, and local checks. Authentication, provider adapters, domain migrations, and product routes remain unimplemented. CI runs the Docker checks on pushes to `main`/`master` and pull requests; it does not deploy the app.
 
 ## Local development
 
-1. Select supported compatible Node.js, Next.js, TypeScript, and SDK versions; record them in the future package manifest and lockfile.
-2. Create the Next.js application only when implementation is requested. Add Tailwind/shadcn, Auth0, Drizzle/Postgres driver, Zod, Octokit, Gemini SDK, and a Backboard server adapter.
-3. Create a development Auth0 Regular Web Application with exact localhost callback/logout URLs according to the pinned SDK. Keep preview and production clients/settings isolated.
-4. Provision a development Tiger Data database (or compatible local PostgreSQL with pgvector). Review Drizzle migrations, enable vector, and seed synthetic fixtures. Use TLS with certificate verification and a small connection pool.
-5. Copy the placeholder inventory below into an ignored local environment file and populate privately. Validate configuration at startup; fail on missing required secrets. Never expose provider secrets with `NEXT_PUBLIC_`.
-6. Follow the M0–M3 parallel roadmap in `docs/product.md`: foundation, profile/opportunity/platform slices, integration, then pilot hardening. Coaching is optional P1. Add actual setup/server/migrate/seed/lint/typecheck/test scripts and document them when they exist.
+1. Install and start Docker with Compose v2 or newer.
+2. Copy `.env.example` to `.env` and replace the example database password with a private local value. Do not commit `.env`.
+3. Run `docker compose up --build --wait` and open `http://localhost:3000`.
+4. Edit files in `app/` for automatic reload. Rebuild with the same command after dependency or configuration changes; only `app/` is bind-mounted.
+5. Stop with `docker compose down`. The named database volume persists. `docker compose down --volumes` deletes the local database; use it only for an intentional reset.
+
+Ports bind only to `127.0.0.1`. Change `APP_PORT` or `DB_PORT` in `.env` if 3000 or 5432 is occupied. The app container reaches PostgreSQL at `db:5432`; host tools use `127.0.0.1:<DB_PORT>`. Database/user are both `employher`. Inspect it with `docker compose exec db psql -U employher -d employher`.
+
+The local database uses the upstream pgvector image and enables `vector` on first initialization. It does not create domain tables. Initialization scripts run only on an empty volume; changing the password in `.env` does not change an existing database role's password. Local Docker database traffic is unencrypted; remote Tiger Data connections will require verified TLS. The app receives PG connection settings for future integration but does not query the database yet.
+
+## Local checks
+
+Smoke tests use POSIX shell scripts named `scripts/smoke*.sh`. `scripts/smoke.sh` checks development HTTP content and a real pgvector cosine-distance query over authenticated TCP using synthetic vectors. `scripts/smoke-production.sh` starts an isolated standalone container, checks its HTTP content and referenced JavaScript/CSS assets, then removes that temporary container. No unit-test runner or coverage threshold is configured.
+
+```sh
+sh scripts/smoke.sh
+docker compose exec app npm run check
+docker build --target runner -t employher-local .
+sh scripts/smoke-production.sh
+```
+
+The `docker build` command runs formatting, ESLint, TypeScript, and a production build, then creates a standalone image running as a non-root user. To run that image locally:
+
+```sh
+docker run --rm -p 127.0.0.1:3001:3000 employher-local
+```
+
+`npm run dev`, `npm run check`, and `npm run build` can also run on the host after `npm ci --ignore-scripts` using Node 24. There is no `npm test` script. Docker dependency installation disables lifecycle scripts; package versions and container digests are pinned. See [dependency review](dependency-review.md).
+
+## Remaining integration work
+
+Add Tailwind/shadcn, Auth0, Drizzle, Zod, Octokit, Gemini, and optional Backboard adapters as their slices are implemented. Configure exact Auth0 localhost callback/logout URLs for the selected SDK. Implement reviewed domain migrations and synthetic fixtures, and add actual migrate/seed commands then. Follow the M0–M3 roadmap in [product.md](product.md).
 
 ## Environment template
 
@@ -44,13 +70,13 @@ AUTH0_INGEST_CLIENT_SECRET=<OPTIONAL_WORKER_CLIENT_SECRET>
 
 Names outside SDK-defined Auth0 variables are application configuration conventions. No Backboard assistant/thread ID is a global environment setting; those are private per-user mappings. No Discord credentials until that feature is requested.
 
-## Deployment on Vercel
+## Local demo runtime
 
-Connect this repository when runnable application code exists. Configure server-side secrets separately for development/preview/production; previews must not use production private data. Select Node runtime for database/PDF integrations, verify request-body limits, memory and function duration, and keep total upload size below platform limits. Configure a bounded request deadline; fail clearly rather than promising background execution after response.
+The Next.js app runs on localhost, with port 3000 by default. Compose sets `APP_BASE_URL` from `APP_PORT`; future Auth0 callback/logout settings must use that same origin. Hosted deployment is deferred; no hosting provider is selected for the current demo.
 
-Place app and database near each other. Set connection pool and concurrency limits against the database budget. Run reviewed migrations as a controlled release step, not on every server startup. Test on staging, then deploy; roll back application releases without destructive schema rollback. Use additive migrations and keep backups/retention documented.
+Keep provider secrets in ignored local environment files and server-side adapters. Auth0, Tiger Data (or compatible local PostgreSQL with pgvector), Gemini, and optional Backboard remain planned integrations; this is not an offline-only demo. Verify upload limits, memory use, request deadlines, connection pool limits, and provider budgets locally. Run reviewed migrations explicitly, not on every server startup.
 
-Set exact Auth0 callback/logout origins. Confirm provider entitlements/model availability and budgets. Load and verify the reviewed static snapshot for the MVP; a scheduled ingestion worker is a later feature. Configure recurring expiry and deletion cleanup with a durable scheduler before real data is enabled; choose and document the concrete scheduler at implementation.
+Load and verify the reviewed static snapshot and synthetic résumé fixtures. Verify the production build and browser flows locally. Recurring expiry/deletion cleanup and durable retries remain gates before real data is enabled; choose and document the concrete scheduler at implementation.
 
 ## Execution milestones
 
@@ -58,15 +84,21 @@ See `docs/product.md`'s "Three-person parallel MVP roadmap" for the full three-p
 
 ## Verification gates
 
-Documentation checks today: internal links, whitespace/diff review, placeholder-only configuration, and staged scope review. No runtime claims.
+Documentation checks: internal links, whitespace/diff review, placeholder-only committed configuration, and staged scope review. The Docker foundation checks below do not establish completion of the product gates.
 
 - M2 core demo: two-user ownership/CSRF; PDF/text limits; five synthetic evidence fixtures; corrections/invalidation; wrong-dimension vectors; repeatable static seeds; unknown eligibility and missing requirements; prompt injection; idempotency, timeouts and provider outage states; quotas; no sensitive logs; production build and browser happy/error paths.
 - M3 real-data pilot: verified provider handling/consent, deletion and late-result races, expiry cleanup and durable cleanup retries, plus regression of M2 checks.
 - Coaching, when enabled: Backboard user isolation, memory opt-in/opt-out, correction and external deletion reconciliation.
 - Later automated refresh: duplicate/changed records, partial snapshot preservation, source closures and stale-data presentation.
 
-Live-provider smoke tests require bounded cost and synthetic data. No runtime check has been performed in this documentation task.
+Live-provider smoke tests require bounded cost and synthetic data. Foundation verification results are recorded below. Product and live-provider checks remain outstanding.
 
-Selected job sources: `SimplifyJobs/Summer2027-Internships` and `SimplifyJobs/New-Grad-Positions`. Open implementation inputs: snapshot commits and reuse terms, model IDs/embedding config, approved inclusion-resource seed set, provider data-handling terms, hosting limits, and cleanup scheduler. These do not block publishing the documentation.
+Selected job sources: `SimplifyJobs/Summer2027-Internships` and `SimplifyJobs/New-Grad-Positions`. Open implementation inputs: snapshot commits and reuse terms, model IDs/embedding config, approved inclusion-resource seed set, provider data-handling terms, local runtime limits, and cleanup scheduler. These do not block publishing the documentation.
 
-Reference: [Vercel function limits](https://vercel.com/docs/functions/limitations). Verify account-specific limits at deployment.
+## Foundation verification — 2026-09-18
+
+Passed locally using Docker on macOS/ARM64: Compose configuration validation; app and database health; formatting, ESLint, and TypeScript checks; standalone production image build; development homepage and pgvector smoke checks; production HTTP and referenced static assets. Smoke tests also check PostgreSQL TCP/password authentication. The development app runs as UID 1000. `npm audit` reports zero known advisories. Relative document links and whitespace checks pass.
+
+The workstation's port 5432 was occupied; its ignored `.env` uses `DB_PORT=5433`. The committed default remains 5432 and is configurable. The live app is at `http://localhost:3000`.
+
+Visual browser verification was not completed because the computer-use tool did not approve Chrome control. No screenshot is claimed. Remote GitHub Actions has not yet run for these changes; its Docker commands were checked locally. Product behavior, auth/isolation, external providers, and domain migrations remain unimplemented and untested.
