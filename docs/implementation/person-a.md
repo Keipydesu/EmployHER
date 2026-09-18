@@ -68,6 +68,8 @@ Profile routes live in root `app/` alongside `/opportunities`; `src/profile/` co
 
 ## Integrated verification — 2026-09-18
 
-Node 24.20.0: all 131 unit tests and five Playwright Chromium tests pass, including the HTTP live-embedding boundary, exact loopback origin handling, and navigation between profile and Opportunities. Formatting, lint, type checks and the combined production build pass. Production smoke checks cover homepage assets, both Opportunities loopback hosts, profile assets and disabled profile API gates. Live Gemini and PostgreSQL were not exercised.
+Integrated against main `c978a33` (including optional Auth0/UI changes). Node 24.20.0: all 131 unit tests and five Playwright Chromium tests pass, including the HTTP live-embedding boundary, exact loopback origin handling, and navigation between profile and Opportunities. Formatting, lint, type checks and the combined production build pass. Production smoke checks cover homepage assets, both Opportunities loopback hosts, profile assets and disabled profile API gates. Live Gemini and PostgreSQL were not exercised.
 
 Screenshots: [desktop](../screenshots/profile/desktop.png), [mobile](../screenshots/profile/mobile.png).
+
+The integrated Webpack build emits a non-fatal dynamic-dependency warning from Auth0’s `dpopUtils.js`. Credentialed Auth0/DPoP behavior is outside these synthetic checks.
