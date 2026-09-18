@@ -20,7 +20,7 @@ const steps = [
 ];
 
 export default async function Home() {
-  const session = await auth0.getSession();
+  const session = auth0 ? await auth0.getSession() : null;
 
   return (
     <main>
@@ -29,7 +29,8 @@ export default async function Home() {
           Employ<span>HER</span>
         </Link>
         <nav className="site-nav" aria-label="Account">
-          {session ? (
+          <span className="badge">In development</span>
+          {session && (
             <>
               <span className="who">
                 {session.user.email ?? session.user.name}
@@ -37,7 +38,8 @@ export default async function Home() {
               {/* Ends the session and redirects to Auth0 to log out */}
               <a href="/auth/logout">Log out</a>
             </>
-          ) : (
+          )}
+          {auth0 && !session && (
             <>
               {/* Redirects to Auth0 Universal Login */}
               <a href="/auth/login">Log in</a>
