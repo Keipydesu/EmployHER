@@ -47,7 +47,7 @@ Pitch: “EmployHER connects what you have done to what you can do next. It turn
 
 One web app, one database, two allowlisted job sources with a reviewed static snapshot for the MVP, a small corpus, and bounded model calls. Normal login is required for saved personal state. Backboard remains in the chosen architecture but its outage must not block matching. Demo fixtures may be used while real-data gates remain closed.
 
-The local Docker foundation includes a minimal app scaffold; the product roadmap below remains to be implemented. No automated applications, outreach, employer quality scores, gender inference, hiring guarantees, unrestricted scraping, agent swarm, agent-to-agent auth, payments, blockchain, OCR, or mentor marketplace. A full four-week curriculum is deferred in favor of three concrete next steps.
+The local Node foundation includes a minimal app scaffold; the product roadmap below remains to be implemented. No automated applications, outreach, employer quality scores, gender inference, hiring guarantees, unrestricted scraping, agent swarm, agent-to-agent auth, payments, blockchain, OCR, or mentor marketplace. A full four-week curriculum is deferred in favor of three concrete next steps.
 
 ## Three-person parallel MVP roadmap
 

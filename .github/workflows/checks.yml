@@ -6,22 +6,29 @@ on:
 permissions:
   contents: read
 jobs:
-  docker:
+  app:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-      - name: Configure isolated synthetic-data environment
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run check
+      - run: npm run build
+      - name: Smoke test the production app
         run: |
-          printf 'POSTGRES_PASSWORD=%s\n' "$(openssl rand -hex 24)" > .env
-      - name: Check formatting, lint, types, and production build
-        run: docker build --target runner -t employher-check .
-      - name: Check production HTTP and static assets
-        run: sh scripts/smoke-production.sh employher-check
-      - name: Start local services
-        run: docker compose up --build --wait
-      - name: Check HTTP and vector queries
-        run: sh scripts/smoke.sh
-      - name: Stop services
-        if: always()
-        run: docker compose down --volumes
+          npm run start > /tmp/employher-next.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:3000/ > /dev/null; then
+              npm run smoke
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/employher-next.log
+          exit 1

@@ -1,41 +1,37 @@
-# Local development plan
+# Local development
 
-The repository includes a minimal Next.js/TypeScript app, Docker Compose, PostgreSQL/pgvector bootstrap, and local checks. Authentication, provider adapters, domain migrations, and product routes remain unimplemented. CI runs the Docker checks on pushes to `main`/`master` and pull requests; it does not deploy the app.
+The repository includes a minimal Next.js/TypeScript page and npm checks. Docker is deferred. Authentication, database integration, provider adapters, domain migrations, and product routes remain unimplemented. CI runs npm checks and HTTP smoke tests on pushes to `main`/`master` and pull requests; it does not deploy the app.
 
-## Local development
+## Start the app
 
-1. Install and start Docker with Compose v2 or newer.
-2. Copy `.env.example` to `.env` and replace the example database password with a private local value. Do not commit `.env`.
-3. Run `docker compose up --build --wait` and open `http://localhost:3000`.
-4. Edit files in `app/` for automatic reload. Rebuild with the same command after dependency or configuration changes; only `app/` is bind-mounted.
-5. Stop with `docker compose down`. The named database volume persists. `docker compose down --volumes` deletes the local database; use it only for an intentional reset.
-
-Ports bind only to `127.0.0.1`. Change `APP_PORT` or `DB_PORT` in `.env` if 3000 or 5432 is occupied. The app container reaches PostgreSQL at `db:5432`; host tools use `127.0.0.1:<DB_PORT>`. Database/user are both `employher`. Inspect it with `docker compose exec db psql -U employher -d employher`.
-
-The local database uses the upstream pgvector image and enables `vector` on first initialization. It does not create domain tables. Initialization scripts run only on an empty volume; changing the password in `.env` does not change an existing database role's password. Local Docker database traffic is unencrypted; remote Tiger Data connections will require verified TLS. The app receives PG connection settings for future integration but does not query the database yet.
-
-## Local checks
-
-Smoke tests use POSIX shell scripts named `scripts/smoke*.sh`. `scripts/smoke.sh` checks development HTTP content and a real pgvector cosine-distance query over authenticated TCP using synthetic vectors. `scripts/smoke-production.sh` starts an isolated standalone container, checks its HTTP content and referenced JavaScript/CSS assets, then removes that temporary container. No unit-test runner or coverage threshold is configured.
+Use Node 24, as selected in `.nvmrc`. If you use nvm, run `nvm install` and `nvm use` first. Otherwise select Node 24 using your usual installation/version manager and verify `node --version` reports `v24.x`.
 
 ```sh
-sh scripts/smoke.sh
-docker compose exec app npm run check
-docker build --target runner -t employher-local .
-sh scripts/smoke-production.sh
+npm ci --ignore-scripts
+npm run dev
 ```
 
-The `docker build` command runs formatting, ESLint, TypeScript, and a production build, then creates a standalone image running as a non-root user. To run that image locally:
+Open `http://localhost:3000`. Both development and production scripts bind only to `127.0.0.1`. Edit `app/` for automatic reload; stop with Ctrl+C. If port 3000 is occupied, use `npm run dev -- --port 3001` and open that port. No `.env`, database, or API keys are required for this initial page.
+
+## Checks and smoke tests
 
 ```sh
-docker run --rm -p 127.0.0.1:3001:3000 employher-local
+npm run check
+npm run build
+npm run start
 ```
 
-`npm run dev`, `npm run check`, and `npm run build` can also run on the host after `npm ci --ignore-scripts` using Node 24. There is no `npm test` script. Docker dependency installation disables lifecycle scripts; package versions and container digests are pinned. See [dependency review](dependency-review.md).
+In another terminal, run `npm run smoke`. It uses Node's built-in fetch to check HTTP status, homepage content, and referenced JavaScript/CSS assets with timeouts. Run it against the development server or the built production app. For a custom port, use `SMOKE_BASE_URL=http://127.0.0.1:3001 npm run smoke`.
 
-## Remaining integration work
+The runner is `scripts/smoke.mjs`, exposed as `npm run smoke`. No separate test framework or coverage threshold is configured. `npm run check` runs Prettier, ESLint, and TypeScript checks. Installs disable dependency lifecycle scripts; direct versions and the lockfile are pinned. See [dependency review](dependency-review.md).
 
-Add Tailwind/shadcn, Auth0, Drizzle, Zod, Octokit, Gemini, and optional Backboard adapters as their slices are implemented. Configure exact Auth0 localhost callback/logout URLs for the selected SDK. Implement reviewed domain migrations and synthetic fixtures, and add actual migrate/seed commands then. Follow the M0–M3 roadmap in [product.md](product.md).
+CI installs Node 24, performs a clean npm install, runs checks/build, starts the production app, and runs the same smoke test. Smoke tests do not establish database connectivity or unimplemented product behavior.
+
+## Remaining integrations
+
+Add Tailwind/shadcn, Auth0, Drizzle, Zod, Octokit, Gemini, and optional Backboard as their slices are implemented. Configure exact Auth0 localhost callback/logout URLs for the selected SDK and app port. Add reviewed domain migrations and synthetic fixtures when the database is connected; no migrate/seed command exists yet. Remote database connections must use verified TLS. Follow the M0–M3 roadmap in [product.md](product.md).
+
+The earlier Docker services were stopped without deleting their database volume. That volume is not used by this workflow. Existing ignored Docker `.env` values can be left in place; the initial page does not read them.
 
 ## Environment template
 
@@ -70,21 +66,13 @@ AUTH0_INGEST_CLIENT_SECRET=<OPTIONAL_WORKER_CLIENT_SECRET>
 
 Names outside SDK-defined Auth0 variables are application configuration conventions. No Backboard assistant/thread ID is a global environment setting; those are private per-user mappings. No Discord credentials until that feature is requested.
 
-## Local demo runtime
-
-The Next.js app runs on localhost, with port 3000 by default. Compose sets `APP_BASE_URL` from `APP_PORT`; future Auth0 callback/logout settings must use that same origin. Hosted deployment is deferred; no hosting provider is selected for the current demo.
-
-Keep provider secrets in ignored local environment files and server-side adapters. Auth0, Tiger Data (or compatible local PostgreSQL with pgvector), Gemini, and optional Backboard remain planned integrations; this is not an offline-only demo. Verify upload limits, memory use, request deadlines, connection pool limits, and provider budgets locally. Run reviewed migrations explicitly, not on every server startup.
-
-Load and verify the reviewed static snapshot and synthetic résumé fixtures. Verify the production build and browser flows locally. Recurring expiry/deletion cleanup and durable retries remain gates before real data is enabled; choose and document the concrete scheduler at implementation.
-
 ## Execution milestones
 
 See `docs/product.md`'s "Three-person parallel MVP roadmap" for the full three-person, milestone-gated work split (M0 foundation → M1 parallel vertical slices → M2 integration/demo → M3 parallel hardening). M2 includes demo reliability/security checks; M3 adds the real-data pilot gates. The roadmap assigns each check group to A, B or C. Optional-feature checks apply only when that feature is enabled.
 
 ## Verification gates
 
-Documentation checks: internal links, whitespace/diff review, placeholder-only committed configuration, and staged scope review. The Docker foundation checks below do not establish completion of the product gates.
+Documentation checks: internal links, whitespace/diff review, placeholder-only committed configuration, and staged scope review. The local foundation checks below do not establish completion of the product gates.
 
 - M2 core demo: two-user ownership/CSRF; PDF/text limits; five synthetic evidence fixtures; corrections/invalidation; wrong-dimension vectors; repeatable static seeds; unknown eligibility and missing requirements; prompt injection; idempotency, timeouts and provider outage states; quotas; no sensitive logs; production build and browser happy/error paths.
 - M3 real-data pilot: verified provider handling/consent, deletion and late-result races, expiry cleanup and durable cleanup retries, plus regression of M2 checks.
@@ -95,10 +83,6 @@ Live-provider smoke tests require bounded cost and synthetic data. Foundation ve
 
 Selected job sources: `SimplifyJobs/Summer2027-Internships` and `SimplifyJobs/New-Grad-Positions`. Open implementation inputs: snapshot commits and reuse terms, model IDs/embedding config, approved inclusion-resource seed set, provider data-handling terms, local runtime limits, and cleanup scheduler. These do not block publishing the documentation.
 
-## Foundation verification — 2026-09-18
+## Verification scope
 
-Passed locally using Docker on macOS/ARM64: Compose configuration validation; app and database health; formatting, ESLint, and TypeScript checks; standalone production image build; development homepage and pgvector smoke checks; production HTTP and referenced static assets. Smoke tests also check PostgreSQL TCP/password authentication. The development app runs as UID 1000. `npm audit` reports zero known advisories. Relative document links and whitespace checks pass.
-
-The workstation's port 5432 was occupied; its ignored `.env` uses `DB_PORT=5433`. The committed default remains 5432 and is configurable. The live app is at `http://localhost:3000`.
-
-Visual browser verification was not completed because the computer-use tool did not approve Chrome control. No screenshot is claimed. Remote GitHub Actions has not yet run for these changes; its Docker commands were checked locally. Product behavior, auth/isolation, external providers, and domain migrations remain unimplemented and untested.
+The former Docker implementation passed local checks and GitHub CI at commit `a9c0c08`. Those results apply to that historical commit. The direct-host workflow passed a clean native install under Node 24.20.0 on macOS/ARM64, formatting/lint/type checks, a production build, and smoke tests against both development (15 static assets) and production (9 static assets). The local Homebrew `node@24` path pointed to Node 25, so verification used a temporary official Node 24 archive with its SHA-256 checked against the release checksum. Select a real Node 24 installation before running the commands. The replacement npm-based CI workflow has not been pushed or run remotely. Product/auth/database/provider behavior remains unimplemented and untested. Visual browser verification remains outstanding because Chrome control was not approved.

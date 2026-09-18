@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Status
 
-A minimal Next.js/TypeScript app and Docker Compose PostgreSQL/pgvector environment are implemented. Product routes, provider integrations, and domain migrations remain planned. See `AGENTS.md` and `docs/development.md` for runnable commands and verification limits.
+A minimal Next.js/TypeScript app runs directly on Node 24. Docker and a local database are not required. Product routes, provider integrations, and domain migrations remain planned. See `AGENTS.md` and `docs/development.md` for runnable commands and verification limits.
 
 ## Where to start reading
 
@@ -15,7 +15,7 @@ A minimal Next.js/TypeScript app and Docker Compose PostgreSQL/pgvector environm
 - `docs/data-model.md` — proposed relational schema (Postgres/Drizzle), ownership patterns.
 - `docs/api.md` — proposed route contracts, shared TypeScript shapes, error codes, idempotency rules.
 - `docs/privacy.md` — retention, deletion, and inclusion-content rules (no gender inference, sourced claims only).
-- `docs/development.md` — local Docker setup, env var inventory, checks, verification gates.
+- `docs/development.md` — local Node setup, env var inventory, checks, verification gates.
 - `TECH-STACK.md` — the chosen stack table.
 
 ## Product architecture (spans multiple docs)
