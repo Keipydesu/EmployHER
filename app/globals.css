@@ -1,0 +1,434 @@
+:root {
+  color-scheme: light;
+  color: #24372e;
+  background: #f8f7f1;
+  font-family: Arial, Helvetica, sans-serif;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+main {
+  max-width: 1160px;
+  margin: auto;
+  padding: 36px 40px;
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+header a {
+  color: inherit;
+  text-decoration: none;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+header a span {
+  color: #596e37;
+}
+.badge {
+  border: 1px solid #bbc6ae;
+  border-radius: 24px;
+  padding: 8px 14px;
+  font-size: 12px;
+}
+.intro {
+  padding: 100px 0 64px;
+  max-width: 780px;
+}
+.eyebrow {
+  color: #596e37;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 700;
+}
+h1 {
+  font-size: clamp(44px, 7vw, 80px);
+  line-height: 1.07;
+  letter-spacing: -3px;
+  margin: 24px 0;
+  font-weight: 500;
+}
+h1 em {
+  font-family: Georgia, serif;
+  color: #526d3b;
+}
+.lead {
+  max-width: 540px;
+  font-size: 19px;
+  line-height: 1.6;
+  color: #526158;
+}
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid #c9cfbf;
+  gap: 32px;
+  padding-top: 32px;
+}
+.number {
+  color: #65764e;
+  font-size: 13px;
+}
+h2 {
+  font-size: 19px;
+  margin-top: 24px;
+}
+article p {
+  color: #526158;
+  line-height: 1.7;
+  font-size: 15px;
+}
+footer {
+  margin-top: 64px;
+  padding-top: 24px;
+  border-top: 1px solid #c9cfbf;
+  font-size: 13px;
+  color: #526158;
+  line-height: 1.6;
+}
+@media (max-width: 640px) {
+  main {
+    padding: 24px;
+  }
+  .intro {
+    padding-top: 64px;
+  }
+  .steps {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  h1 {
+    letter-spacing: -2px;
+  }
+}
+
+/* Opportunities workspace */
+button,
+select {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+  border: 1px solid #9cac91;
+  border-radius: 8px;
+  padding: 10px 14px;
+  background: #f9fbf5;
+  color: #24372e;
+}
+button:hover:not(:disabled) {
+  background: #e7eddc;
+}
+button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+:focus-visible {
+  outline: 3px solid #5c783b;
+  outline-offset: 3px;
+}
+a {
+  color: #365524;
+}
+.opportunities {
+  max-width: 1400px;
+}
+.op-hero {
+  padding: 62px 0 28px;
+}
+.op-hero h1 {
+  font-size: clamp(36px, 5vw, 64px);
+}
+.demo-note {
+  padding: 18px 22px;
+  background: #edf1e4;
+  border: 1px solid #c6d0b9;
+  border-radius: 10px;
+  line-height: 1.6;
+}
+.status-message {
+  min-height: 30px;
+  padding: 7px 0;
+  font-size: 14px;
+}
+.error-box {
+  background: #fff0e8;
+  border: 1px solid #b65432;
+  padding: 15px;
+  margin: 12px 0;
+}
+.toolbar {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 1fr 1fr;
+  gap: 16px;
+  padding: 20px 0 28px;
+}
+.toolbar label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #b8c3ad;
+  border-radius: 8px;
+  background: #fff;
+  color: #24372e;
+}
+.workspace {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+.path-nav {
+  position: sticky;
+  top: 20px;
+}
+.path-choice {
+  display: block;
+  width: 100%;
+  text-align: left;
+  margin: 8px 0;
+  padding: 14px;
+  background: transparent;
+  border-color: transparent;
+}
+.path-choice[aria-pressed="true"] {
+  background: #e5ecd9;
+  border-color: #8da473;
+}
+.path-choice span {
+  display: block;
+  font-size: 12px;
+  line-height: 1.6;
+  margin-top: 6px;
+  color: #526158;
+}
+.path-choice.subpath {
+  padding-left: 28px;
+  border-left: 2px solid #b7c8a3;
+  border-radius: 0 8px 8px 0;
+}
+.panel {
+  background: #fffefa;
+  border: 1px solid #d4dbc9;
+  border-radius: 14px;
+  padding: 26px;
+  margin-bottom: 22px;
+}
+.panel h2 {
+  margin: 0 0 14px;
+  font-size: 24px;
+  letter-spacing: -0.5px;
+}
+.panel h3 {
+  font-size: 16px;
+}
+.panel p,
+.panel li {
+  line-height: 1.65;
+  font-size: 14px;
+}
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.coverage-label {
+  font-size: 18px !important;
+}
+progress {
+  width: 100%;
+  height: 14px;
+  accent-color: #648348;
+}
+.muted {
+  color: #5b665f;
+  font-size: 12px !important;
+  line-height: 1.7;
+}
+.checkpoints {
+  margin-top: 24px;
+}
+.checkpoints details,
+.job-card {
+  border-top: 1px solid #d8dfcd;
+}
+summary {
+  cursor: pointer;
+  padding: 18px 0;
+  line-height: 1.5;
+}
+.checkpoints summary,
+.job-card summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+}
+.checkpoints summary::before,
+.job-card summary::before {
+  content: "＋";
+}
+details[open] > summary::before {
+  content: "−";
+}
+.checkpoint-state {
+  margin-left: auto;
+  font-size: 12px;
+  border-radius: 20px;
+  padding: 4px 10px;
+  background: #f1eee4;
+  text-align: right;
+}
+.checkpoint-state.supported {
+  background: #e3edda;
+  color: #345122;
+}
+.checkpoint-body {
+  padding: 0 0 20px 24px;
+}
+blockquote {
+  border-left: 3px solid #93ab76;
+  margin: 14px 0;
+  padding: 8px 16px;
+  line-height: 1.6;
+  background: #f2f5eb;
+  font-size: 14px;
+}
+.button-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.action-suggestion {
+  background: #f1f4eb;
+  padding: 14px;
+  border-radius: 8px;
+  margin-top: 16px;
+}
+.action-list {
+  list-style: none;
+  padding: 0;
+}
+.action-list li {
+  padding: 14px 0;
+  border-bottom: 1px solid #d8dfcd;
+}
+.small-label {
+  font-weight: 400;
+  font-size: 12px;
+  color: #596858;
+}
+.job-card summary small {
+  display: block;
+  color: #526158;
+  margin-top: 6px;
+}
+.empty {
+  background: #f1f2eb;
+  padding: 18px;
+  border-radius: 8px;
+}
+.warning {
+  color: #864820;
+}
+.field-context {
+  background: #f0f3e9;
+}
+fieldset {
+  border: 1px solid #c9d1bf;
+  border-radius: 8px;
+  padding: 14px;
+  margin: 20px 0;
+}
+legend {
+  font-size: 13px;
+  padding: 0 6px;
+}
+.checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 18px 8px 0;
+  font-size: 14px;
+}
+.resource-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+.resource-card {
+  border-top: 2px solid #c5d2b4;
+  padding: 20px 0;
+}
+.resource-card a {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 900px) {
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+  .path-nav {
+    position: static;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .path-nav > p {
+    grid-column: 1/-1;
+  }
+  .toolbar {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 560px) {
+  .toolbar,
+  .resource-grid,
+  .path-nav {
+    grid-template-columns: 1fr;
+  }
+  .panel {
+    padding: 18px;
+  }
+  .checkpoints summary,
+  .job-card summary {
+    flex-wrap: wrap;
+  }
+  .checkpoint-body {
+    padding-left: 0;
+  }
+  .section-heading {
+    align-items: start;
+  }
+  .opportunities header {
+    align-items: start;
+  }
+  .opportunities .badge {
+    max-width: 170px;
+  }
+  .op-hero {
+    padding-top: 32px;
+  }
+}
+
+.demo-link {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 14px 20px;
+  background: #365524;
+  color: white;
+  border-radius: 8px;
+  text-decoration: none;
+}

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const LIMITS = {
   bytes: 2 * 1024 * 1024,
@@ -7,7 +7,7 @@ export const LIMITS = {
   facts: 60,
   dimensions: 768,
 } as const;
-export const factKind = z.enum(['skill', 'experience', 'education']);
+export const factKind = z.enum(["skill", "experience", "education"]);
 const shortText = z.string().trim().min(1).max(160);
 export const extractedFactSchema = z.strictObject({
   kind: factKind,
@@ -21,11 +21,11 @@ export const extractionSchema = z.strictObject({
 });
 export type Extracted = z.infer<typeof extractionSchema>;
 export type FactKind = z.infer<typeof factKind>;
-export type Fact = Omit<Extracted['facts'][number], 'excerpt'> & {
+export type Fact = Omit<Extracted["facts"][number], "excerpt"> & {
   id: string;
   evidence:
-    | { source: 'resume'; excerpt: string; start: number; end: number }
-    | { source: 'user_reported' };
+    | { source: "resume"; excerpt: string; start: number; end: number }
+    | { source: "user_reported" };
 };
 export const correctionSchema = z.strictObject({
   id: z.uuid().optional(),
@@ -44,14 +44,14 @@ export type Embedding = {
   values: number[];
   model: string;
   dimensions: 768;
-  config: 'profile-semantic-v1';
+  config: "profile-semantic-v1";
   simulated: boolean;
 };
 export type Profile = {
   profileId: string;
   ownerId: string;
   version: number;
-  status: 'draft' | 'confirmed';
+  status: "draft" | "confirmed";
   facts: Fact[];
   embedding: Embedding | null;
   extractionModel: string;
@@ -59,19 +59,44 @@ export type Profile = {
   createdAt: string;
   expiresAt: string;
 };
-export type PublicProfile = Omit<Profile, 'ownerId' | 'embedding'> & {
+export type PublicProfile = Omit<Profile, "ownerId" | "embedding"> & {
   embedding: { model: string; dimensions: number; simulated: boolean } | null;
 };
 export function publicProfile(profile: Profile): PublicProfile {
-  const { ownerId: _owner, embedding, ...safe } = profile;
+  const {
+    embedding,
+    profileId,
+    version,
+    status,
+    facts,
+    extractionModel,
+    promptVersion,
+    createdAt,
+    expiresAt,
+  } = profile;
   return {
-    ...safe,
+    profileId,
+    version,
+    status,
+    facts,
+    extractionModel,
+    promptVersion,
+    createdAt,
+    expiresAt,
     embedding: embedding
-      ? { model: embedding.model, dimensions: embedding.dimensions, simulated: embedding.simulated }
+      ? {
+          model: embedding.model,
+          dimensions: embedding.dimensions,
+          simulated: embedding.simulated,
+        }
       : null,
   };
 }
-export type ReviewedRequirement = { id: string; skill: string; excerpt: string };
+export type ReviewedRequirement = {
+  id: string;
+  skill: string;
+  excerpt: string;
+};
 // Person B resolves this server-side from its reviewed, versioned catalog.
 export type ReviewedPath = {
   id: string;
@@ -86,5 +111,5 @@ export type ResumeSuggestion = {
   original: string;
   proposed: string;
   reason: string;
-  source: Fact['evidence']['source'];
+  source: Fact["evidence"]["source"];
 };

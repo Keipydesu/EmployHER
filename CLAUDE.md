@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Status
 
-Person A's profile slice now has a local synthetic Next.js harness, executable contracts, a Gemini adapter, PostgreSQL domain adapter/schema, and unit/browser tests. Production Auth0/database wiring, B's catalog, and deployment remain integration work. See `docs/implementation/person-a.md` and `AGENTS.md` for verified commands and boundaries. Never treat sample sessions or simulated vectors as production integrations.
+A minimal Next.js/TypeScript app runs directly on Node 24. Docker and a local database are not required. Product routes, provider integrations, and domain migrations remain planned. See `AGENTS.md` and `docs/development.md` for runnable commands and verification limits.
 
 ## Where to start reading
 
@@ -15,7 +15,7 @@ Person A's profile slice now has a local synthetic Next.js harness, executable c
 - `docs/data-model.md` — proposed relational schema (Postgres/Drizzle), ownership patterns.
 - `docs/api.md` — proposed route contracts, shared TypeScript shapes, error codes, idempotency rules.
 - `docs/privacy.md` — retention, deletion, and inclusion-content rules (no gender inference, sourced claims only).
-- `docs/development.md` — local dev plan, env var inventory, deployment plan, verification gates.
+- `docs/development.md` — local Node setup, env var inventory, checks, verification gates.
 - `TECH-STACK.md` — the chosen stack table.
 
 ## Product architecture (spans multiple docs)
@@ -25,7 +25,7 @@ EmployHER is a résumé-to-opportunity navigator for early-career tech roles: up
 Planned flow, synthesized across `architecture.md`, `data-model.md`, and `api.md`:
 
 ```
-Browser → Auth0 login → Next.js on Vercel
+Browser → Auth0 login → Next.js on localhost
                            ├─ Zod validation + ownership + quota checks
                            ├─ Drizzle → Tiger Data PostgreSQL / pgvector
                            ├─ Gemini: extraction, embeddings, gap analysis
@@ -54,3 +54,5 @@ Prefer stable npm versions published at least 7-14 days earlier. A newer release
 ## Shared-workspace note
 
 This repository is sometimes edited by multiple coordinating agent sessions (Talking Stick). If you are in such a session, acquire a live writer turn before editing files, verify your change, and release with a concrete handoff — see `AGENTS.md`'s "Security & Agent Coordination" section.
+
+Profile routes share root `app/` with Opportunities. See `docs/implementation/person-a.md` for synthetic boundaries and A/C integration requirements. `npm test` runs both tracks through `tsx`.

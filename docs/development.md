@@ -1,15 +1,37 @@
-# Development and deployment plan
+# Local development
 
-Person A's profile slice now includes a runnable Next.js sample harness, pinned dependencies, tests, and proposed domain SQL. See [the implemented setup and handoff](implementation/person-a.md). The broader deployment steps below remain an integration plan, not a completed production setup.
+The repository includes a minimal Next.js/TypeScript page and npm checks. Docker is deferred. Authentication, database integration, provider adapters, domain migrations, and product routes remain unimplemented. CI runs npm checks and HTTP smoke tests on pushes to `main`/`master` and pull requests; it does not deploy the app.
 
-## Local development
+## Start the app
 
-1. Select supported compatible Node.js, Next.js, TypeScript, and SDK versions; record them in the future package manifest and lockfile.
-2. Create the Next.js application only when implementation is requested. Add Tailwind/shadcn, Auth0, Drizzle/Postgres driver, Zod, Octokit, Gemini SDK, and a Backboard server adapter.
-3. Create a development Auth0 Regular Web Application with exact localhost callback/logout URLs according to the pinned SDK. Keep preview and production clients/settings isolated.
-4. Provision a development Tiger Data database (or compatible local PostgreSQL with pgvector). Review Drizzle migrations, enable vector, and seed synthetic fixtures. Use TLS with certificate verification and a small connection pool.
-5. Copy the placeholder inventory below into an ignored local environment file and populate privately. Validate configuration at startup; fail on missing required secrets. Never expose provider secrets with `NEXT_PUBLIC_`.
-6. Follow the M0–M3 parallel roadmap in `docs/product.md`: foundation, profile/opportunity/platform slices, integration, then pilot hardening. Coaching is optional P1. Add actual setup/server/migrate/seed/lint/typecheck/test scripts and document them when they exist.
+Use Node 24, as selected in `.nvmrc`. If you use nvm, run `nvm install` and `nvm use` first. Otherwise select Node 24 using your usual installation/version manager and verify `node --version` reports `v24.x`.
+
+```sh
+npm ci --ignore-scripts
+npm run dev
+```
+
+Open `http://localhost:3000`. Both development and production scripts bind only to `127.0.0.1`. Edit `app/` for automatic reload; stop with Ctrl+C. If port 3000 is occupied, use `npm run dev -- --port 3001` and open that port. No `.env`, database, or API keys are required for this initial page.
+
+## Checks and smoke tests
+
+```sh
+npm run check
+npm run build
+npm run start
+```
+
+In another terminal, run `npm run smoke`. It uses Node's built-in fetch to check HTTP status, homepage content, and referenced JavaScript/CSS assets with timeouts. Run it against the development server or the built production app. For a custom port, use `SMOKE_BASE_URL=http://127.0.0.1:3001 npm run smoke`.
+
+The runner is `scripts/smoke.mjs`, exposed as `npm run smoke`. No separate test framework or coverage threshold is configured. `npm run check` runs Prettier, ESLint, and TypeScript checks. Installs disable dependency lifecycle scripts; direct versions and the lockfile are pinned. See [dependency review](dependency-review.md).
+
+CI installs Node 24, performs a clean npm install, runs checks/build, starts the production app, and runs the same smoke test. Smoke tests do not establish database connectivity or unimplemented product behavior.
+
+## Remaining integrations
+
+Add Tailwind/shadcn, Auth0, Drizzle, Zod, Octokit, Gemini, and optional Backboard as their slices are implemented. Configure exact Auth0 localhost callback/logout URLs for the selected SDK and app port. Add reviewed domain migrations and synthetic fixtures when the database is connected; no migrate/seed command exists yet. Remote database connections must use verified TLS. Follow the M0–M3 roadmap in [product.md](product.md).
+
+The earlier Docker services were stopped without deleting their database volume. That volume is not used by this workflow. Existing ignored Docker `.env` values can be left in place; the initial page does not read them.
 
 ## Environment template
 
@@ -44,29 +66,27 @@ AUTH0_INGEST_CLIENT_SECRET=<OPTIONAL_WORKER_CLIENT_SECRET>
 
 Names outside SDK-defined Auth0 variables are application configuration conventions. No Backboard assistant/thread ID is a global environment setting; those are private per-user mappings. No Discord credentials until that feature is requested.
 
-## Deployment on Vercel
-
-Connect this repository when runnable application code exists. Configure server-side secrets separately for development/preview/production; previews must not use production private data. Select Node runtime for database/PDF integrations, verify request-body limits, memory and function duration, and keep total upload size below platform limits. Configure a bounded request deadline; fail clearly rather than promising background execution after response.
-
-Place app and database near each other. Set connection pool and concurrency limits against the database budget. Run reviewed migrations as a controlled release step, not on every server startup. Test on staging, then deploy; roll back application releases without destructive schema rollback. Use additive migrations and keep backups/retention documented.
-
-Set exact Auth0 callback/logout origins. Confirm provider entitlements/model availability and budgets. Load and verify the reviewed static snapshot for the MVP; a scheduled ingestion worker is a later feature. Configure recurring expiry and deletion cleanup with a durable scheduler before real data is enabled; choose and document the concrete scheduler at implementation.
-
 ## Execution milestones
 
 See `docs/product.md`'s "Three-person parallel MVP roadmap" for the full three-person, milestone-gated work split (M0 foundation → M1 parallel vertical slices → M2 integration/demo → M3 parallel hardening). M2 includes demo reliability/security checks; M3 adds the real-data pilot gates. The roadmap assigns each check group to A, B or C. Optional-feature checks apply only when that feature is enabled.
 
 ## Verification gates
 
-Profile checks: `npm test`, `npm run typecheck`, `npm run build`, and `npm run test:browser`. Documentation checks: internal links, whitespace/diff review, placeholder-only configuration, and staged scope review.
+Documentation checks: internal links, whitespace/diff review, placeholder-only committed configuration, and staged scope review. The local foundation checks below do not establish completion of the product gates.
 
 - M2 core demo: two-user ownership/CSRF; PDF/text limits; five synthetic evidence fixtures; corrections/invalidation; wrong-dimension vectors; repeatable static seeds; unknown eligibility and missing requirements; prompt injection; idempotency, timeouts and provider outage states; quotas; no sensitive logs; production build and browser happy/error paths.
 - M3 real-data pilot: verified provider handling/consent, deletion and late-result races, expiry cleanup and durable cleanup retries, plus regression of M2 checks.
 - Coaching, when enabled: Backboard user isolation, memory opt-in/opt-out, correction and external deletion reconciliation.
 - Later automated refresh: duplicate/changed records, partial snapshot preservation, source closures and stale-data presentation.
 
-Live-provider smoke tests require bounded cost and synthetic data. A's fixture-backed checks do not establish the unimplemented B/C gates or live-provider quality.
+Live-provider smoke tests require bounded cost and synthetic data. Foundation verification results are recorded below. Product and live-provider checks remain outstanding.
 
-Selected job sources: `SimplifyJobs/Summer2027-Internships` and `SimplifyJobs/New-Grad-Positions`. Open implementation inputs: snapshot commits and reuse terms, model IDs/embedding config, approved inclusion-resource seed set, provider data-handling terms, hosting limits, and cleanup scheduler. These do not block publishing the documentation.
+Selected job sources: `SimplifyJobs/Summer2027-Internships` and `SimplifyJobs/New-Grad-Positions`. Open implementation inputs: snapshot commits and reuse terms, model IDs/embedding config, approved inclusion-resource seed set, provider data-handling terms, local runtime limits, and cleanup scheduler. These do not block publishing the documentation.
 
-Reference: [Vercel function limits](https://vercel.com/docs/functions/limitations). Verify account-specific limits at deployment.
+## Verification scope
+
+The former Docker implementation passed local checks and GitHub CI at commit `a9c0c08`. Those results apply to that historical commit. The direct-host workflow passed a clean native install under Node 24.20.0 on macOS/ARM64, formatting/lint/type checks, a production build, and smoke tests against both development (15 static assets) and production (9 static assets). The local Homebrew `node@24` path pointed to Node 25, so verification used a temporary official Node 24 archive with its SHA-256 checked against the release checksum. Select a real Node 24 installation before running the commands. The replacement npm-based CI workflow has not been pushed or run remotely. Product/auth/database/provider behavior remains unimplemented and untested. Visual browser verification remains outstanding because Chrome control was not approved.
+
+## Profile integration checks
+
+`PROFILE_DEMO_MODE=true npm run dev` enables the synthetic `/profile` workspace alongside `/opportunities`. `npm test` uses `tsx` to run both tracks. `npm run test:browser` exercises profile extraction, corrections, confirmation, PDF intake and mobile layout after installing Playwright Chromium. See [profile implementation](implementation/person-a.md) for provider boundaries. Live demo embeddings accept only exact approved fixture summaries; edited summaries use simulated vectors.

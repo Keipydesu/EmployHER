@@ -4,7 +4,7 @@ Implemented locally: résumé text/PDF intake, a server-side Gemini REST adapter
 
 ## Run and verify
 
-Use a supported Node LTS release >=22.13 (Node 24 LTS recommended); the current workspace verification uses Node 25.9.0. From the repository root:
+Use Node 24 LTS, as pinned in `.nvmrc`. From the repository root:
 
 ```sh
 npm ci --ignore-scripts
@@ -21,7 +21,7 @@ Open `/profile` and start a sample session. Choose one of five synthetic résum�
 
 The harness is opt-in, non-production, loopback-bound by the dev command, and unavailable on Vercel. It accepts only supplied sample text/PDFs. It uses opaque HttpOnly sample session cookies and in-memory adapters; these are not Auth0 or durable application storage. No live AI calls occur by default. Simulated vectors are explicitly labeled and cannot be used by `matchingProfile()` or persisted by the PostgreSQL adapter. Restart clears demo data.
 
-To smoke-test Gemini on synthetic inputs, configure the placeholder variables from `.env.example`, set `PROFILE_DEMO_GEMINI=true` alongside demo mode, and restart. Use available model IDs supporting structured `generateContent` and `embedContent` with 768 output dimensions. This opt-in makes billable provider calls. No live-provider quality claim follows from fixture tests.
+To smoke-test Gemini on synthetic inputs, configure the placeholder variables from `.env.example`, set `PROFILE_DEMO_GEMINI=true` alongside demo mode, and restart. Use available model IDs supporting structured `generateContent` and `embedContent` with 768 output dimensions. This opt-in makes billable provider calls. Only exact approved fixture summaries reach live embedding; edited or differently extracted summaries use clearly marked simulated vectors. Editing remains available, and draft saves do not embed. No live-provider quality claim follows from fixture tests.
 
 ## Contracts for Person B
 
@@ -56,8 +56,18 @@ Call `deleteOwner()` during deletion: its lifecycle row serializes deletion agai
 
 Set `APP_BASE_URL` to the canonical application origin for CSRF checks behind a proxy.
 
-Before Vercel release, verify the PDF worker's output tracing and bundling, approved body/time limits, and connection pool/TLS configuration. A bounds uploads to 2 MB, five pages, 20,000 characters; parses in a worker with a 10-second/128-MB limit; rejects password-protected/unreadable PDFs; and offers text fallback. Parsing does not write files or invoke OCR. Gemini gets a 45-second deadline shared across at most two extraction attempts. It has no tools and receives contact-line-minimized text only. Provider errors are sanitized.
+Before any future hosted release, verify the PDF worker's output tracing and bundling, approved body/time limits, and connection pool/TLS configuration. A bounds uploads to 2 MB, five pages, 20,000 characters; parses in a worker with a 10-second/128-MB limit; rejects password-protected/unreadable PDFs; and offers text fallback. Parsing does not write files or invoke OCR. Gemini gets a 45-second deadline shared across at most two extraction attempts. It has no tools and receives contact-line-minimized text only. Provider errors are sanitized.
 
 ## Verification limits
 
 Unit/contract and browser tests use synthetic data and mocked Gemini responses. Live Gemini accuracy and Tiger Data transactions still require credentialed integration tests. Auth0, global quotas, distributed operations, deployment, scheduled expiry cleanup, production pilot consent, and B's real catalog/matching are outside this slice and must be wired before real use. The build is not an indication that those services are configured.
+
+## Shared application integration
+
+Profile routes live in root `app/` alongside `/opportunities`; `src/profile/` contains domain logic. Profile CSS is scoped beneath `.profile-demo` to avoid changing the Opportunities UI. One `tsx` test command runs both tracks, including TypeScript parameter properties in the profile slice. Shared Node 24, lint/format/type checks and Opportunities smoke checks remain in CI.
+
+## Integrated verification — 2026-09-18
+
+Node 24.20.0: all 131 unit tests and five Playwright Chromium tests pass, including the HTTP live-embedding boundary, exact loopback origin handling, and navigation between profile and Opportunities. Formatting, lint, type checks and the combined production build pass. Production smoke checks cover homepage assets, both Opportunities loopback hosts, profile assets and disabled profile API gates. Live Gemini and PostgreSQL were not exercised.
+
+Screenshots: [desktop](../screenshots/profile/desktop.png), [mobile](../screenshots/profile/mobile.png).

@@ -1,19 +1,24 @@
-import { randomUUID } from 'node:crypto';
-import { and, eq, gt, isNull } from 'drizzle-orm';
-import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import { profileHeads, profileVersions, profileEvents, profileOwnerLifecycle } from '../schema';
-import type { Profile } from '../contracts';
-import type { ProfileRepository } from '../ports';
-import { conflict, notFound, ProfileError } from '../errors';
+import { randomUUID } from "node:crypto";
+import { and, eq, gt, isNull } from "drizzle-orm";
+import type { NodePgDatabase } from "drizzle-orm/node-postgres";
+import {
+  profileHeads,
+  profileVersions,
+  profileEvents,
+  profileOwnerLifecycle,
+} from "../schema";
+import type { Profile } from "../contracts";
+import type { ProfileRepository } from "../ports";
+import { conflict, notFound, ProfileError } from "../errors";
 
 export class PostgresProfileRepository implements ProfileRepository {
   constructor(private db: NodePgDatabase) {}
   private values(p: Profile) {
     if (p.embedding?.simulated)
       throw new ProfileError(
-        'SIMULATED_VECTOR',
+        "SIMULATED_VECTOR",
         400,
-        'Simulated vectors cannot be stored in the application database.',
+        "Simulated vectors cannot be stored in the application database.",
       );
     return {
       profileId: p.profileId,
@@ -29,12 +34,15 @@ export class PostgresProfileRepository implements ProfileRepository {
   }
   async create(p: Profile) {
     await this.db.transaction(async (tx) => {
-      await tx.insert(profileOwnerLifecycle).values({ ownerId: p.ownerId }).onConflictDoNothing();
+      await tx
+        .insert(profileOwnerLifecycle)
+        .values({ ownerId: p.ownerId })
+        .onConflictDoNothing();
       const [owner] = await tx
         .select()
         .from(profileOwnerLifecycle)
         .where(eq(profileOwnerLifecycle.ownerId, p.ownerId))
-        .for('update');
+        .for("update");
       if (!owner || owner.deletedAt) throw notFound();
       await tx.insert(profileHeads).values({
         id: p.profileId,
@@ -49,7 +57,10 @@ export class PostgresProfileRepository implements ProfileRepository {
     const [row] = await this.db
       .select()
       .from(profileHeads)
-      .innerJoin(profileOwnerLifecycle, eq(profileOwnerLifecycle.ownerId, profileHeads.ownerId))
+      .innerJoin(
+        profileOwnerLifecycle,
+        eq(profileOwnerLifecycle.ownerId, profileHeads.ownerId),
+      )
       .innerJoin(
         profileVersions,
         and(
@@ -79,7 +90,7 @@ export class PostgresProfileRepository implements ProfileRepository {
               values: v.embedding,
               model: v.embeddingModel,
               dimensions: 768,
-              config: 'profile-semantic-v1',
+              config: "profile-semantic-v1",
               simulated: false,
             }
           : null,
@@ -96,13 +107,18 @@ export class PostgresProfileRepository implements ProfileRepository {
         .select()
         .from(profileOwnerLifecycle)
         .where(eq(profileOwnerLifecycle.ownerId, ownerId))
-        .for('update');
+        .for("update");
       if (!owner || owner.deletedAt) throw notFound();
       const [head] = await tx
         .select()
         .from(profileHeads)
-        .where(and(eq(profileHeads.id, p.profileId), eq(profileHeads.ownerId, ownerId)))
-        .for('update');
+        .where(
+          and(
+            eq(profileHeads.id, p.profileId),
+            eq(profileHeads.ownerId, ownerId),
+          ),
+        )
+        .for("update");
       if (!head || head.expiresAt <= new Date()) throw notFound();
       if (head.currentVersion !== expected) throw conflict();
       await tx.insert(profileVersions).values(this.values(p));

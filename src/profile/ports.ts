@@ -1,4 +1,4 @@
-import type { Embedding, Extracted, Profile, ReviewedPath } from './contracts';
+import type { Embedding, Extracted, Profile, ReviewedPath } from "./contracts";
 
 export interface ProfileAI {
   readonly model: string;
@@ -9,7 +9,11 @@ export interface ProfileRepository {
   create(profile: Profile): Promise<void>;
   get(ownerId: string, profileId: string): Promise<Profile | null>;
   // Atomically compare current version, write version + head, emit invalidation event.
-  replace(ownerId: string, expectedVersion: number, next: Profile): Promise<void>;
+  replace(
+    ownerId: string,
+    expectedVersion: number,
+    next: Profile,
+  ): Promise<void>;
   // Person C calls during lifecycle cleanup. Must prevent in-flight writes.
   deleteOwner(ownerId: string): Promise<void>;
 }

@@ -1,22 +1,28 @@
-import type { Profile, ReviewedPath, ResumeSuggestion } from './contracts';
-import { ProfileError } from './errors';
+import type { Profile, ReviewedPath, ResumeSuggestion } from "./contracts";
+import { ProfileError } from "./errors";
 
 // Conservative first release: foreground confirmed facts verbatim. No generative claims,
 // metrics, credentials, or future work can enter ready-to-use résumé copy.
-export function suggestResume(profile: Profile, path: ReviewedPath): ResumeSuggestion[] {
-  if (profile.status !== 'confirmed')
+export function suggestResume(
+  profile: Profile,
+  path: ReviewedPath,
+): ResumeSuggestion[] {
+  if (profile.status !== "confirmed")
     throw new ProfileError(
-      'CONFIRM_FIRST',
+      "CONFIRM_FIRST",
       409,
-      'Confirm your profile before requesting résumé suggestions.',
+      "Confirm your profile before requesting résumé suggestions.",
     );
   return path.requirements
     .flatMap((requirement) => {
       if (!requirement.excerpt.trim() || !requirement.skill.trim()) return [];
-      const escaped = requirement.skill.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const token = new RegExp(`(?:^|[^\\p{L}\\p{N}])${escaped}(?=$|[^\\p{L}\\p{N}])`, 'iu');
+      const escaped = requirement.skill.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const token = new RegExp(
+        `(?:^|[^\\p{L}\\p{N}])${escaped}(?=$|[^\\p{L}\\p{N}])`,
+        "iu",
+      );
       const fact = profile.facts.find(
-        (f) => f.kind === 'experience' && token.test(`${f.label} ${f.detail}`),
+        (f) => f.kind === "experience" && token.test(`${f.label} ${f.detail}`),
       );
       if (!fact) return [];
       return [

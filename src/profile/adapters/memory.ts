@@ -1,6 +1,6 @@
-import type { Profile } from '../contracts';
-import type { Operations, ProfileRepository } from '../ports';
-import { conflict, notFound, ProfileError } from '../errors';
+import type { Profile } from "../contracts";
+import type { Operations, ProfileRepository } from "../ports";
+import { conflict, notFound, ProfileError } from "../errors";
 
 // Synthetic local harness only. Person C supplies durable operations/auth lifecycle.
 export class MemoryProfileRepository implements ProfileRepository {
@@ -34,7 +34,11 @@ export class MemoryProfileRepository implements ProfileRepository {
       Date.parse(current.expiresAt) <= Date.now()
     )
       throw notFound();
-    if (current.version !== expected || next.version !== expected + 1 || next.ownerId !== owner)
+    if (
+      current.version !== expected ||
+      next.version !== expected + 1 ||
+      next.ownerId !== owner
+    )
       throw conflict();
     this.heads.set(next.profileId, structuredClone(next));
     this.events.push({
@@ -46,11 +50,15 @@ export class MemoryProfileRepository implements ProfileRepository {
   }
   async deleteOwner(owner: string) {
     this.deletedOwners.add(owner);
-    for (const [id, profile] of this.heads) if (profile.ownerId === owner) this.heads.delete(id);
+    for (const [id, profile] of this.heads)
+      if (profile.ownerId === owner) this.heads.delete(id);
   }
 }
 export class MemoryOperations implements Operations {
-  private entries = new Map<string, { digest: string; pending: boolean; value?: unknown }>();
+  private entries = new Map<
+    string,
+    { digest: string; pending: boolean; value?: unknown }
+  >();
   async run<T>(
     owner: string,
     kind: string,
@@ -59,21 +67,25 @@ export class MemoryOperations implements Operations {
     work: () => Promise<T>,
   ): Promise<T> {
     if (!/^[\w-]{8,100}$/.test(key))
-      throw new ProfileError('IDEMPOTENCY_REQUIRED', 400, 'Provide a valid Idempotency-Key.');
+      throw new ProfileError(
+        "IDEMPOTENCY_REQUIRED",
+        400,
+        "Provide a valid Idempotency-Key.",
+      );
     const id = JSON.stringify([owner, kind, key]);
     const previous = this.entries.get(id);
     if (previous) {
       if (previous.digest !== digest)
         throw new ProfileError(
-          'IDEMPOTENCY_CONFLICT',
+          "IDEMPOTENCY_CONFLICT",
           409,
-          'This request key was already used for different input.',
+          "This request key was already used for different input.",
         );
       if (previous.pending)
         throw new ProfileError(
-          'OPERATION_PENDING',
+          "OPERATION_PENDING",
           409,
-          'This request is still processing. Please wait.',
+          "This request is still processing. Please wait.",
           true,
         );
       return structuredClone(previous.value) as T;
@@ -81,7 +93,11 @@ export class MemoryOperations implements Operations {
     this.entries.set(id, { digest, pending: true });
     try {
       const result = await work();
-      this.entries.set(id, { digest, pending: false, value: structuredClone(result) });
+      this.entries.set(id, {
+        digest,
+        pending: false,
+        value: structuredClone(result),
+      });
       return result;
     } catch (error) {
       this.entries.delete(id);

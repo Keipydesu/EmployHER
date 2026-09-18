@@ -1,6 +1,6 @@
 # EmployHER — current stack
 
-Status: user-selected direction for future implementation, recorded 2026-09-18. Person A's Next.js/TypeScript profile slice, Zod validation, Drizzle adapter, and Gemini REST integration are implemented locally. Provider infrastructure and production integration remain unprovisioned. See [the profile handoff](docs/implementation/person-a.md). Supersedes the previous Rails stack through [decision 002](docs/decisions/002-hackhers-career-navigator.md).
+Status: user-selected direction for future implementation, recorded 2026-09-18. The Next.js/TypeScript local foundation is implemented; other integrations remain planned. Supersedes the previous Rails stack through [decision 002](docs/decisions/002-hackhers-career-navigator.md).
 
 | Layer | Choice | Responsibility |
 | --- | --- | --- |
@@ -12,8 +12,12 @@ Status: user-selected direction for future implementation, recorded 2026-09-18. 
 | AI | Gemini | Structured résumé extraction, embeddings, grounded gap analysis |
 | Coaching | Backboard.io | Persistent conversations and opted-in coaching memory |
 | Ingestion | GitHub API + Octokit | Read the two selected SimplifyJobs repositories and update opportunities |
-| Hosting | Vercel | Next.js deployment and server-side integration |
+| App runtime | Node 24 on localhost | Direct npm development workflow; Docker and hosted deployment deferred |
 
 Use server-only provider adapters. Pin mutually compatible supported runtime, framework, SDK, and model versions during implementation. No agent-to-agent authentication is needed. An optional independent ingestion worker may use Auth0 Client Credentials and the narrow `opportunities:ingest` scope.
 
+The localhost target is recorded in [decision 003](docs/decisions/003-localhost-demo.md). Auth0, database, and AI provider integrations remain planned; localhost does not imply offline operation.
+
 See [architecture](docs/architecture.md) and [development plan](docs/development.md). Earlier stack content remains available in Git history.
+
+The local profile sample workspace is implemented alongside Opportunities. See [profile handoff](docs/implementation/person-a.md); authenticated provider/database integration remains pending.

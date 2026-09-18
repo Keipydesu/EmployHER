@@ -1,13 +1,21 @@
-'use client';
-import { useEffect, useRef, useState } from 'react';
-import type { Fact, PublicProfile, ResumeSuggestion } from '@/profile/contracts';
-import { resumeFixtures, demoPaths } from '@/profile/fixtures';
+"use client";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import type {
+  Fact,
+  PublicProfile,
+  ResumeSuggestion,
+} from "@/profile/contracts";
+import { resumeFixtures, demoPaths } from "@/profile/fixtures";
 
-type Edit = Pick<Fact, 'id' | 'kind' | 'label' | 'detail' | 'dateText'>;
+type Edit = Pick<Fact, "id" | "kind" | "label" | "detail" | "dateText">;
 async function api<T>(url: string, options?: RequestInit): Promise<T> {
   const response = await fetch(url, options);
   const result = await response.json();
-  if (!response.ok) throw new Error(result.error?.message ?? 'The request failed. Please retry.');
+  if (!response.ok)
+    throw new Error(
+      result.error?.message ?? "The request failed. Please retry.",
+    );
   return result;
 }
 const editsFor = (profile: PublicProfile): Edit[] =>
@@ -37,18 +45,22 @@ export function ProfileWorkspace({
   }
   const [text, setText] = useState(resumeFixtures[0].text);
   const [file, setFile] = useState<File | null>(null);
-  const [mode, setMode] = useState<'sample' | 'text' | 'pdf'>('sample');
+  const [mode, setMode] = useState<"sample" | "text" | "pdf">("sample");
   const [sampleId, setSampleId] = useState(resumeFixtures[0].id);
   const [profile, setProfile] = useState<PublicProfile | null>(null);
   const [edits, setEdits] = useState<Edit[]>([]);
-  const [newKind, setNewKind] = useState<Fact['kind']>('skill');
-  const [newLabel, setNewLabel] = useState('');
-  const [busy, setBusy] = useState('');
-  const [error, setError] = useState('');
-  const [notice, setNotice] = useState('');
-  const [pathId, setPathId] = useState('data');
-  const [suggestions, setSuggestions] = useState<ResumeSuggestion[] | null>(null);
-  const [decisions, setDecisions] = useState<Record<string, 'accepted' | 'dismissed'>>({});
+  const [newKind, setNewKind] = useState<Fact["kind"]>("skill");
+  const [newLabel, setNewLabel] = useState("");
+  const [busy, setBusy] = useState("");
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [pathId, setPathId] = useState("data");
+  const [suggestions, setSuggestions] = useState<ResumeSuggestion[] | null>(
+    null,
+  );
+  const [decisions, setDecisions] = useState<
+    Record<string, "accepted" | "dismissed">
+  >({});
   const [drafts, setDrafts] = useState<Record<string, string>>({});
   const [dirty, setDirty] = useState(false);
   function showProfile(next: PublicProfile) {
@@ -58,10 +70,10 @@ export function ProfileWorkspace({
     setDirty(false);
     setDecisions({});
     setDrafts({});
-    sessionStorage.setItem('profile-id', next.profileId);
+    sessionStorage.setItem("profile-id", next.profileId);
   }
   useEffect(() => {
-    const id = sessionStorage.getItem('profile-id');
+    const id = sessionStorage.getItem("profile-id");
     if (id)
       void api<PublicProfile>(`/api/resumes/${id}`)
         .then((p) => {
@@ -69,96 +81,123 @@ export function ProfileWorkspace({
           setSession(true);
         })
         .catch(() => {
-          sessionStorage.removeItem('profile-id');
-          setNotice('The previous sample session is unavailable. Start a new one.');
+          sessionStorage.removeItem("profile-id");
+          setNotice(
+            "The previous sample session is unavailable. Start a new one.",
+          );
         });
   }, []);
   async function run(label: string, work: () => Promise<void>) {
     setBusy(label);
-    setError('');
-    setNotice('');
+    setError("");
+    setNotice("");
     try {
       await work();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Please retry.');
+      setError(e instanceof Error ? e.message : "Please retry.");
     } finally {
-      setBusy('');
+      setBusy("");
     }
   }
   function edit(index: number, patch: Partial<Edit>) {
-    setEdits((previous) => previous.map((f, i) => (i === index ? { ...f, ...patch } : f)));
+    setEdits((previous) =>
+      previous.map((f, i) => (i === index ? { ...f, ...patch } : f)),
+    );
     setDirty(true);
     setSuggestions(null);
   }
   async function extract() {
-    await run('Reading the résumé…', async () => {
+    await run("Reading the résumé…", async () => {
       const headers: Record<string, string> = {};
       let body: BodyInit;
-      if (mode === 'pdf') {
-        if (!file) throw new Error('Choose a sample PDF first.');
-        if (file.size > 2 * 1024 * 1024) throw new Error('PDFs must be 2 MB or smaller.');
+      if (mode === "pdf") {
+        if (!file) throw new Error("Choose a sample PDF first.");
+        if (file.size > 2 * 1024 * 1024)
+          throw new Error("PDFs must be 2 MB or smaller.");
         const form = new FormData();
-        form.set('file', file);
+        form.set("file", file);
         body = form;
       } else {
-        headers['Content-Type'] = 'application/json';
+        headers["Content-Type"] = "application/json";
         body = JSON.stringify({ text });
       }
-      const content = mode === 'pdf' ? await file!.arrayBuffer() : new TextEncoder().encode(text);
+      const content =
+        mode === "pdf"
+          ? await file!.arrayBuffer()
+          : new TextEncoder().encode(text);
       const fingerprint = Array.from(
-        new Uint8Array(await crypto.subtle.digest('SHA-256', content)),
-        (b) => b.toString(16).padStart(2, '0'),
-      ).join('');
+        new Uint8Array(await crypto.subtle.digest("SHA-256", content)),
+        (b) => b.toString(16).padStart(2, "0"),
+      ).join("");
       const intent = `intake:${mode}:${fingerprint}`;
-      headers['Idempotency-Key'] = stableKey(intent);
-      showProfile(await api<PublicProfile>('/api/resumes', { method: 'POST', headers, body }));
+      headers["Idempotency-Key"] = stableKey(intent);
+      showProfile(
+        await api<PublicProfile>("/api/resumes", {
+          method: "POST",
+          headers,
+          body,
+        }),
+      );
       requestKeys.current.delete(intent);
-      setNotice('Draft ready. Check every fact before confirming.');
+      setNotice("Draft ready. Check every fact before confirming.");
     });
   }
   async function save(confirm: boolean) {
     if (!profile) return;
-    await run(confirm ? 'Confirming and preparing embeddings…' : 'Saving your draft…', async () => {
-      const corrections = edits.map((f) => ({
-        ...f,
-        ...(f.id.startsWith('new-') ? { id: undefined } : {}),
-      }));
-      const payload = JSON.stringify({ expectedVersion: profile.version, corrections, confirm });
-      const intent = `update:${profile.profileId}:${payload}`;
-      const next = await api<PublicProfile>(`/api/resumes/${profile.profileId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'Idempotency-Key': stableKey(intent) },
-        body: payload,
-      });
-      requestKeys.current.delete(intent);
-      showProfile(next);
-      setNotice(
-        confirm
-          ? 'Profile confirmed. Changes have invalidated earlier profile-based results.'
-          : 'Draft saved. Confirm again when you are ready.',
-      );
-    });
+    await run(
+      confirm ? "Confirming and preparing embeddings…" : "Saving your draft…",
+      async () => {
+        const corrections = edits.map((f) => ({
+          ...f,
+          ...(f.id.startsWith("new-") ? { id: undefined } : {}),
+        }));
+        const payload = JSON.stringify({
+          expectedVersion: profile.version,
+          corrections,
+          confirm,
+        });
+        const intent = `update:${profile.profileId}:${payload}`;
+        const next = await api<PublicProfile>(
+          `/api/resumes/${profile.profileId}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              "Idempotency-Key": stableKey(intent),
+            },
+            body: payload,
+          },
+        );
+        requestKeys.current.delete(intent);
+        showProfile(next);
+        setNotice(
+          confirm
+            ? "Profile confirmed. Changes have invalidated earlier profile-based results."
+            : "Draft saved. Confirm again when you are ready.",
+        );
+      },
+    );
   }
   const sourceFor = (f: Edit) => {
     const original = profile?.facts.find((old) => old.id === f.id);
     return original &&
-      ['kind', 'label', 'detail', 'dateText'].every(
+      ["kind", "label", "detail", "dateText"].every(
         (k) => original[k as keyof Fact] === f[k as keyof Edit],
       )
       ? original.evidence
-      : { source: 'user_reported' as const };
+      : { source: "user_reported" as const };
   };
   return (
     <>
       <header className="site-header">
-        <a className="brand" href="/">
+        <Link className="brand" href="/">
           employ<span>HER</span>
           <span className="brand-dot">✳</span>
-        </a>
+        </Link>
         <span className="header-caption">A little clarity. A next step.</span>
         <span className="pill">PROFILE WORKSPACE</span>
       </header>
-      <main className="workspace">
+      <main className="profile-workspace">
         <div className="eyebrow">01 / KNOW YOUR STARTING POINT</div>
         <section className="hero">
           <div>
@@ -168,8 +207,8 @@ export function ProfileWorkspace({
               than you think.
             </h1>
             <p>
-              Projects, coursework, community work. Start with what you’ve done, then make sure the
-              story is yours.
+              Projects, coursework, community work. Start with what you’ve done,
+              then make sure the story is yours.
             </p>
           </div>
           <div className="hero-note">
@@ -183,25 +222,31 @@ export function ProfileWorkspace({
             </p>
           </div>
         </section>
-        <ol className="steps">
+        <ol className="profile-steps">
           <li className="active">
             <b>1</b> Bring your experience
           </li>
-          <li className={profile ? 'active' : ''}>
+          <li className={profile ? "active" : ""}>
             <b>2</b> Review the evidence
           </li>
-          <li className={profile?.status === 'confirmed' && !dirty ? 'active' : ''}>
+          <li
+            className={
+              profile?.status === "confirmed" && !dirty ? "active" : ""
+            }
+          >
             <b>3</b> Tell your story
           </li>
         </ol>
         <div className="demo-banner">
-          <strong>{localDemo ? 'Local synthetic-data demo' : 'Integration required'}</strong>
+          <strong>
+            {localDemo ? "Local synthetic-data demo" : "Integration required"}
+          </strong>
           <span>
             {localDemo
               ? liveGemini
-                ? 'Gemini processes sample data. No real résumés in this workspace.'
-                : 'Extraction and vectors are simulated fixtures. No model calls or real matching.'
-              : 'Sign-in and storage are not connected yet. This preview is available in local sample mode.'}
+                ? "Gemini processes approved samples only. Edited summaries use simulated embeddings. No real résumés."
+                : "Extraction and vectors are simulated fixtures. No model calls or real matching."
+              : "Sign-in and storage are not connected yet. This preview is available in local sample mode."}
           </span>
         </div>
         {!session && localDemo && (
@@ -209,8 +254,8 @@ export function ProfileWorkspace({
             className="button session-button"
             disabled={!!busy}
             onClick={() =>
-              run('Starting sample session…', async () => {
-                await api('/api/demo/session', { method: 'POST' });
+              run("Starting sample session…", async () => {
+                await api("/api/demo/session", { method: "POST" });
                 setSession(true);
               })
             }
@@ -230,8 +275,12 @@ export function ProfileWorkspace({
                 className="text-button"
                 disabled={!!busy}
                 onClick={() =>
-                  run('Reloading…', async () =>
-                    showProfile(await api<PublicProfile>(`/api/resumes/${profile.profileId}`)),
+                  run("Reloading…", async () =>
+                    showProfile(
+                      await api<PublicProfile>(
+                        `/api/resumes/${profile.profileId}`,
+                      ),
+                    ),
                   )
                 }
               >
@@ -242,38 +291,38 @@ export function ProfileWorkspace({
         )}
         <div className="columns">
           <section className="card intake">
-            <div className="section-heading">
+            <div className="profile-section-heading">
               <span className="section-number">01</span>
               <h2>Start with a résumé</h2>
             </div>
-            <p className="muted">
-              Only the supplied samples are accepted in this local demo. They are fictional and
-              contain no personal contact information.
+            <p className="profile-muted">
+              Only the supplied samples are accepted in this local demo. They
+              are fictional and contain no personal contact information.
             </p>
             <div className="tabs" role="group" aria-label="Résumé input method">
-              {(['sample', 'text', 'pdf'] as const).map((value) => (
+              {(["sample", "text", "pdf"] as const).map((value) => (
                 <button
                   key={value}
-                  className={mode === value ? 'selected' : ''}
+                  className={mode === value ? "selected" : ""}
                   aria-pressed={mode === value}
                   disabled={!!busy}
                   onClick={() => setMode(value)}
                 >
-                  {value === 'sample'
-                    ? 'Sample résumé'
-                    : value === 'text'
-                      ? 'Paste text'
-                      : 'Upload PDF'}
+                  {value === "sample"
+                    ? "Sample résumé"
+                    : value === "text"
+                      ? "Paste text"
+                      : "Upload PDF"}
                 </button>
               ))}
             </div>
             <fieldset disabled={!!busy || !session}>
-              {mode === 'sample' && (
+              {mode === "sample" && (
                 <div className="sample-list">
                   {resumeFixtures.map((sample) => (
                     <label
                       key={sample.id}
-                      className={`sample-option ${sampleId === sample.id ? 'chosen' : ''}`}
+                      className={`sample-option ${sampleId === sample.id ? "chosen" : ""}`}
                     >
                       <input
                         type="radio"
@@ -292,7 +341,7 @@ export function ProfileWorkspace({
                   ))}
                 </div>
               )}
-              {mode === 'text' && (
+              {mode === "text" && (
                 <label className="field">
                   Sample résumé text
                   <textarea
@@ -302,15 +351,17 @@ export function ProfileWorkspace({
                     onChange={(e) => setText(e.target.value)}
                   />
                   <small>
-                    {text.length.toLocaleString()} / 20,000 characters. Use the supplied sample
-                    text.
+                    {text.length.toLocaleString()} / 20,000 characters. Use the
+                    supplied sample text.
                   </small>
                 </label>
               )}
-              {mode === 'pdf' && (
+              {mode === "pdf" && (
                 <div className="upload-box">
                   <span className="upload-icon">↥</span>
-                  <label htmlFor="resume-file">Choose a text-based sample PDF</label>
+                  <label htmlFor="resume-file">
+                    Choose a text-based sample PDF
+                  </label>
                   <input
                     id="resume-file"
                     type="file"
@@ -318,7 +369,9 @@ export function ProfileWorkspace({
                     onChange={(e) => setFile(e.target.files?.[0] ?? null)}
                   />
                   <p>Up to 2 MB · 5 pages · no scanned or encrypted PDFs</p>
-                  <a href={`/api/demo/fixtures/${sampleId}`}>Download the selected sample PDF</a>
+                  <a href={`/api/demo/fixtures/${sampleId}`}>
+                    Download the selected sample PDF
+                  </a>
                 </div>
               )}
               <button className="button wide" onClick={extract}>
@@ -326,17 +379,19 @@ export function ProfileWorkspace({
               </button>
             </fieldset>
             <p className="privacy-note">
-              ↳ Raw files and full text are not saved. The demo stores reviewed facts in server
-              memory until restart; production retention and login are Person C’s integration.
+              ↳ Raw files and full text are not saved. The demo stores reviewed
+              facts in server memory until restart; production retention and
+              login are Person C’s integration.
             </p>
           </section>
           <section className="card review">
-            <div className="section-heading">
+            <div className="profile-section-heading">
               <span className="section-number">02</span>
               <h2>Make it your story</h2>
               {profile && (
                 <span className="pill">
-                  v{profile.version} · {dirty ? 'UNSAVED' : profile.status.toUpperCase()}
+                  v{profile.version} ·{" "}
+                  {dirty ? "UNSAVED" : profile.status.toUpperCase()}
                 </span>
               )}
             </div>
@@ -345,17 +400,18 @@ export function ProfileWorkspace({
                 <span className="empty-symbol">✳</span>
                 <h3>Your experience belongs here.</h3>
                 <p>
-                  Choose a sample to see skills, education, and projects with the excerpts that
-                  support them.
+                  Choose a sample to see skills, education, and projects with
+                  the excerpts that support them.
                 </p>
                 <div className="placeholder-row" />
                 <div className="placeholder-row short" />
               </div>
             ) : (
               <>
-                <p className="muted">
-                  Review every item. Edits and additions become <strong>user-reported</strong>; they
-                  are never presented as original résumé evidence.
+                <p className="profile-muted">
+                  Review every item. Edits and additions become{" "}
+                  <strong>user-reported</strong>; they are never presented as
+                  original résumé evidence.
                 </p>
                 <fieldset disabled={!!busy} className="fact-list">
                   {edits.map((fact, index) => {
@@ -365,7 +421,9 @@ export function ProfileWorkspace({
                         <div className="fact-top">
                           <span className="eyebrow">{fact.kind}</span>
                           <span className={`source ${evidence.source}`}>
-                            {evidence.source === 'resume' ? 'Résumé excerpt' : 'User-reported'}
+                            {evidence.source === "resume"
+                              ? "Résumé excerpt"
+                              : "User-reported"}
                           </span>
                           <button
                             className="text-button remove"
@@ -380,40 +438,50 @@ export function ProfileWorkspace({
                           </button>
                         </div>
                         <label className="field">
-                          {fact.kind === 'skill'
-                            ? 'Skill'
-                            : fact.kind === 'education'
-                              ? 'Credential or study'
-                              : 'Project or role'}
+                          {fact.kind === "skill"
+                            ? "Skill"
+                            : fact.kind === "education"
+                              ? "Credential or study"
+                              : "Project or role"}
                           <input
                             maxLength={160}
                             value={fact.label}
-                            onChange={(e) => edit(index, { label: e.target.value })}
+                            onChange={(e) =>
+                              edit(index, { label: e.target.value })
+                            }
                           />
                         </label>
-                        {fact.kind !== 'skill' && (
+                        {fact.kind !== "skill" && (
                           <>
                             <label className="field">
-                              {fact.kind === 'education' ? 'Institution / details' : 'What you did'}
+                              {fact.kind === "education"
+                                ? "Institution / details"
+                                : "What you did"}
                               <textarea
                                 rows={2}
                                 maxLength={400}
                                 value={fact.detail}
-                                onChange={(e) => edit(index, { detail: e.target.value })}
+                                onChange={(e) =>
+                                  edit(index, { detail: e.target.value })
+                                }
                               />
                             </label>
                             <label className="field">
                               Dates, if known
                               <input
                                 maxLength={80}
-                                value={fact.dateText ?? ''}
+                                value={fact.dateText ?? ""}
                                 placeholder="Not specified"
-                                onChange={(e) => edit(index, { dateText: e.target.value || null })}
+                                onChange={(e) =>
+                                  edit(index, {
+                                    dateText: e.target.value || null,
+                                  })
+                                }
                               />
                             </label>
                           </>
                         )}
-                        {evidence.source === 'resume' && (
+                        {evidence.source === "resume" && (
                           <blockquote>{evidence.excerpt}</blockquote>
                         )}
                       </article>
@@ -424,7 +492,9 @@ export function ProfileWorkspace({
                       Add a fact
                       <select
                         value={newKind}
-                        onChange={(e) => setNewKind(e.target.value as Fact['kind'])}
+                        onChange={(e) =>
+                          setNewKind(e.target.value as Fact["kind"])
+                        }
                       >
                         <option value="skill">Skill</option>
                         <option value="experience">Experience</option>
@@ -450,11 +520,11 @@ export function ProfileWorkspace({
                             id: `new-${crypto.randomUUID()}`,
                             kind: newKind,
                             label: newLabel.trim(),
-                            detail: '',
+                            detail: "",
                             dateText: null,
                           },
                         ]);
-                        setNewLabel('');
+                        setNewLabel("");
                         setDirty(true);
                         setSuggestions(null);
                       }}
@@ -465,14 +535,18 @@ export function ProfileWorkspace({
                   <div className="actions">
                     <button
                       className="secondary"
-                      disabled={!edits.length || edits.some((f) => !f.label.trim())}
+                      disabled={
+                        !edits.length || edits.some((f) => !f.label.trim())
+                      }
                       onClick={() => save(false)}
                     >
                       Save draft
                     </button>
                     <button
                       className="button"
-                      disabled={!edits.length || edits.some((f) => !f.label.trim())}
+                      disabled={
+                        !edits.length || edits.some((f) => !f.label.trim())
+                      }
                       onClick={() => save(true)}
                     >
                       Confirm reviewed profile →
@@ -482,7 +556,7 @@ export function ProfileWorkspace({
                 {profile.embedding && !dirty && (
                   <p className="embedding-note">
                     {profile.embedding.simulated
-                      ? 'Demo embedding prepared — not usable for real matching.'
+                      ? "Demo embedding prepared — not usable for real matching."
                       : `Profile embedding ready: ${profile.embedding.dimensions} dimensions · ${profile.embedding.model}`}
                   </p>
                 )}
@@ -490,16 +564,17 @@ export function ProfileWorkspace({
             )}
           </section>
         </div>
-        {profile?.status === 'confirmed' && !dirty && (
+        {profile?.status === "confirmed" && !dirty && (
           <section className="card suggestions">
-            <div className="section-heading">
+            <div className="profile-section-heading">
               <span className="section-number">03</span>
               <h2>Tell an honest résumé story</h2>
             </div>
-            <p className="muted">
-              Foreground confirmed experience for a reviewed path. These suggestions reuse your
-              words without adding achievements, metrics, or credentials. Path requirements below
-              are synthetic demo fixtures.
+            <p className="profile-muted">
+              Foreground confirmed experience for a reviewed path. These
+              suggestions reuse your words without adding achievements, metrics,
+              or credentials. Path requirements below are synthetic demo
+              fixtures.
             </p>
             <div className="actions">
               <label className="field">
@@ -523,8 +598,10 @@ export function ProfileWorkspace({
                 className="secondary"
                 disabled={!!busy}
                 onClick={() =>
-                  run('Finding supported résumé suggestions…', async () => {
-                    const result = await api<{ suggestions: ResumeSuggestion[] }>(
+                  run("Finding supported résumé suggestions…", async () => {
+                    const result = await api<{
+                      suggestions: ResumeSuggestion[];
+                    }>(
                       `/api/resumes/${profile.profileId}/suggestions?pathId=${pathId}&version=${profile.version}`,
                     );
                     setSuggestions(result.suggestions);
@@ -538,17 +615,20 @@ export function ProfileWorkspace({
             </div>
             {suggestions?.length === 0 && (
               <p className="notice">
-                No confirmed experience directly supports these sample requirements. Add missing
-                experience if you have it; don’t invent it.
+                No confirmed experience directly supports these sample
+                requirements. Add missing experience if you have it; don’t
+                invent it.
               </p>
             )}
             {suggestions
-              ?.filter((s) => decisions[s.id] !== 'dismissed')
+              ?.filter((s) => decisions[s.id] !== "dismissed")
               .map((s) => (
                 <article className="suggestion" key={s.id}>
                   <p>{s.reason}</p>
                   <small>
-                    {s.source === 'resume' ? 'Original résumé evidence' : 'User-reported evidence'}{' '}
+                    {s.source === "resume"
+                      ? "Original résumé evidence"
+                      : "User-reported evidence"}{" "}
                     · requirement {s.requirementId}
                   </small>
                   <label className="field">
@@ -557,29 +637,39 @@ export function ProfileWorkspace({
                       value={drafts[s.id] ?? s.proposed}
                       onChange={(e) => {
                         setDrafts({ ...drafts, [s.id]: e.target.value });
-                        setDecisions({ ...decisions, [s.id]: 'accepted' });
+                        setDecisions({ ...decisions, [s.id]: "accepted" });
                       }}
                     />
                   </label>
                   <div className="actions">
                     <button
                       className="secondary"
-                      onClick={() => setDecisions({ ...decisions, [s.id]: 'accepted' })}
+                      onClick={() =>
+                        setDecisions({ ...decisions, [s.id]: "accepted" })
+                      }
                     >
-                      {decisions[s.id] === 'accepted' ? 'Selected ✓' : 'Accept draft'}
+                      {decisions[s.id] === "accepted"
+                        ? "Selected ✓"
+                        : "Accept draft"}
                     </button>
                     <button
                       className="text-button"
-                      onClick={() => setDecisions({ ...decisions, [s.id]: 'dismissed' })}
+                      onClick={() =>
+                        setDecisions({ ...decisions, [s.id]: "dismissed" })
+                      }
                     >
                       Reject
                     </button>
                     <button
                       className="text-button"
                       onClick={() =>
-                        run('Copying…', async () => {
-                          await navigator.clipboard.writeText(drafts[s.id] ?? s.proposed);
-                          setNotice('Copied. Check that your final wording stays accurate.');
+                        run("Copying…", async () => {
+                          await navigator.clipboard.writeText(
+                            drafts[s.id] ?? s.proposed,
+                          );
+                          setNotice(
+                            "Copied. Check that your final wording stays accurate.",
+                          );
                         })
                       }
                     >
@@ -589,8 +679,8 @@ export function ProfileWorkspace({
                 </article>
               ))}
             <p className="privacy-note">
-              Draft choices stay on this page and do not change your confirmed profile. Copy any
-              wording you want to keep.
+              Draft choices stay on this page and do not change your confirmed
+              profile. Copy any wording you want to keep.
             </p>
           </section>
         )}
