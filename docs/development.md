@@ -52,6 +52,10 @@ Place app and database near each other. Set connection pool and concurrency limi
 
 Set exact Auth0 callback/logout origins. Confirm provider entitlements/model availability and budgets. Run a small authenticated manual ingestion first; add a scheduled independent worker only after repeat-run behavior works. Configure recurring expiry and deletion cleanup with a durable scheduler before real data is enabled; choose and document the concrete scheduler at implementation.
 
+## Execution milestones
+
+See `docs/product.md`'s "Three-person parallel MVP roadmap" for the full three-person, milestone-gated work split (M0 foundation → M1 parallel vertical slices → M2 integration/demo → M3 parallel hardening). The "Future implementation checks" list below is the acceptance bar for M3.
+
 ## Verification gates
 
 Documentation checks today: internal links, whitespace/diff review, placeholder-only configuration, and staged scope review. No runtime claims.

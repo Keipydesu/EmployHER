@@ -32,7 +32,7 @@ A ranking value is a retrieval aid, not a probability of hiring. Do not show a m
 | P1 / 8 | Demo and pilot hardening | Rate limits, timeout UX, refresh, deletion races, and provider outages checked |
 | P2 | Scheduled worker, Discord bot, richer resource curation | Only after the core flow is reliable |
 
-Build owners: A owns Gemini extraction/evidence/contracts; B owns schema, matching, and results; C owns Auth0, ingestion, deployment, and coach integration. Freeze contracts together; this is a proposed human work split, not a claim that work has started.
+See "Three-person parallel MVP roadmap" below for the current milestone-gated work split; this is a proposed human work split, not a claim that work has started.
 
 ## Demo script and pitch
 
@@ -45,6 +45,25 @@ Pitch: “EmployHER connects what you have done to what you can do next. It turn
 One web app, one database, one curated ingestion source, a small corpus, and bounded model calls. Normal login is required for saved personal state. Backboard remains in the chosen architecture but its outage must not block matching. Demo fixtures may be used while real-data gates remain closed.
 
 No application scaffold in this documentation task. No automated applications, outreach, employer quality scores, gender inference, hiring guarantees, unrestricted scraping, agent swarm, agent-to-agent auth, payments, blockchain, OCR, or mentor marketplace. A full four-week curriculum is deferred in favor of three concrete next steps.
+
+## Three-person parallel MVP roadmap
+
+Splits the P0/P1 backlog above into three vertical workstreams that can run concurrently after a short shared foundation session. Supersedes the "Build owners" line above with a milestone-gated plan.
+
+**M0 — Foundation (all three together, one session).** Freeze the Zod/API contracts in `docs/api.md`. Draft per-domain Drizzle schema files so parallel edits don't collide: `profiles.ts` (Track A), `catalog.ts`/`matches.ts` (Track B), `operations.ts`/user/session tables (Track C). Produce committed fixtures: 5 synthetic résumés; a one-time parse of the two SimplifyJobs source repos into ≥15 curated roles that include real, reviewed requirement excerpts (not just title/legend-icon data — see `docs/architecture.md`'s ingestion contract for why bare rows can't support a grounded gap claim); and the inclusion-resource seed set (each entry sourced, dated, per `docs/privacy.md`). Gate: all three can build independently against frozen contracts and fixtures without further sync.
+
+**M1 — Parallel vertical slices.**
+- **Track A — Profile intake.** Résumé upload, Gemini structured extraction, review/correction UI, profile confirmation and versioning, embedding generation. Stretch (after this track's core is integrated): Backboard coaching (P1) — not required for the MVP demo.
+- **Track B — Catalog and matching.** Loads the M0 static snapshot into `jobs`/`job_requirements`/`inclusion_resources`; semantic retrieval via pgvector; grounded gap explanation restricted to roles with a reviewed requirement excerpt (roles without one show as discovery candidates with requirements marked unavailable, not an inferred gap); next-steps generation; match persistence and invalidation on profile correction.
+- **Track C — Platform.** Next.js/Tailwind/shadcn app shell; Auth0 integration and session/ownership middleware; Tiger Data provisioning and migration ordering across A's and B's schema files; `operations`/idempotency table and CSRF protection; Vercel deployment config.
+
+Each track's acceptance gate is its corresponding row in the backlog table above (e.g. Track B: "active roles only, grounded evidence, useful empty/error states").
+
+**M2 — Integration and demo.** Wire the three tracks together and remove mocks/fixture-only paths. Gate: the demo script below runs end-to-end against real (non-mock) endpoints — one apply-ready role, one role with a genuine gap, and one inclusion resource shown contextually on a matched role card (not a disconnected generic list).
+
+**M3 — Parallel hardening.** Split again across three people using `docs/development.md`'s verification-gate list (two-user ownership/CSRF, idempotency and timeout recovery, deletion races, provider outages, no sensitive logs, etc.) as the acceptance bar. Backboard coaching, if not already done in Track A's stretch slot, lands here as an explicit stretch item — never a blocker for the core demo.
+
+The one-time source snapshot in M0 is a static fixture, not a live/scheduled ingestion pipeline; the fuller ingestion contract in `docs/architecture.md` (pagination, ETag, retry, dedup) is explicitly deferred past the MVP.
 
 ## Future Discord integration
 
