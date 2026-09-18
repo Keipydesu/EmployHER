@@ -174,7 +174,7 @@
   <h2><span class="num">01</span>Product outcome</h2>
   <p class="lede">Help an early-career learner turn a career goal into a realistic learning plan grounded in a target job description, then identify mentors who can help with the specific gaps in that plan.</p>
   <p class="flow">resume + goal + target job → evidence review → confirmed gaps → four-week learning plan → relevant mentor + outreach draft → progress</p>
-  <p>The original concept calls for Gemini to compare resumes with job descriptions, generate a personalized curriculum, and draft mentor icebreakers. It proposes Google Cloud hosting, Cloud Storage for resume PDFs and profile images, and Firestore for profiles, matches, and progress. This MVP preserves those outcomes while deferring profile images and a full mentorship marketplace.</p>
+  <p>The original concept calls for Gemini to compare resumes with job descriptions, generate a personalized curriculum, and draft mentor icebreakers. It proposes Google Cloud hosting, Cloud Storage for resume PDFs and profile images, and Firestore for profiles, matches, and progress. This MVP preserves those outcomes while deferring profile images and a full mentorship marketplace. The operator has since specified Ruby on Rails as the application framework; section 7 records the resulting architecture, including where it departs from the concept&rsquo;s original datastore suggestion.</p>
 </section>
 
 <section>
@@ -276,6 +276,9 @@ RoadmapTask { id, primaryGapId, week: 1..4, title, hours,
   dependencyTaskIds[], deliverable, completionCheck, resourceId? }
 OutreachDraft { mentorId, gapId, text }</code></pre>
   <p>Validate required fields, enum values, source spans, foreign-key references, finite positive hours, weekly totals, and acyclic dependencies. Treat model output as untrusted data. Retry schema or grounding failure once; if still invalid, show a recoverable error and no factual gap claims from the invalid output. Set an overall generation timeout and bounded retries; initial design budget is 60 seconds. Never silently replace a failed live run with a sample result.</p>
+  <div class="callout warn">
+    <p><span class="label">Generation must not run in-process</span>On request-based billing Cloud Run disables or severely limits CPU outside a request, so a job started in the web process is not guaranteed to finish after the response is sent. Use one durable execution model and only one: a Cloud Tasks queue dispatching to an authenticated, owner-scoped Cloud Run endpoint. Cloud Tasks is then the single retry authority, and the handler must be idempotent, keyed on the analysis ID, so a redelivered task cannot produce a duplicate plan. A Solid Queue worker on an always-allocated-CPU service is a valid alternative, but it is a choice between the two, not an addition, and it carries continuous cost against the spend cap. The client polls for status; F10&rsquo;s processing display reports that real state.</p>
+  </div>
   <div class="callout">
     <p><span class="label">Injection posture</span>Resume and JD contents are data, not instructions. Give the model no tools or browsing capability for these steps. Do not execute embedded commands or follow document instructions. Render generated content as escaped text; validate any curated URLs separately. Version prompts and model configuration with every analysis for reproducibility.</p>
   </div>
@@ -284,14 +287,15 @@ OutreachDraft { mentorId, gapId, text }</code></pre>
 <section>
   <h2><span class="num">07</span>Proposed architecture and data</h2>
   <div class="callout warn">
-    <p><span class="label">Design, not deployment</span>These are design choices, not verified deployment claims. Confirm supported SDK and model versions and deployment settings during implementation.</p>
+    <p><span class="label">Design, not deployment</span>These are design choices, not verified deployment claims. Confirm supported gem, SDK, and model versions and deployment settings during implementation.</p>
   </div>
+  <p>The application framework is <strong>Ruby on Rails</strong>, set by the operator. Rails supplies the request layer, ActiveRecord persistence, ActiveStorage file handling, and encrypted signed sessions; the list below records how each cloud dependency maps onto it. A companion tech-stack document accompanies this PRD in the repository.</p>
   <ul>
-    <li><strong>Cloud Run:</strong> web application and authenticated backend endpoints; server-side Gemini calls and PDF extraction.</li>
-    <li><strong>Managed anonymous authentication:</strong> creates a per-browser identity for ownership without requiring email registration. Rate-limit generation and impose a per-session quota (initially five analyses/day) plus a global spend limit. The per-browser quota deters casual overuse but is not a security control, since a user can reset the browser identity; the global spend limit is the actual enforcement boundary.</li>
-    <li><strong>Cloud Storage:</strong> private temporary PDF objects scoped by owner ID; short-lived authorized upload and download access only. Do not expose public object URLs.</li>
-    <li><strong>Firestore:</strong> owner-scoped structured profiles, analysis metadata, confirmed gaps, versioned roadmaps, progress, and mentor-match references. Curated mentor records are read-only for learners.</li>
-    <li><strong>Gemini API:</strong> configured from server-side secrets; minimize submitted fields and choose data handling appropriate for pilot resume content before enabling that mode.</li>
+    <li><strong>Cloud Run:</strong> containerized Rails application and authenticated backend endpoints; server-side Gemini calls and PDF extraction. Recent Rails versions generate a production Dockerfile; confirm for the version actually used.</li>
+    <li><strong>Rails encrypted signed session:</strong> creates a per-browser identity for ownership without requiring email registration, replacing the managed anonymous-auth service. Same ownership semantics and the same browser-only recovery limitation already disclosed in F9, with one less external dependency. Rate-limit generation and impose a per-session quota (initially five analyses/day) plus a global spend limit. The per-browser quota deters casual overuse but is not a security control, since a user can reset the browser identity; the global spend limit is the actual enforcement boundary.</li>
+    <li><strong>Cloud Storage via ActiveStorage:</strong> private temporary PDF objects scoped by owner ID; short-lived authorized upload and download access only. Do not expose public object URLs. ActiveStorage&rsquo;s default signed routes grant bearer access to whoever holds the URL, which is not owner authorization &mdash; serve resume files through authenticated owner-scoped controllers, and disable preview and analysis jobs for temporary uploads.</li>
+    <li><strong>Cloud SQL for PostgreSQL via ActiveRecord:</strong> owner-scoped structured profiles, analysis metadata, confirmed gaps, versioned roadmaps, progress, and mentor-match references. Curated mentor records are read-only for learners. This is a <em>proposed substitution</em> for the concept&rsquo;s Firestore, not an operator instruction. The records below are already relational, and section 6 requires foreign-key validation, so a relational store enforces with constraints and cascading deletes what would otherwise be hand-checked. Rails without ActiveRecord also forfeits migrations, validations, and associations. Keeping Firestore behind the <code>google-cloud-firestore</code> gem remains possible; the cost is that trade.</li>
+    <li><strong>Gemini API from Ruby:</strong> configured from Rails encrypted credentials or Secret Manager; minimize submitted fields and choose data handling appropriate for pilot resume content before enabling that mode. The vendor lists official SDKs for Python, JS/TS, Go, Java, and C#, but not Ruby, so the plan of record is a thin server-side REST client; re-check at implementation. Section 6 already requires us to own schema validation and bounded retry regardless of client.</li>
   </ul>
   <h3>Logical records</h3>
   <div class="table-wrap">
@@ -307,7 +311,7 @@ OutreachDraft { mentorId, gapId, text }</code></pre>
       </tbody>
     </table>
   </div>
-  <p>Full raw resumes and full raw text are not persisted in Firestore. Minimal supporting resume excerpts remain sensitive structured data and follow the same retention policy as profiles. JDs and source text needed for validation exist only during processing; retain only cited requirement excerpts afterward. Outreach drafts may remain local until copied rather than adding another retained record.</p>
+  <p>Full raw resumes and full raw text are not persisted in the database. Minimal supporting resume excerpts remain sensitive structured data and follow the same retention policy as profiles. JDs and source text needed for validation exist only during processing; retain only cited requirement excerpts afterward. Outreach drafts may remain local until copied rather than adding another retained record.</p>
 </section>
 
 <section>
@@ -321,7 +325,7 @@ OutreachDraft { mentorId, gapId, text }</code></pre>
     <li>Delete raw PDF and extracted full text immediately after successful analysis or terminal failure. A cleanup job removes abandoned uploads within 24 hours; no real-data pilot without that job.</li>
     <li>Structured profiles, excerpts, analyses, plans, and progress expire 30 days after creation. No automatic extension unless the product later introduces an explicit policy.</li>
     <li>&ldquo;Delete my data&rdquo; removes owned application records and storage objects; make them inaccessible immediately and complete application deletion within 24 hours. Show completion and failure status and retry failures. Document backup retention separately before launch.</li>
-    <li>Authorization covers every read, write, delete, and upload. Test cross-user access denial, including direct object access.</li>
+    <li>Authorization covers every read, write, delete, and upload. Test cross-user access denial, including direct object access. ActiveStorage&rsquo;s default signed routes are bearer access, not owner authorization; serve resume files through authenticated owner-scoped controllers. Disable ActiveStorage preview and analysis jobs for temporary resume uploads so deletion scope and queue surface stay no wider than intended.</li>
     <li>Never log raw resume or JD bodies, sensitive excerpts, or generated outreach. Log request IDs, timing, validation failures, and model versions.</li>
     <li>Mentor content for a real pilot requires documented permission and a removal path. Product owner recruits at least three opted-in mentors before presenting a populated live directory. Synthetic profiles remain a separate demo dataset.</li>
   </ul>
@@ -395,12 +399,15 @@ OutreachDraft { mentorId, gapId, text }</code></pre>
   <h3>Track B &mdash; plan, progress, and data model</h3>
   <p>Gap confirmation and priority UI, transparent prioritization, roadmap generation plus the deterministic validators (weekly hours within budget, acyclic dependencies, every gap covered or explicitly deferred with the cap and budget causes distinguished), task editing, roadmap versioning, and progress persistence. The validators are deterministic application logic, not model output, so B can build and test them against fixture <code>Requirement[]</code> before A&rsquo;s extraction is finished.</p>
   <h3>Track C &mdash; mentors, demo surface, and platform</h3>
-  <p>Synthetic mentor dataset and sample labeling, deterministic matching and ranking, icebreaker drafting, empty and no-availability states, the demo/pilot mode switch, anonymous identity and ownership rules, Cloud Run deployment, quotas and the global spend cap, the abandoned-upload cleanup job, and cross-identity authorization tests. C is the least coupled track and can start immediately against an agreed <code>ConfirmedGap</code> shape.</p>
+  <p>Synthetic mentor dataset and sample labeling, deterministic matching and ranking, icebreaker drafting, empty and no-availability states, the demo/pilot mode switch, session identity and ownership rules, Cloud Run deployment, quotas and the global spend cap, the abandoned-upload cleanup job, and cross-identity authorization tests. C is the least coupled track and can start immediately against an agreed <code>ConfirmedGap</code> shape.</p>
+  <div class="callout warn">
+    <p><span class="label">One Rails-specific caution</span>A single Rails application collides far more than three separate services would, because the three tracks share <code>db/</code>, <code>config/</code>, and the route table. Namespace domain logic under <code>app/services/extraction</code> (A), <code>app/services/planning</code> (B), and <code>app/services/mentors</code> (C), keep each track&rsquo;s routes in its own drawn file, and route every schema change through B. Track ownership of requirements does not change; this is purely about keeping three developers out of the same files.</p>
+  </div>
   <div class="callout warn">
     <p><span class="label">Critical path</span>A then B. C runs parallel to both. If a track slips, C&rsquo;s mentor preview is the only one that can be feature-flagged off for an interim demo, and doing so means presenting partial implementation rather than the full concept.</p>
   </div>
   <h3>Shared boundaries that need one owner each</h3>
-  <p>To avoid merge collisions: the contract definitions and fixtures belong to A; the Firestore schema and security rules to B, with C reviewing the ownership and authorization model; the deployment configuration and secrets to C. Any change to a frozen contract is a three-way decision, not a unilateral edit.</p>
+  <p>To avoid merge collisions: the contract definitions and fixtures belong to A; the ActiveRecord schema and every migration to B, with C reviewing the ownership and authorization model; the deployment configuration and credentials to C. Migrations need a single owner because <code>db/schema.rb</code> is the classic three-developer Rails merge conflict. Any change to a frozen contract is a three-way decision, not a unilateral edit.</p>
   <h3>Integration checkpoints</h3>
   <p>Integrate when A can emit a validated <code>Requirement[]</code> for all five fixtures; again when B can turn that into a validated roadmap with progress surviving a refresh; again when C can rank mentors from real <code>ConfirmedGap[]</code> and render labeled samples. The acceptance suite in section 9 is the final gate and belongs to whoever is not the author of the code under test.</p>
 </section>
@@ -419,6 +426,9 @@ OutreachDraft { mentorId, gapId, text }</code></pre>
         <tr><td>PDF complexity</td><td>Backend implementer</td><td>Text-based PDFs only and equal-status text input for pilot</td></tr>
         <tr><td>Unrealistic plan estimates</td><td>Product/AI implementer</td><td>User-editable hours, explicit deferral, no proficiency guarantees</td></tr>
         <tr><td>Provider processing terms and deletion</td><td>Deployment owner</td><td>Document chosen settings and terms and test gates before real data</td></tr>
+        <tr><td>Datastore substitution</td><td>Product owner</td><td><strong>Proposed decision, not operator-instructed.</strong> Cloud SQL Postgres with ActiveRecord replaces the concept&rsquo;s Firestore; rationale in section 7. Operator may override back to Firestore, accepting the loss of ActiveRecord</td></tr>
+        <tr><td>Ruby Gemini client</td><td>Deployment owner + Dev A</td><td>No official Ruby SDK is listed by the vendor; plan of record is a thin REST client with our own schema validation and bounded retry. Re-check at implementation</td></tr>
+        <tr><td>Background execution model</td><td>Deployment owner</td><td>Cloud Tasks to an authenticated Cloud Run endpoint, chosen over an always-on Solid Queue worker on cost grounds. Pick exactly one</td></tr>
         <tr><td>Latency and cost</td><td>Deployment owner</td><td>Quotas, bounded retries, measured timing, spend cap</td></tr>
         <tr><td>Browser identity recovery</td><td>Product owner</td><td>Disclose limitation; defer account linking unless pilot requires it</td></tr>
         <tr><td>Mentor pillar importance</td><td>Product owner</td><td><strong>Open.</strong> Keep required preview; change emphasis if operator prioritizes live mentorship</td></tr>
