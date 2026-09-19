@@ -65,9 +65,11 @@ export function ProfileWorkspace({
     requestKeys.current.set(intent, key);
     return key;
   }
-  const [text, setText] = useState(resumeFixtures[0].text);
+  const [text, setText] = useState(personal ? "" : resumeFixtures[0].text);
   const [file, setFile] = useState<File | null>(null);
-  const [mode, setMode] = useState<"sample" | "text" | "pdf">("sample");
+  const [mode, setMode] = useState<"sample" | "text" | "pdf">(
+    personal ? "pdf" : "sample",
+  );
   const [sampleId, setSampleId] = useState(resumeFixtures[0].id);
   const [profile, setProfile] = useState<PublicProfile | null>(null);
   const [edits, setEdits] = useState<Edit[]>([]);
@@ -269,8 +271,19 @@ export function ProfileWorkspace({
             employ<span>HER</span>
             <span className="brand-dot">✳</span>
           </Link>
-          <span className="header-caption">A little clarity. A next step.</span>
-          <span className="pill">PROFILE WORKSPACE</span>
+          <span className="header-caption">YOUR WORKSPACE</span>
+          <nav aria-label="Sample workspace">
+            <Link href="/demo/profile" aria-current="page">
+              Your résumé
+            </Link>
+            <Link href="/demo">Explore the demo →</Link>
+          </nav>
+          <p className="profile-sidebar-note">
+            Small steps.
+            <br />
+            Real possibilities.
+            <small>Built around evidence. Guided by you.</small>
+          </p>
         </header>
       )}
       <main className="profile-workspace">
@@ -278,13 +291,13 @@ export function ProfileWorkspace({
         <section className="hero">
           <div>
             <h1>
-              You bring more
+              Your next chapter
               <br />
-              than you think.
+              starts with your story.
             </h1>
             <p>
-              Projects, coursework, community work. Start with what you’ve done,
-              then make sure the story is yours.
+              Bring your projects, coursework and experience together. We’ll
+              help you see what’s already there — and where you could go next.
             </p>
           </div>
           <div className="hero-note">
@@ -298,19 +311,29 @@ export function ProfileWorkspace({
             </p>
           </div>
         </section>
-        <ol className="profile-steps">
-          <li className="active">
+        <ol className="profile-steps" aria-label="Résumé progress">
+          <li className="active" aria-current={!profile ? "step" : undefined}>
             <b>1</b> Bring your experience
           </li>
-          <li className={profile ? "active" : ""}>
+          <li
+            className={profile ? "active" : ""}
+            aria-current={
+              profile && (profile.status !== "confirmed" || dirty)
+                ? "step"
+                : undefined
+            }
+          >
             <b>2</b> Review the evidence
           </li>
           <li
             className={
               profile?.status === "confirmed" && !dirty ? "active" : ""
             }
+            aria-current={
+              profile?.status === "confirmed" && !dirty ? "step" : undefined
+            }
           >
-            <b>3</b> Tell your story
+            <b>3</b> Ready for your next step
           </li>
         </ol>
         <div className="demo-banner">
@@ -411,7 +434,14 @@ export function ProfileWorkspace({
                   className={mode === value ? "selected" : ""}
                   aria-pressed={mode === value}
                   disabled={!!busy}
-                  onClick={() => setMode(value)}
+                  onClick={() => {
+                    setMode(value);
+                    if (value === "sample")
+                      setText(
+                        resumeFixtures.find((sample) => sample.id === sampleId)!
+                          .text,
+                      );
+                  }}
                 >
                   {value === "sample"
                     ? "Sample résumé"
@@ -463,7 +493,9 @@ export function ProfileWorkspace({
               )}
               {mode === "pdf" && (
                 <div className="upload-box">
-                  <span className="upload-icon">↥</span>
+                  <span className="upload-icon" aria-hidden="true">
+                    ↥
+                  </span>
                   <label htmlFor="resume-file">
                     {personal
                       ? "Choose your text-based résumé PDF"
@@ -472,17 +504,25 @@ export function ProfileWorkspace({
                   <input
                     id="resume-file"
                     type="file"
-                    accept="application/pdf"
+                    accept="application/pdf,.pdf"
+                    aria-describedby="resume-file-help"
                     onChange={(e) => setFile(e.target.files?.[0] ?? null)}
                   />
-                  <p>Up to 2 MB · 5 pages · no scanned or encrypted PDFs</p>
+                  {file && (
+                    <p className="selected-file" role="status">
+                      Ready to review: <strong>{file.name}</strong>
+                    </p>
+                  )}
+                  <p id="resume-file-help">
+                    Up to 2 MB · 5 pages · no scanned or encrypted PDFs
+                  </p>
                   <a href={`/api/demo/fixtures/${sampleId}`}>
                     Download the selected sample PDF
                   </a>
                 </div>
               )}
               {personal && (
-                <label className="field">
+                <label className="processing-consent">
                   <input
                     type="checkbox"
                     checked={consent}
@@ -501,7 +541,11 @@ export function ProfileWorkspace({
               <button
                 className="button wide"
                 onClick={extract}
-                disabled={personal && !consent}
+                disabled={
+                  (personal && !consent) ||
+                  (mode === "pdf" && !file) ||
+                  (mode === "text" && !text.trim())
+                }
               >
                 Review my experience <span>→</span>
               </button>
@@ -528,8 +572,9 @@ export function ProfileWorkspace({
                 <span className="empty-symbol">✳</span>
                 <h3>Your experience belongs here.</h3>
                 <p>
-                  Choose a sample to see skills, education, and projects with
-                  the excerpts that support them.
+                  {personal
+                    ? "Add your résumé to see your skills, education and projects, with the excerpts that support them."
+                    : "Choose a sample to see skills, education and projects, with the excerpts that support them."}
                 </p>
                 <div className="placeholder-row" />
                 <div className="placeholder-row short" />
