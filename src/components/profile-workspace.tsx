@@ -1,5 +1,5 @@
 "use client";
-import { WorkspaceNav } from "./workspace-nav";
+import { ProfileSidebar } from "./profile-sidebar";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type {
@@ -263,30 +263,15 @@ export function ProfileWorkspace({
   };
   return (
     <>
-      {authenticated && !localDemo ? (
-        <WorkspaceNav active="profile" />
-      ) : (
-        <header className="site-header">
-          <Link className="brand" href="/">
-            employ<span>HER</span>
-            <span className="brand-dot">✳</span>
-          </Link>
-          <span className="header-caption">YOUR WORKSPACE</span>
-          <nav aria-label="Sample workspace">
-            <Link href="/demo/profile" aria-current="page">
-              Your résumé
-            </Link>
-            <Link href="/demo">Explore the demo →</Link>
-          </nav>
-          <p className="profile-sidebar-note">
-            Small steps.
-            <br />
-            Real possibilities.
-            <small>Built around evidence. Guided by you.</small>
-          </p>
-        </header>
-      )}
-      <main className="profile-workspace">
+      <ProfileSidebar
+        personal={authenticated && !localDemo}
+        careerHref={
+          profile?.status === "confirmed" && !dirty
+            ? `/career?profileId=${profile.profileId}&profileVersion=${profile.version}`
+            : undefined
+        }
+      />
+      <main id="profile-content" className="profile-workspace" tabIndex={-1}>
         <div className="eyebrow">01 / KNOW YOUR STARTING POINT</div>
         <section className="hero">
           <div>

@@ -216,7 +216,7 @@ test("profile and Opportunities keep independent layouts in the shared app", asy
     "display",
     "block",
   );
-  await page.getByRole("link", { name: /employHER/ }).click();
+  await page.getByRole("link", { name: /employHER/i }).click();
   await page.getByRole("link", { name: "Sample opportunities" }).click();
   await expect(page).toHaveURL(/\/opportunities$/);
   await expect(page.locator(".workspace")).toHaveCSS("display", "grid");

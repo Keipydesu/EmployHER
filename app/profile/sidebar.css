@@ -1,0 +1,248 @@
+.profile-demo {
+  .profile-skip {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    transform: translateY(-180%);
+    z-index: 20;
+    padding: 12px 18px;
+    background: white;
+    border-radius: 6px;
+  }
+  .profile-skip:focus {
+    transform: none;
+  }
+  .profile-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: 235px;
+    height: 100dvh;
+    overflow-y: auto;
+    padding: 36px 22px 22px;
+    display: flex;
+    flex-direction: column;
+    background: #f0f3ed;
+    border-right: 1px solid #dae2dc;
+    z-index: 5;
+  }
+  .profile-sidebar a {
+    text-decoration: none;
+  }
+  .profile-sidebar-brand {
+    display: flex;
+    align-items: baseline;
+    padding-left: 12px;
+    color: #223d34;
+    font-size: 26px;
+    font-weight: 750;
+    letter-spacing: -1.5px;
+    line-height: 1.4;
+  }
+  .profile-sidebar-brand span {
+    color: #285e50;
+  }
+  .profile-sidebar-brand i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #66917a;
+    margin-left: 3px;
+  }
+  .profile-sidebar-label {
+    margin: 55px 0 17px 12px;
+    color: #64766e;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 1.8px;
+  }
+  .profile-sidebar-nav {
+    display: grid;
+    gap: 8px;
+  }
+  .profile-sidebar-nav > a,
+  .profile-nav-upcoming {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 48px;
+    padding: 12px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    color: #5c6d62;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .profile-sidebar svg {
+    flex-shrink: 0;
+  }
+  .profile-sidebar-nav > a:hover {
+    background: #e6ece1;
+  }
+  .profile-sidebar-nav > a[aria-current="page"] {
+    background: #dfe8d9;
+    color: #244937;
+    font-weight: 650;
+  }
+  .profile-nav-dot {
+    margin-left: auto;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #52755c;
+  }
+  .profile-nav-arrow {
+    margin-left: auto;
+  }
+  .profile-nav-upcoming {
+    color: #69766b;
+  }
+  .profile-nav-upcoming small {
+    display: block;
+    margin-top: 3px;
+    font-size: 10px;
+  }
+  .profile-sidebar-encouragement {
+    margin: auto 10px 32px;
+    padding-top: 48px;
+  }
+  .profile-sidebar-encouragement > span {
+    font-size: 58px;
+    line-height: 1;
+    color: #6d8b64;
+  }
+  .profile-sidebar-encouragement p {
+    margin: 14px 0 0;
+    font-size: 19px;
+    line-height: 1.4;
+    letter-spacing: -0.4px;
+  }
+  .profile-sidebar-encouragement small {
+    display: block;
+    margin-top: 12px;
+    color: #64766e;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+  .profile-sidebar-account {
+    border-top: 1px solid #dae2dc;
+    padding-top: 20px;
+  }
+  .profile-sidebar-identity {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .profile-sidebar-avatar {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #e0d9c8;
+    color: #5e6651;
+  }
+  .profile-sidebar-identity strong {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .profile-sidebar-identity small {
+    display: block;
+    margin-top: 3px;
+    font-size: 10px;
+    color: #64766e;
+  }
+  .profile-sidebar-utilities {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 14px;
+  }
+  .profile-sidebar-utilities a,
+  .profile-sidebar-entry {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 36px;
+    font-size: 11px;
+  }
+  .profile-sidebar-utilities svg {
+    width: 15px;
+    height: 15px;
+  }
+  .profile-sidebar-entry {
+    margin-top: 12px;
+  }
+  .profile-sidebar-utilities a:hover,
+  .profile-sidebar-entry:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  @media (max-width: 800px) {
+    .profile-sidebar {
+      position: static;
+      width: auto;
+      height: auto;
+      padding: 20px 18px 12px;
+      border-right: 0;
+      border-bottom: 1px solid #dae2dc;
+    }
+    .profile-sidebar-brand {
+      padding-left: 0;
+      font-size: 24px;
+    }
+    .profile-sidebar-label {
+      margin: 20px 0 10px;
+    }
+    .profile-sidebar-nav {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 4px;
+    }
+    .profile-sidebar-nav > a,
+    .profile-nav-upcoming {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 7px;
+      padding: 10px 8px;
+      font-size: 11px;
+    }
+    .profile-nav-dot,
+    .profile-nav-arrow {
+      display: none;
+    }
+    .profile-nav-upcoming small {
+      font-size: 9px;
+    }
+    .profile-sidebar-encouragement,
+    .profile-sidebar-identity {
+      display: none;
+    }
+    .profile-sidebar-account {
+      margin-top: 12px;
+      padding-top: 0;
+    }
+    .profile-sidebar-utilities,
+    .profile-sidebar-entry {
+      margin-top: 4px;
+    }
+  }
+  @media (max-height: 740px) and (min-width: 801px) {
+    .profile-sidebar {
+      padding-top: 24px;
+    }
+    .profile-sidebar-label {
+      margin-top: 32px;
+    }
+    .profile-sidebar-encouragement {
+      padding-top: 24px;
+      margin-bottom: 22px;
+    }
+    .profile-sidebar-encouragement > span {
+      font-size: 40px;
+    }
+    .profile-sidebar-encouragement p {
+      font-size: 17px;
+    }
+  }
+}
