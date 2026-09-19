@@ -347,6 +347,14 @@
   font-size: 10px;
   color: var(--muted);
 }
+.home-evidence-foot a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.home-evidence-foot a:hover {
+  color: var(--accent-deep);
+}
 .home-page .home-small {
   font-size: 11px;
   color: var(--muted);

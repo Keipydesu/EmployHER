@@ -150,46 +150,96 @@ export function ResumeJourney() {
         </div>
         <section className="home-story-section" id="skills">
           <div className="home-story-copy">
-            <p className="home-kicker">01 / SEE YOURSELF CLEARLY</p>
+            <p className="home-kicker">01 / THE GAP</p>
             <h2>
-              You already
+              Fewer of us
               <br />
-              bring a lot.
+              than you’d think.
             </h2>
             <p>
-              The projects, the part-time jobs, the things you figured out along
-              the way. There are skills in all of it.
+              Computing has grown faster than almost any other field — but
+              women’s share of it hasn’t kept pace. Women hold just a quarter of
+              U.S. computer occupations, and earn under a fifth of computer
+              science bachelor’s degrees.
             </p>
-            <div className="home-skill-pills">
-              <span>↗ Problem solving</span>
-              <span>⌘ Python</span>
-              <span>✳ Research</span>
-            </div>
             <div className="home-evidence">
-              <span className="home-evidence-label">
-                CONNECTED TO YOUR EXPERIENCE
-              </span>
-              <p>“Used Python to analyze survey responses…”</p>
+              <span className="home-evidence-label">SOURCED DATA</span>
+              <p>
+                “Women account for 25% of those working in computer occupations”
+                · “Women earned… just 19% [of bachelor’s degrees] in computer
+                science.”
+              </p>
               <span className="home-evidence-foot">
-                Sample evidence → Python · Data analysis
+                Source:{" "}
+                <a
+                  href="https://www.pewresearch.org/science/2021/04/01/stem-jobs-see-uneven-progress-in-increasing-gender-racial-and-ethnic-diversity/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Pew Research Center, 2021
+                </a>
               </span>
             </div>
             <p className="home-small">
-              You review, edit, and confirm. Your story stays yours.
+              This isn’t about ability or interest. It’s about who gets seen,
+              supported, and kept.
             </p>
           </div>
         </section>
         <section className="home-story-section" id="directions">
           <div className="home-story-copy">
-            <p className="home-kicker">02 / EXPAND YOUR POSSIBILITIES</p>
+            <p className="home-kicker">02 / WHY IT HAPPENS</p>
             <h2>
-              One beginning.
+              It’s not a
               <br />
-              Many directions.
+              pipeline problem.
             </h2>
             <p>
-              Explore paths in tech. See what connects to your experience and
-              what you could learn next.
+              Women study and enter tech — then leave it. About half of women
+              who start a tech career leave the field by age 35, most commonly
+              citing a non-inclusive workplace culture rather than a lack of
+              ability or interest.
+            </p>
+            <div className="home-skill-pills">
+              <span>Non-inclusive culture</span>
+              <span>Fewer mentors</span>
+              <span>Uneven advancement</span>
+            </div>
+            <div className="home-evidence">
+              <span className="home-evidence-label">SOURCED DATA</span>
+              <p>
+                “Half of women who enter tech will leave the field by 35” — most
+                frequently citing poor company culture, not capability.
+              </p>
+              <span className="home-evidence-foot">
+                Source:{" "}
+                <a
+                  href="https://www.accenture.com/content/dam/accenture/final/a-com-migration/pdf/pdf-136/accenture-resetting-tech-culture.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Accenture &amp; Girls Who Code, “Resetting Tech Culture,” 2020
+                </a>
+              </span>
+            </div>
+          </div>
+        </section>
+        <section
+          className="home-story-section home-last-section"
+          id="next-step"
+        >
+          <div className="home-story-copy">
+            <p className="home-kicker">03 / OUR SOLUTION</p>
+            <h2>
+              Start with
+              <br />
+              what’s already true.
+            </h2>
+            <p>
+              EmployHER grounds every next step in real evidence from your own
+              experience — not assumptions about what you should already know.
+              Review your skills, explore paths that connect to them, and opt in
+              to women’s professional communities and mentorship along the way.
             </p>
             <div className="home-paths">
               {paths.map((path) => (
@@ -212,26 +262,6 @@ export function ResumeJourney() {
                 </Link>
               ))}
             </div>
-            <p className="home-small">
-              Explore example paths. These aren’t personalized matches.
-            </p>
-          </div>
-        </section>
-        <section
-          className="home-story-section home-last-section"
-          id="next-step"
-        >
-          <div className="home-story-copy">
-            <p className="home-kicker">03 / MOVE FORWARD</p>
-            <h2>
-              A next step.
-              <br />
-              That feels like you.
-            </h2>
-            <p>
-              You don’t need the whole journey figured out. Start with a clearer
-              picture of what you bring.
-            </p>
             <ol className="home-checklist">
               <li>
                 <span>01</span>Review your experience
