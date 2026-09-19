@@ -22,3 +22,5 @@ playwright-report/
 .next-auth-test/
 .next-smoke/
 .catalog-cache/
+
+.next-demo-test/

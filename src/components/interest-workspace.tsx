@@ -1,4 +1,5 @@
 "use client";
+import { WorkspaceNav } from "./workspace-nav";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { careerFields, type Interests } from "@/opportunities/interests";
@@ -33,8 +34,10 @@ export function InterestWorkspace({ initial }: { initial: Interests }) {
     }
   }
   return (
-    <main className="opportunities">
+    <main className="opportunities app-workspace interests-workspace">
+      <WorkspaceNav active="interests" />
       <section className="panel">
+        <p className="eyebrow">01 / Your direction</p>
         <h1>What would you like to explore?</h1>
         <p>
           Choose one or more fields. We’ll use these interests to focus your
@@ -43,10 +46,7 @@ export function InterestWorkspace({ initial }: { initial: Interests }) {
         <fieldset disabled={busy}>
           <legend>Fields of interest</legend>
           {careerFields.map((field) => (
-            <label
-              key={field.id}
-              style={{ display: "block", marginBlock: "1rem" }}
-            >
+            <label key={field.id} className="interest-card">
               <input
                 type="checkbox"
                 checked={fields.includes(field.id)}

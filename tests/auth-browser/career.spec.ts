@@ -9,6 +9,7 @@ test("career UI explains provider failure, saves a sourced step and records comp
   await signIn(context, "auth0|career-ui-student");
   const fixture = await careerFixture();
   let failAnalysis = true;
+  let failInitialLoad = true;
   const commands: Record<string, unknown>[] = [];
   await page.route("**/api/me/memory", (route) =>
     route.fulfill({
@@ -17,6 +18,13 @@ test("career UI explains provider failure, saves a sourced step and records comp
   );
   await page.route("**/api/career**", async (route) => {
     const request = route.request();
+    if (request.method() === "GET" && failInitialLoad) {
+      await route.fulfill({
+        status: 503,
+        json: { error: { message: "Synthetic context unavailable." } },
+      });
+      return;
+    }
     if (request.url().endsWith("/analyze")) {
       if (failAnalysis) {
         failAnalysis = false;
@@ -39,7 +47,17 @@ test("career UI explains provider failure, saves a sourced step and records comp
     await route.fulfill({ json: await fixture.view() });
   });
   await page.goto(`/career?profileId=${fixture.profileId}&profileVersion=1`);
+  await expect(page.getByRole("main").getByRole("alert")).toContainText(
+    "Synthetic context unavailable",
+  );
+  failInitialLoad = false;
+  await page.getByRole("button", { name: "Reload career plan" }).click();
   await expect(page.getByLabel("Field to explore")).toHaveValue("software");
+  await page
+    .getByRole("navigation", { name: "Career plan sections" })
+    .getByRole("link", { name: "Saved steps", exact: true })
+    .click();
+  await expect(page).toHaveURL(/#saved-steps$/);
   await page
     .getByRole("button", { name: "Find my next steps with Gemini" })
     .click();

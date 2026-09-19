@@ -1,0 +1,18 @@
+import { defineConfig } from "@playwright/test";
+
+export default defineConfig({
+  testDir: "./tests/judges-demo",
+  workers: 1,
+  use: {
+    baseURL: "http://127.0.0.1:3120",
+    browserName: "chromium",
+    viewport: { width: 1440, height: 1000 },
+    screenshot: "only-on-failure",
+  },
+  webServer: {
+    command: "NEXT_TEST_OUTPUT=demo npm run dev -- --webpack --port 3120",
+    url: "http://127.0.0.1:3120/demo",
+    reuseExistingServer: false,
+    timeout: 120000,
+  },
+});

@@ -1,4 +1,5 @@
 "use client";
+import { WorkspaceNav } from "./workspace-nav";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type {
@@ -260,14 +261,18 @@ export function ProfileWorkspace({
   };
   return (
     <>
-      <header className="site-header">
-        <Link className="brand" href="/">
-          employ<span>HER</span>
-          <span className="brand-dot">✳</span>
-        </Link>
-        <span className="header-caption">A little clarity. A next step.</span>
-        <span className="pill">PROFILE WORKSPACE</span>
-      </header>
+      {authenticated && !localDemo ? (
+        <WorkspaceNav active="profile" />
+      ) : (
+        <header className="site-header">
+          <Link className="brand" href="/">
+            employ<span>HER</span>
+            <span className="brand-dot">✳</span>
+          </Link>
+          <span className="header-caption">A little clarity. A next step.</span>
+          <span className="pill">PROFILE WORKSPACE</span>
+        </header>
+      )}
       <main className="profile-workspace">
         <div className="eyebrow">01 / KNOW YOUR STARTING POINT</div>
         <section className="hero">

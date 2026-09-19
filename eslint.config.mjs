@@ -10,6 +10,7 @@ export default defineConfig([
     ".next-test/**",
     ".next-auth-test/**",
     ".next-smoke/**",
+    ".next-demo-test/**",
     "next-env.d.ts",
   ]),
 ]);

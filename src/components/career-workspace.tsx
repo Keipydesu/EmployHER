@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { WorkspaceNav } from "./workspace-nav";
 import { MemoryControls } from "./memory-controls";
 import Link from "next/link";
 import type { CareerService } from "@/opportunities/career-service";
@@ -85,13 +86,11 @@ export function CareerWorkspace({
     return () => controller.abort();
   }, [profileId, profileVersion]);
   return (
-    <main className="opportunities">
-      <header style={{ flexWrap: "wrap", gap: "1rem" }}>
-        <Link href="/">EmployHER</Link>
-        <Link href="/profile">Review résumé</Link>
-        <Link href="/onboarding">Edit interests</Link>
-        <Link href="/account">Manage my data</Link>
-      </header>
+    <main
+      className="opportunities app-workspace career-workspace"
+      id="career-plan"
+    >
+      <WorkspaceNav active="career" />
       <section className="op-hero">
         <p className="eyebrow">Your next chapter</p>
         <h1>A practical next step, chosen for you.</h1>
@@ -101,11 +100,31 @@ export function CareerWorkspace({
           hiring predictions.
         </p>
       </section>
+      {view && (
+        <nav className="career-sections" aria-label="Career plan sections">
+          <a href="#next-steps">Your next steps</a>
+          <a href="#saved-steps">Saved steps</a>
+          <a href="#field-evidence">Your evidence</a>
+          <a href="#career-resources">Resources</a>
+        </nav>
+      )}
       <div aria-live="polite">{busy && <p>{busy}</p>}</div>
       {error && (
-        <p role="alert" className="error">
-          {error}
-        </p>
+        <div role="alert" className="error-box">
+          <p>{error}</p>
+          <button
+            disabled={!!busy}
+            onClick={() =>
+              void run("Reloading your plan…", () =>
+                load(
+                  `/api/career?profileId=${encodeURIComponent(profileId)}&profileVersion=${profileVersion}`,
+                ),
+              )
+            }
+          >
+            Reload career plan
+          </button>
+        </div>
       )}
       {view && (
         <>
@@ -245,7 +264,11 @@ export function CareerWorkspace({
               ))}
             </fieldset>
           </section>
-          <section className="panel" aria-label="Gemini career recommendations">
+          <section
+            className="panel"
+            id="next-steps"
+            aria-label="Gemini career recommendations"
+          >
             <h2>Your next steps</h2>
             {!view.analysis ? (
               <p>
@@ -337,7 +360,11 @@ export function CareerWorkspace({
             profileId={profileId}
             profileVersion={profileVersion}
           />
-          <section className="panel" aria-label="Saved next steps">
+          <section
+            className="panel"
+            id="saved-steps"
+            aria-label="Saved next steps"
+          >
             <h2>Your saved next steps</h2>
             <p>
               Keep up to three active steps. Completing a step records progress;
@@ -392,7 +419,7 @@ export function CareerWorkspace({
               ))}
             </ul>
           </section>
-          <section className="panel">
+          <section className="panel" id="field-evidence">
             <h2>Context from this field</h2>
             <h3>Your evidence checklist</h3>
             <p>
@@ -496,6 +523,7 @@ export function CareerWorkspace({
           </section>
           <section
             className="panel"
+            id="career-resources"
             aria-label="Learning and community resources"
           >
             <h2>Organizations and learning resources</h2>

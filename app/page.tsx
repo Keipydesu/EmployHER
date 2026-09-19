@@ -1,89 +1,51 @@
 import Link from "next/link";
 import { auth0 } from "../src/server/auth0";
-
-const steps = [
-  [
-    "01",
-    "Recognize your experience",
-    "Start with what you have learned, built, and contributed.",
-  ],
-  [
-    "02",
-    "Explore your possibilities",
-    "Find tech paths and opportunities connected to your experience.",
-  ],
-  [
-    "03",
-    "Choose your next step",
-    "Turn the qualifications you want to develop into practical actions.",
-  ],
-];
+import { ResumeJourney } from "./resume-journey";
+import "./home.css";
 
 export default async function Home() {
   const session = auth0 ? await auth0.getSession() : null;
-
   return (
-    <main>
-      <header>
-        <Link href="/" aria-label="EmployHER home">
+    <main className="home-page">
+      <a className="home-skip" href="#journey">
+        Skip to content
+      </a>
+      <header className="home-header">
+        <Link className="home-brand" href="/">
           Employ<span>HER</span>
+          <i />
         </Link>
-        <nav className="site-nav" aria-label="Account">
-          <span className="badge">In development</span>
-          {session && (
+        <nav aria-label="Main navigation" className="home-nav">
+          <a className="home-nav-about" href="#skills">
+            How it works
+          </a>
+          <Link className="home-nav-about" href="/onboarding">
+            Build my career
+          </Link>
+          {session ? (
             <>
-              <span className="who">
-                {session.user.email ?? session.user.name}
-              </span>
-              {/* Ends the session and redirects to Auth0 to log out */}
+              <Link href="/account">My account</Link>
               <a href="/auth/logout">Log out</a>
-              <Link href="/account">Manage my data</Link>
             </>
-          )}
-          {auth0 && !session && (
-            <>
-              {/* Redirects to Auth0 Universal Login */}
-              <a href="/auth/login">Log in</a>
-              <a
-                className="cta"
-                href="/auth/login?screen_hint=signup&returnTo=/onboarding"
-              >
-                Sign up
-              </a>
-            </>
-          )}
+          ) : auth0 ? (
+            <a href="/auth/login?returnTo=/onboarding">Log in</a>
+          ) : null}
+          <Link className="home-button home-button-small" href="/demo">
+            Try the demo <span aria-hidden="true">↗</span>
+          </Link>
         </nav>
       </header>
-      <section className="intro">
-        <p className="eyebrow">A career navigator for your next chapter</p>
-        <h1>
-          Your experience.
-          <br />
-          <em>Your possibilities.</em>
-        </h1>
-        <p className="lead">
-          Discover where your skills can take you—and a practical next step
-          toward a career in tech.
-        </p>
-        <Link className="demo-link" href="/demo/profile">
-          Review a sample résumé →
+      <ResumeJourney />
+      <footer className="home-footer">
+        <Link className="home-brand" href="/">
+          EmployHER
+          <i />
         </Link>
-        <Link className="demo-link" href="/opportunities">
-          Explore the synthetic demo →
-        </Link>
-      </section>
-      <section className="steps" aria-label="The planned journey">
-        {steps.map(([number, title, description]) => (
-          <article key={number}>
-            <span className="number">{number}</span>
-            <h2>{title}</h2>
-            <p>{description}</p>
-          </article>
-        ))}
-      </section>
-      <footer>
-        Explore the working synthetic Opportunities demo. Real profile intake
-        and provider integrations remain in development.
+        <p>More women. More possibilities.</p>
+        <nav aria-label="Sample workspaces">
+          <Link href="/demo/profile">Sample résumé</Link>
+          <Link href="/opportunities">Sample opportunities</Link>
+        </nav>
       </footer>
     </main>
   );

@@ -2,7 +2,7 @@ const base = process.env.SMOKE_BASE_URL ?? "http://127.0.0.1:3000";
 const response = await fetch(base, { signal: AbortSignal.timeout(5000) });
 if (!response.ok) throw new Error(`Homepage returned ${response.status}`);
 const html = await response.text();
-if (!html.includes("Your possibilities.")) {
+if (!html.includes("YOUR NEXT CHAPTER STARTS HERE")) {
   throw new Error("Homepage content missing");
 }
 const assets = [

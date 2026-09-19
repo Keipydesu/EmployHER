@@ -6,6 +6,11 @@ A HackHers-focused career-building app: use your résumé and patterns across jo
 
 ## Run locally
 
+For the judge walkthrough, open `/demo`: a polished sample résumé → career plan →
+saved steps flow with no sign-in or live providers. See the
+[two-minute demo guide](docs/judges-demo.md). Run its browser checks with
+`npm run test:demo` (or add `-- --ui` for Playwright UI).
+
 Use Node 24 (see `.nvmrc`). No Docker, database, or credentials are needed for this initial page.
 
 ```sh
