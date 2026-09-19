@@ -40,6 +40,8 @@ Suggestions deliberately foreground existing confirmed experience verbatim, matc
 
 ## Contracts for Person C
 
+Stack confirmation: [decision 006](../decisions/006-retain-drizzle-with-tiger-data.md) retains Drizzle with the pg driver and Tiger Data PostgreSQL. The existing bindings below remain applicable; shared connection setup, migrations and authenticated runtime integration still need verification.
+
 A small Next.js harness was necessary because M0 had no scaffold. C can integrate the modules into its app shell and shared Tailwind/shadcn components. The harness uses plain CSS and accessible native controls; it is not a replacement platform design system.
 
 Supply `ProfileRuntime` from `src/profile/runtime.ts` through `installProfileRuntime()` in the server bootstrap (or inject it into `createProfileHandlers`). Production without this binding returns 503. Required bindings:

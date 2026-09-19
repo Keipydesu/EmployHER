@@ -6,9 +6,20 @@ import {
   type Path,
   type Resource,
   type Skill,
+  type Confirmation,
 } from "./contracts.ts";
 
+const opportunityErrorBrand = Symbol.for("employher.OpportunityError");
 export class OpportunityError extends Error {
+  readonly [opportunityErrorBrand] = true;
+  static [Symbol.hasInstance](value: unknown) {
+    return (
+      !!value &&
+      typeof value === "object" &&
+      Symbol.for("employher.OpportunityError") in value &&
+      Reflect.get(value, Symbol.for("employher.OpportunityError")) === true
+    );
+  }
   code: string;
   status: number;
   constructor(code: string, message: string, status = 422) {
@@ -69,7 +80,6 @@ export function rankJobs(
     .sort(
       (a, b) => b.similarity - a.similarity || a.job.id.localeCompare(b.job.id),
     )
-    .slice(0, 20)
     .slice(0, 10)
     .map((candidate) => ({
       ...candidate,
@@ -226,10 +236,32 @@ export function validateExplanation(
   input: unknown,
   resources: Resource[],
   now = new Date(),
+  context?: {
+    checklistVersion: number;
+    confirmations: Confirmation[];
+    preferences: Preferences;
+  },
 ) {
   const result = ExplanationSchema.safeParse(input);
   if (!result.success || profile.status !== "confirmed") return false;
   const owns = (id: string) => job.requirements.some((r) => r.id === id);
+  const confirmed = (id: string) => {
+    const requirement = job.requirements.find((r) => r.id === id);
+    return (
+      !!requirement &&
+      !!context &&
+      !profile.evidence.some((e) => e.skill === requirement.skill) &&
+      context.confirmations.some(
+        (c) =>
+          c.pathId === job.pathId &&
+          c.skill === requirement.skill &&
+          c.profileVersion === profile.version &&
+          c.checklistVersion === context.checklistVersion &&
+          Number.isFinite(Date.parse(c.confirmedAt)) &&
+          Date.parse(c.confirmedAt) <= now.getTime(),
+      )
+    );
+  };
   return (
     result.data.strengths.every(
       (s) =>
@@ -246,6 +278,7 @@ export function validateExplanation(
     result.data.gaps.every(
       (g) =>
         owns(g.requirementId) &&
+        (g.state !== "not_evidenced" || confirmed(g.requirementId)) &&
         !profile.evidence.some(
           (e) =>
             e.skill ===
@@ -255,10 +288,13 @@ export function validateExplanation(
     result.data.nextSteps.every(
       (s) =>
         owns(s.requirementId) &&
+        confirmed(s.requirementId) &&
         (!s.resourceId ||
           resources.some(
             (r) =>
               r.id === s.resourceId &&
+              (!r.inclusionCategory ||
+                context?.preferences.inclusion.includes(r.inclusionCategory)) &&
               r.reviewStatus === "reviewed" &&
               Date.parse(r.checkedAt) <= now.getTime() &&
               Date.parse(r.expiresAt) > now.getTime() &&

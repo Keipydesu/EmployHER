@@ -9,10 +9,11 @@ A minimal Next.js/TypeScript app runs directly on Node 24. Docker and a local da
 ## Where to start reading
 
 - `README.md` — entry point and index of the documents below.
-- `docs/decisions/002-hackhers-career-navigator.md` — current accepted direction; supersedes `docs/decisions/001-rails-mvp-baseline.md` (kept only as history — do not resurrect its plan).
+- Read the decisions. One numbered file each in docs/decisions/ (NNN-short-slug.md). No index — search it: grep -ril <topic> docs/decisions/. Read every decision touching what you are about to change.
+- Read the roadmap. roadmap.md gives the phase, what has landed, what is deferred, and what is a release blocker. §9 is the current priority order.
 - `docs/product.md` — scope, screens, prioritized backlog, demo script, explicit non-goals.
 - `docs/architecture.md` — data flow, provider boundaries, ingestion contract, execution/failure handling.
-- `docs/data-model.md` — proposed relational schema (Postgres/Drizzle), ownership patterns.
+- `docs/data-model.md` — proposed relational schema (PostgreSQL/Drizzle), ownership patterns.
 - `docs/api.md` — proposed route contracts, shared TypeScript shapes, error codes, idempotency rules.
 - `docs/privacy.md` — retention, deletion, and inclusion-content rules (no gender inference, sourced claims only).
 - `docs/development.md` — local Node setup, env var inventory, checks, verification gates.
@@ -20,14 +21,15 @@ A minimal Next.js/TypeScript app runs directly on Node 24. Docker and a local da
 
 ## Product architecture (spans multiple docs)
 
-EmployHER is a résumé-to-opportunity navigator for early-career tech roles: upload a résumé → Gemini extracts structured skills/experience/education → user reviews/corrects → the app matches against ingested job postings → each match shows grounded evidence, qualifications not yet evidenced, and up to three concrete next steps → optional documented inclusion resources (women's employee groups, mentorship, scholarships) surfaced by user opt-in category.
+EmployHER is a career-building app: a user uploads their own résumé, reviews extracted evidence, chooses a field, and receives grounded projects, skills and organization/mentorship suggestions based on recurring requirements across reviewed listings. Individual vacancies are supporting context, not the primary outcome. An optional supplied-sample demo works without sign-in; personal uploads and saved private state use authenticated routes. See [decision 004](docs/decisions/004-career-building-and-anonymous-demo.md).
 
 Planned flow, synthesized across `architecture.md`, `data-model.md`, and `api.md`:
 
 ```
-Browser → Auth0 login → Next.js on localhost
+Browser → no-sign-in supplied-sample demo → isolated sample state
+Browser → Auth0 login → personal résumé flow → Next.js on localhost
                            ├─ Zod validation + ownership + quota checks
-                           ├─ Drizzle → Tiger Data PostgreSQL / pgvector
+                           ├─ Drizzle + pg → Tiger Data PostgreSQL / pgvector
                            ├─ Gemini: extraction, embeddings, gap analysis
                            └─ Backboard: per-user coaching assistant/threads
 GitHub source repos → Octokit fetch → normalized roles + source evidence → Gemini embeddings → database
@@ -35,7 +37,7 @@ GitHub source repos → Octokit fetch → normalized roles + source evidence →
 
 Key architectural boundaries a future implementer must preserve:
 
-- **Auth0 authenticates; every route re-checks ownership.** Never trust a client-submitted user ID — resolve it from the validated session on the server.
+- **Auth0 authenticates personal use; every private route re-checks ownership.** Anonymous sample tokens cannot authorize personal uploads or private data. Never trust a client-submitted user ID — resolve it from the validated session on the server.
 - **Tiger Data (Postgres) is the source of truth.** Gemini only *suggests* structured facts/embeddings/explanations; deterministic validation and explicit user confirmation govern what gets persisted. Backboard owns conversational continuity only — never authoritative skills, eligibility, or match state.
 - **No raw résumé storage.** Parse and discard raw PDF/text within a bounded request (`finally`-block cleanup). A structured draft profile (with minimal excerpts) may be persisted before confirmation, but user confirmation is required before it feeds matching.
 - **Grounding is mandatory, not cosmetic.** A skill/requirement match needs a reviewed evidence excerpt from the actual job posting. Title- or category-inferred "skills" are not sufficient for a gap claim — render such roles as discovery candidates with requirements marked unavailable instead of fabricating an explanation. No invented employers, contact details, salary, or hiring-probability numbers; a ranking score is a retrieval aid, never a fit percentage.

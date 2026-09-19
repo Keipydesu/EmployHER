@@ -1,10 +1,16 @@
 # Repository Guidelines
 
+## Before you plan anything
+
+Read the decisions. One numbered file each in docs/decisions/ (NNN-short-slug.md). No index — search it: grep -ril <topic> docs/decisions/. Read every decision touching what you are about to change.
+
+Read the roadmap. roadmap.md gives the phase, what has landed, what is deferred, and what is a release blocker. §9 is the current priority order.
+
 ## Project Structure & Current Status
 
 EmployHER is an early-career tech navigator with synthetic profile and Opportunities demos running directly on Node 24. Production integrations remain proposed. `app/` owns the UI, `scripts/smoke.mjs` checks the local HTTP app. Start with `README.md` and `TECH-STACK.md`. `docs/product.md` owns scope; `docs/architecture.md`, `docs/data-model.md`, and `docs/api.md` define proposed contracts. Read `docs/development.md` for implementation gates and `docs/privacy.md` for data handling. Number architecture decisions under `docs/decisions/`; decision `002` supersedes the historical Rails baseline.
 
-The planned stack is Next.js/TypeScript, Tailwind/shadcn, Auth0, Tiger Data PostgreSQL/pgvector, Drizzle, Zod, Gemini, and Backboard. Run the app on localhost for now; hosted deployment is deferred under decision `003`.
+The planned stack is Next.js/TypeScript, Tailwind CSS/shadcn, Auth0, Tiger Data PostgreSQL/pgvector, Drizzle, Zod, Gemini, and Backboard. Run the app on localhost for now; hosted deployment is deferred under decision `003`. Drizzle remains selected for database access under decision `006`, which supersedes `005`.
 
 ## Build, Test, and Development Commands
 

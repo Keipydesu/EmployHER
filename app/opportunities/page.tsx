@@ -447,6 +447,53 @@ export default function Opportunities() {
                   </ul>
                 )}
               </section>
+              <section className="panel" aria-labelledby="field-patterns-title">
+                <h2 id="field-patterns-title">Skills across this field</h2>
+                <p>
+                  {view.guidance.patterns.knownRequirements} of{" "}
+                  {view.guidance.patterns.sampleSize} sample listings have
+                  reviewed requirements;{" "}
+                  {view.guidance.patterns.unknownRequirements} are unknown.
+                </p>
+                <p>{view.guidance.patterns.limitation}</p>
+                {view.guidance.checkpoints.map((checkpoint) => (
+                  <details key={checkpoint.skill}>
+                    <summary>
+                      {labels[checkpoint.skill]} — {checkpoint.listingCount}{" "}
+                      listings ·{" "}
+                      {checkpoint.state === "evidenced"
+                        ? "Evidence present"
+                        : checkpoint.state === "confirmed_learning_need"
+                          ? "Confirmed learning need"
+                          : "Needs clarification"}
+                    </summary>
+                    <p>
+                      {checkpoint.rationale} Use the path checklist to clarify
+                      your experience and choose a next step.
+                    </p>
+                    <ul>
+                      {checkpoint.requirements.map((ref) => (
+                        <li key={`${ref.jobId}:${ref.requirementId}`}>
+                          <a
+                            href={ref.sourceUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {ref.requirementId}
+                          </a>
+                          : {ref.excerpt} (checked {date(ref.checkedAt)})
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                ))}
+                {!view.guidance.checkpoints.length && (
+                  <p>
+                    No reviewed requirement patterns are available for these
+                    filters.
+                  </p>
+                )}
+              </section>
               <section className="panel">
                 <h2>Opportunities to explore</h2>
                 <p>

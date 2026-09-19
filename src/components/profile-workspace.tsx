@@ -7,13 +7,23 @@ import type {
   ResumeSuggestion,
 } from "@/profile/contracts";
 import { resumeFixtures, demoPaths } from "@/profile/fixtures";
+import { PERSONAL_CONSENT_VERSION } from "@/profile/personal-mode";
+import { reconcileAfterSessionRecovery } from "@/profile/recovery";
 
 type Edit = Pick<Fact, "id" | "kind" | "label" | "detail" | "dateText">;
+class ApiError extends Error {
+  code: string;
+  constructor(code: string, message: string) {
+    super(message);
+    this.code = code;
+  }
+}
 async function api<T>(url: string, options?: RequestInit): Promise<T> {
   const response = await fetch(url, options);
   const result = await response.json();
   if (!response.ok)
-    throw new Error(
+    throw new ApiError(
+      result.error?.code ?? "UNKNOWN",
       result.error?.message ?? "The request failed. Please retry.",
     );
   return result;
@@ -30,11 +40,22 @@ const editsFor = (profile: PublicProfile): Edit[] =>
 export function ProfileWorkspace({
   localDemo,
   liveGemini,
+  authenticated = false,
+  personalUpload = false,
 }: {
   localDemo: boolean;
   liveGemini: boolean;
+  authenticated?: boolean;
+  personalUpload?: boolean;
 }) {
-  const [session, setSession] = useState(false);
+  const baseUrl = localDemo ? "/api/demo/resumes" : "/api/resumes";
+  const profileStorageKey = localDemo ? "profile-id" : "private-profile-id";
+  const [session, setSession] = useState(authenticated);
+  const [consent, setConsent] = useState(false);
+  const personal = personalUpload && authenticated && !localDemo;
+  const [sessionExpired, setSessionExpired] = useState(false);
+  const pristineRef = useRef<Edit[]>([]);
+  const capturedInputRef = useRef("");
   const requestKeys = useRef(new Map<string, string>());
   function stableKey(intent: string) {
     const existing = requestKeys.current.get(intent);
@@ -63,6 +84,11 @@ export function ProfileWorkspace({
   >({});
   const [drafts, setDrafts] = useState<Record<string, string>>({});
   const [dirty, setDirty] = useState(false);
+  function inputSignature() {
+    return mode === "pdf"
+      ? `pdf:${file?.name ?? ""}:${file?.size ?? 0}:${file?.lastModified ?? 0}`
+      : `${mode}:${sampleId}:${text}`;
+  }
   function showProfile(next: PublicProfile) {
     setProfile(next);
     setEdits(editsFor(next));
@@ -70,22 +96,26 @@ export function ProfileWorkspace({
     setDirty(false);
     setDecisions({});
     setDrafts({});
-    sessionStorage.setItem("profile-id", next.profileId);
+    sessionStorage.setItem(profileStorageKey, next.profileId);
   }
   useEffect(() => {
-    const id = sessionStorage.getItem("profile-id");
+    const id = sessionStorage.getItem(profileStorageKey);
     if (id)
-      void api<PublicProfile>(`/api/resumes/${id}`)
+      void api<PublicProfile>(`${baseUrl}/${id}`)
         .then((p) => {
           showProfile(p);
+          pristineRef.current = editsFor(p);
+          capturedInputRef.current = inputSignature();
           setSession(true);
         })
         .catch(() => {
-          sessionStorage.removeItem("profile-id");
+          sessionStorage.removeItem(profileStorageKey);
           setNotice(
             "The previous sample session is unavailable. Start a new one.",
           );
         });
+    // Runs once on mount against the initial mode/sampleId/text state only.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   async function run(label: string, work: () => Promise<void>) {
     setBusy(label);
@@ -94,7 +124,18 @@ export function ProfileWorkspace({
     try {
       await work();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Please retry.");
+      if (e instanceof ApiError && e.code === "UNAUTHENTICATED") {
+        setSession(false);
+        setSessionExpired(true);
+        setSuggestions(null);
+        setNotice(
+          profile
+            ? "Your sample session expired. Your in-progress edits are kept — start a new session to continue."
+            : "Your sample session expired. Start a new one to continue.",
+        );
+      } else {
+        setError(e instanceof Error ? e.message : "Please retry.");
+      }
     } finally {
       setBusy("");
     }
@@ -106,41 +147,71 @@ export function ProfileWorkspace({
     setDirty(true);
     setSuggestions(null);
   }
+  async function performExtraction(): Promise<PublicProfile> {
+    const headers: Record<string, string> = {};
+    if (personal) {
+      if (!consent) throw new Error("Confirm résumé processing first.");
+      headers["x-resume-consent"] = PERSONAL_CONSENT_VERSION;
+    }
+    let body: BodyInit;
+    if (mode === "pdf") {
+      if (!file) throw new Error("Choose a PDF first.");
+      if (file.size > 2 * 1024 * 1024)
+        throw new Error("PDFs must be 2 MB or smaller.");
+      const form = new FormData();
+      form.set("file", file);
+      body = form;
+    } else {
+      headers["Content-Type"] = "application/json";
+      body = JSON.stringify({ text });
+    }
+    const content =
+      mode === "pdf"
+        ? await file!.arrayBuffer()
+        : new TextEncoder().encode(text);
+    const fingerprint = Array.from(
+      new Uint8Array(await crypto.subtle.digest("SHA-256", content)),
+      (b) => b.toString(16).padStart(2, "0"),
+    ).join("");
+    const intent = `intake:${mode}:${fingerprint}`;
+    headers["Idempotency-Key"] = stableKey(intent);
+    const next = await api<PublicProfile>(baseUrl, {
+      method: "POST",
+      headers,
+      body,
+    });
+    requestKeys.current.delete(intent);
+    return next;
+  }
   async function extract() {
     await run("Reading the résumé…", async () => {
-      const headers: Record<string, string> = {};
-      let body: BodyInit;
-      if (mode === "pdf") {
-        if (!file) throw new Error("Choose a sample PDF first.");
-        if (file.size > 2 * 1024 * 1024)
-          throw new Error("PDFs must be 2 MB or smaller.");
-        const form = new FormData();
-        form.set("file", file);
-        body = form;
-      } else {
-        headers["Content-Type"] = "application/json";
-        body = JSON.stringify({ text });
-      }
-      const content =
-        mode === "pdf"
-          ? await file!.arrayBuffer()
-          : new TextEncoder().encode(text);
-      const fingerprint = Array.from(
-        new Uint8Array(await crypto.subtle.digest("SHA-256", content)),
-        (b) => b.toString(16).padStart(2, "0"),
-      ).join("");
-      const intent = `intake:${mode}:${fingerprint}`;
-      headers["Idempotency-Key"] = stableKey(intent);
-      showProfile(
-        await api<PublicProfile>("/api/resumes", {
-          method: "POST",
-          headers,
-          body,
-        }),
-      );
-      requestKeys.current.delete(intent);
+      const next = await performExtraction();
+      pristineRef.current = editsFor(next);
+      capturedInputRef.current = inputSignature();
+      showProfile(next);
       setNotice("Draft ready. Check every fact before confirming.");
     });
+  }
+  async function recoverAfterExpiry() {
+    const pendingEdits = edits;
+    const next = await performExtraction();
+    const reconciled = reconcileAfterSessionRecovery(
+      next,
+      pristineRef.current,
+      pendingEdits,
+    );
+    pristineRef.current = editsFor(next);
+    capturedInputRef.current = inputSignature();
+    setProfile(next);
+    setEdits(reconciled);
+    setSuggestions(null);
+    setDecisions({});
+    setDrafts({});
+    setDirty(true);
+    sessionStorage.setItem(profileStorageKey, next.profileId);
+    setNotice(
+      "Session restored. Your edits were carried over — recheck them before confirming.",
+    );
   }
   async function save(confirm: boolean) {
     if (!profile) return;
@@ -158,7 +229,7 @@ export function ProfileWorkspace({
         });
         const intent = `update:${profile.profileId}:${payload}`;
         const next = await api<PublicProfile>(
-          `/api/resumes/${profile.profileId}`,
+          `${baseUrl}/${profile.profileId}`,
           {
             method: "PATCH",
             headers: {
@@ -239,14 +310,24 @@ export function ProfileWorkspace({
         </ol>
         <div className="demo-banner">
           <strong>
-            {localDemo ? "Local synthetic-data demo" : "Integration required"}
+            {localDemo
+              ? "Local synthetic-data demo"
+              : authenticated
+                ? personal
+                  ? "Private résumé — local MVP"
+                  : "Authenticated integration — supplied samples only"
+                : "Integration required"}
           </strong>
           <span>
             {localDemo
               ? liveGemini
                 ? "Gemini processes approved samples only. Edited summaries use simulated embeddings. No real résumés."
                 : "Extraction and vectors are simulated fixtures. No model calls or real matching."
-              : "Sign-in and storage are not connected yet. This preview is available in local sample mode."}
+              : authenticated
+                ? personal
+                  ? "Your résumé is processed by Gemini; structured profile data is saved in your account. Local operation still uses external services."
+                  : "Your account uses database storage and Gemini. Personal uploads remain disabled until release verification."
+                : "Sign-in and storage are not connected yet. This preview is available in local sample mode."}
           </span>
         </div>
         {!session && localDemo && (
@@ -254,13 +335,31 @@ export function ProfileWorkspace({
             className="button session-button"
             disabled={!!busy}
             onClick={() =>
-              run("Starting sample session…", async () => {
-                await api("/api/demo/session", { method: "POST" });
-                setSession(true);
-              })
+              run(
+                sessionExpired && profile
+                  ? "Restoring your session…"
+                  : "Starting sample session…",
+                async () => {
+                  if (
+                    sessionExpired &&
+                    profile &&
+                    inputSignature() !== capturedInputRef.current
+                  ) {
+                    throw new Error(
+                      "Your edits are still here. Restore the original sample/input before recovering this draft.",
+                    );
+                  }
+                  await api("/api/demo/session", { method: "POST" });
+                  if (sessionExpired && profile) await recoverAfterExpiry();
+                  setSession(true);
+                  setSessionExpired(false);
+                },
+              )
             }
           >
-            Start sample session
+            {sessionExpired && profile
+              ? "Start new session and restore my edits"
+              : "Start sample session"}
           </button>
         )}
         <div className="feedback" aria-live="polite" aria-atomic="true">
@@ -278,7 +377,7 @@ export function ProfileWorkspace({
                   run("Reloading…", async () =>
                     showProfile(
                       await api<PublicProfile>(
-                        `/api/resumes/${profile.profileId}`,
+                        `${baseUrl}/${profile.profileId}`,
                       ),
                     ),
                   )
@@ -296,8 +395,9 @@ export function ProfileWorkspace({
               <h2>Start with a résumé</h2>
             </div>
             <p className="profile-muted">
-              Only the supplied samples are accepted in this local demo. They
-              are fictional and contain no personal contact information.
+              {personal
+                ? "Upload your own text-based PDF or paste your résumé. Review extracted facts before confirming."
+                : "Only the supplied samples are accepted in this local demo. They are fictional and contain no personal contact information."}
             </p>
             <div className="tabs" role="group" aria-label="Résumé input method">
               {(["sample", "text", "pdf"] as const).map((value) => (
@@ -343,7 +443,7 @@ export function ProfileWorkspace({
               )}
               {mode === "text" && (
                 <label className="field">
-                  Sample résumé text
+                  {personal ? "Résumé text" : "Sample résumé text"}
                   <textarea
                     rows={10}
                     maxLength={20000}
@@ -351,8 +451,8 @@ export function ProfileWorkspace({
                     onChange={(e) => setText(e.target.value)}
                   />
                   <small>
-                    {text.length.toLocaleString()} / 20,000 characters. Use the
-                    supplied sample text.
+                    {text.length.toLocaleString()} / 20,000 characters.
+                    {!personal && " Use the supplied sample text."}
                   </small>
                 </label>
               )}
@@ -360,7 +460,9 @@ export function ProfileWorkspace({
                 <div className="upload-box">
                   <span className="upload-icon">↥</span>
                   <label htmlFor="resume-file">
-                    Choose a text-based sample PDF
+                    {personal
+                      ? "Choose your text-based résumé PDF"
+                      : "Choose a text-based sample PDF"}
                   </label>
                   <input
                     id="resume-file"
@@ -374,14 +476,35 @@ export function ProfileWorkspace({
                   </a>
                 </div>
               )}
-              <button className="button wide" onClick={extract}>
+              {personal && (
+                <label className="field">
+                  <input
+                    type="checkbox"
+                    checked={consent}
+                    onChange={(e) => setConsent(e.target.checked)}
+                  />
+                  I agree to send my résumé content to Gemini for extraction,
+                  embeddings and career suggestions, and save structured facts
+                  and excerpts in Tiger Data for up to 30 days. I can request
+                  deletion through Manage my data. Optional Backboard memory is
+                  separate. On unpaid Gemini quota, Google may use inputs and
+                  outputs to improve products and human reviewers may review
+                  them; its terms say not to submit personal information.
+                  Running locally does not change that handling.
+                </label>
+              )}
+              <button
+                className="button wide"
+                onClick={extract}
+                disabled={personal && !consent}
+              >
                 Review my experience <span>→</span>
               </button>
             </fieldset>
             <p className="privacy-note">
-              ↳ Raw files and full text are not saved. The demo stores reviewed
-              facts in server memory until restart; production retention and
-              login are Person C’s integration.
+              {authenticated
+                ? "Raw files and full text are not saved. Structured facts, excerpts and vectors are stored in your account; account deletion is available through Manage my data."
+                : "Raw files and full text are not saved. This sample demo keeps profile state in server memory until restart."}
             </p>
           </section>
           <section className="card review">
@@ -566,6 +689,15 @@ export function ProfileWorkspace({
         </div>
         {profile?.status === "confirmed" && !dirty && (
           <section className="card suggestions">
+            {authenticated && (
+              <p>
+                <Link
+                  href={`/career?profileId=${profile.profileId}&profileVersion=${profile.version}`}
+                >
+                  Find my next career steps with Gemini
+                </Link>
+              </p>
+            )}
             <div className="profile-section-heading">
               <span className="section-number">03</span>
               <h2>Tell an honest résumé story</h2>
@@ -602,7 +734,7 @@ export function ProfileWorkspace({
                     const result = await api<{
                       suggestions: ResumeSuggestion[];
                     }>(
-                      `/api/resumes/${profile.profileId}/suggestions?pathId=${pathId}&version=${profile.version}`,
+                      `${baseUrl}/${profile.profileId}/suggestions?pathId=${pathId}&version=${profile.version}`,
                     );
                     setSuggestions(result.suggestions);
                     setDecisions({});

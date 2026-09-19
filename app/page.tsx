@@ -37,13 +37,17 @@ export default async function Home() {
               </span>
               {/* Ends the session and redirects to Auth0 to log out */}
               <a href="/auth/logout">Log out</a>
+              <Link href="/account">Manage my data</Link>
             </>
           )}
           {auth0 && !session && (
             <>
               {/* Redirects to Auth0 Universal Login */}
               <a href="/auth/login">Log in</a>
-              <a className="cta" href="/auth/login?screen_hint=signup">
+              <a
+                className="cta"
+                href="/auth/login?screen_hint=signup&returnTo=/onboarding"
+              >
                 Sign up
               </a>
             </>
@@ -61,7 +65,7 @@ export default async function Home() {
           Discover where your skills can take you—and a practical next step
           toward a career in tech.
         </p>
-        <Link className="demo-link" href="/profile">
+        <Link className="demo-link" href="/demo/profile">
           Review a sample résumé →
         </Link>
         <Link className="demo-link" href="/opportunities">

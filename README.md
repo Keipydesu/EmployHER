@@ -1,6 +1,6 @@
 # EmployHER
 
-A HackHers-focused career navigator: upload a résumé, review extracted skills, discover relevant internships and jobs, understand qualification gaps, and choose actionable next steps.
+A HackHers-focused career-building app: use your résumé and patterns across job and internship requirements to choose projects, skills and organizations that can help you grow. Try supplied sample data without signing in; the planned personal experience uses your own résumé.
 
 **Status: local synthetic Opportunities demo.** Explore paths, evidence, ranked fixture roles, saved next steps and reviewed resources at `/opportunities`. Authentication, real résumé intake, database/provider adapters and coaching remain integration work. See [implementation status](docs/opportunities-implementation.md).
 
@@ -19,6 +19,7 @@ See [development](docs/development.md) for Node selection, ports, checks, and re
 
 ## Product and implementation plan
 
+- [Start-to-finish delivery roadmap](roadmap.md)
 - [Product, scope, backlog, and demo](docs/product.md)
 - [Developer B: Opportunities implementation plan](docs/plans/developer-b-opportunities.md)
 - [Student journey and career-path user story](docs/user-story.md)
@@ -31,7 +32,7 @@ See [development](docs/development.md) for Node selection, ports, checks, and re
 - [Stack decision](docs/decisions/002-hackhers-career-navigator.md)
 - [Localhost demo decision](docs/decisions/003-localhost-demo.md)
 
-Chosen stack: Next.js + TypeScript, Tailwind/shadcn, Auth0, Tiger Data PostgreSQL with pgvector, Gemini, Backboard.io, GitHub API/Octokit, Drizzle, and Zod. The app will run on localhost for now; hosted deployment is deferred.
+Chosen stack: Next.js + TypeScript, Tailwind CSS/shadcn, Auth0, Tiger Data PostgreSQL with pgvector, Gemini, Backboard.io, GitHub API/Octokit, Drizzle, and Zod. The app will run on localhost for now; hosted deployment is deferred. Drizzle handles database queries/schema alongside TypeScript and Tailwind CSS; see [decision 006](docs/decisions/006-retain-drizzle-with-tiger-data.md).
 
 The latest user direction supersedes the earlier Rails/mentor-first planning baseline. Earlier PRD and formatted planning artifacts are available in Git history; [decision 001](docs/decisions/001-rails-mvp-baseline.md) remains historical context. Follow this README and current linked documents for implementation. No real résumé data or credentials belong in this repository.
 
