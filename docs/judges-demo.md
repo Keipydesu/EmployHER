@@ -87,3 +87,15 @@ See [decision 003](decisions/003-localhost-demo.md) for the localhost boundary.
 The suite runs in CI. The shared instrumentation guard keeps Node-only database
 modules out of Edge bundles. Profile errors use a shared symbol brand to preserve
 safe messages across server bundles; existing profile browser tests cover this.
+
+## Women in tech community recommendations
+
+The career plan highlights three optional women-led organizations with official
+links and curated first steps. This is resource discovery, not enrollment or a
+promise of mentorship. Membership conditions remain on each provider’s site.
+
+Official sources reviewed September 19, 2026:
+
+- Rewriting the Code: [student benefits and free membership](https://rewritingthecode.org/students/), [founder and CEO Sue Harnett](https://rewritingthecode.org/about-us/).
+- Women in Robotics: [chapters and online community](https://www.womeninrobotics.org/chapters/), [leadership](https://www.womeninrobotics.org/about/), [audience](https://www.womeninrobotics.org/).
+- AnitaB.org: [membership tiers and benefits](https://www.anitab.org/membership), [leadership](https://www.anitab.org/our-team).

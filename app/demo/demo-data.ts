@@ -490,3 +490,37 @@ export function buildFields(profile: DemoProfile): Record<
     },
   };
 }
+
+export const demoCommunities = [
+  {
+    name: "Rewriting the Code",
+    tag: "Find your student community",
+    description:
+      "A community for university students and early-career technologists, with peer interview practice, résumé reviews, and career events.",
+    next: "Explore the student community, then prepare a short introduction about your current project and ask for a peer interview-practice partner.",
+    access: "Free student membership; applications are reviewed.",
+    url: "https://rewritingthecode.org/students/",
+    link: "Explore RTC membership",
+  },
+  {
+    name: "Women in Robotics",
+    tag: "Meet people in your field",
+    description:
+      "A global network for women working in robotics or interested in entering it, with local chapters and an online community. Non-binary people are welcome.",
+    next: "Explore a chapter or the online community. Bring your robot evaluation diagram and one question about testing language-guided robots to a conversation.",
+    access: "Check the current chapter and event details before joining.",
+    url: "https://www.womeninrobotics.org/chapters/",
+    link: "Find a robotics community",
+  },
+  {
+    name: "AnitaB.org",
+    tag: "Grow your professional network",
+    description:
+      "A tech community offering discussion forums, networking events, and volunteer opportunities. Mentorship is listed among Premium membership benefits.",
+    next: "Compare membership options and choose a relevant networking event. Prepare a 30-second project introduction and two questions for someone in your target role.",
+    access:
+      "Benefits vary by membership tier; check current pricing and event access.",
+    url: "https://www.anitab.org/membership",
+    link: "Explore AnitaB.org membership",
+  },
+];

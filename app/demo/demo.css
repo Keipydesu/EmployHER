@@ -1578,3 +1578,125 @@
   font-weight: 600;
   text-underline-offset: 4px;
 }
+
+.jd-community {
+  margin: 40px 0;
+  padding: 30px;
+  border: 3px solid transparent;
+  border-radius: 22px;
+  background:
+    linear-gradient(125deg, #f4f8ee, #fcf8ff) padding-box,
+    conic-gradient(from 35deg, #719f81, #c4addc, #e3bc75, #71a999, #719f81)
+      border-box;
+  box-shadow:
+    0 10px 36px #54745b12,
+    0 0 0 5px #a8bba514;
+}
+.jd-community-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.jd-community-heading h2 {
+  font-size: clamp(24px, 3vw, 34px);
+  line-height: 1.2;
+  margin: 12px 0;
+  letter-spacing: -1px;
+}
+.jd-community-heading p {
+  max-width: 600px;
+  margin: 0;
+  color: #52665b;
+}
+.jd-community-star {
+  font-size: 76px;
+  line-height: 1;
+  color: #799575;
+}
+.jd-community-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.jd-community-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 22px;
+  background: #fffefa;
+  border: 1px solid #dce2d5;
+  border-radius: 14px;
+}
+.jd-community-tag {
+  color: #536c59;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+.jd-community-card h3 {
+  font-size: 21px;
+  line-height: 1.3;
+  margin: 14px 0 6px;
+}
+.jd-community-card p {
+  font-size: 12px;
+  line-height: 1.7;
+}
+.jd-community-next {
+  padding: 14px;
+  background: #eef3e9;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+.jd-community-next small {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.jd-community-next p {
+  margin: 6px 0 0;
+}
+.jd-community-access {
+  color: #59685f;
+}
+.jd-community-card a {
+  margin-top: auto;
+  padding-top: 16px;
+  color: #285e50;
+  font-size: 12px;
+  font-weight: 700;
+  text-underline-offset: 4px;
+}
+.jd-community-note {
+  font-size: 10px;
+  color: #59685f;
+  margin: 20px 0 0;
+}
+.jd-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+@media (max-width: 1100px) {
+  .jd-community-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 650px) {
+  .jd-community {
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+  .jd-community-star {
+    display: none;
+  }
+}
