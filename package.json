@@ -18,6 +18,7 @@
     "smoke:opportunities": "node scripts/smoke-opportunities.mjs",
     "test": "node --import tsx --test tests/*.test.ts",
     "test:browser": "playwright test",
+    "test:demo": "playwright test --config playwright.demo.config.ts",
     "smoke:profile": "node scripts/smoke-profile.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "node scripts/migrate.mjs"

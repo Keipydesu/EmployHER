@@ -289,8 +289,8 @@ export function ResumeJourney() {
           <br />
           <span>Your possibilities.</span>
         </h2>
-        <Link href="/profile" className="home-button">
-          Let’s begin <span aria-hidden="true">↗</span>
+        <Link href="/demo" className="home-button">
+          Try the interactive demo <span aria-hidden="true">↗</span>
         </Link>
         <p className="home-small">
           Explore with a sample résumé in the local demo.

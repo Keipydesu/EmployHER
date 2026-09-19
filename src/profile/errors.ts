@@ -1,4 +1,18 @@
+const profileErrorBrand = Symbol.for("employher.profile-error");
+
 export class ProfileError extends Error {
+  readonly [profileErrorBrand] = true;
+
+  // The demo session and route can hold separate Next.js module instances.
+  // Preserve known, safe errors when they cross that server bundle boundary.
+  static [Symbol.hasInstance](value: unknown): boolean {
+    return (
+      typeof value === "object" &&
+      value !== null &&
+      (value as ProfileError)[profileErrorBrand] === true
+    );
+  }
+
   constructor(
     public code: string,
     public status: number,
