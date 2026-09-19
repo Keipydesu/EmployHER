@@ -1,0 +1,536 @@
+{
+  "version": "reviewed-2026-09-19-v1",
+  "jobs": [
+    {
+      "id": "together-intern",
+      "version": 1,
+      "sourceKey": "https://job-boards.greenhouse.io/togetherai/jobs/5232036007",
+      "sourceRepo": "SimplifyJobs/Summer2027-Internships",
+      "sourceCommit": "cd6d284e9ecba163966b8ded3c9d5bbd98113759",
+      "sourceUrl": "https://job-boards.greenhouse.io/togetherai/jobs/5232036007",
+      "applyUrl": "https://job-boards.greenhouse.io/togetherai/jobs/5232036007",
+      "checkedAt": "2026-09-19T00:00:00.000Z",
+      "title": "Software Engineer Intern (Summer 2027)",
+      "company": "Together AI",
+      "pathId": "software",
+      "roleType": "internship",
+      "location": "US",
+      "remote": "onsite",
+      "status": "open",
+      "requirements": [
+        {
+          "id": "together-intern-git",
+          "skill": "git",
+          "text": "Experience with version control systems (e.g., Git) and collaborative development workflows",
+          "excerpt": "Experience with version control systems (e.g., Git) and collaborative development workflows",
+          "importance": "required"
+        }
+      ],
+      "qualificationNotes": [],
+      "eligibility": {
+        "noSponsorship": null,
+        "citizenship": null,
+        "advancedDegree": null
+      },
+      "synthetic": false
+    },
+    {
+      "id": "tyler-intern",
+      "version": 1,
+      "sourceKey": "https://jobs.jobvite.com/tylertech/job/oAVOAfwD",
+      "sourceRepo": "SimplifyJobs/Summer2027-Internships",
+      "sourceCommit": "cd6d284e9ecba163966b8ded3c9d5bbd98113759",
+      "sourceUrl": "https://jobs.jobvite.com/tylertech/job/oAVOAfwD",
+      "applyUrl": "https://jobs.jobvite.com/tylertech/job/oAVOAfwD",
+      "checkedAt": "2026-09-19T00:00:00.000Z",
+      "title": "Software Development Intern, Summer 2027",
+      "company": "Tyler Technologies",
+      "pathId": "software",
+      "roleType": "internship",
+      "location": "Georgia",
+      "remote": "unknown",
+      "status": "open",
+      "requirements": [],
+      "qualificationNotes": [
+        "Knowledge of a high-level language and coding principles"
+      ],
+      "eligibility": {
+        "noSponsorship": null,
+        "citizenship": null,
+        "advancedDegree": null
+      },
+      "synthetic": false
+    },
+    {
+      "id": "klaviyo-intern",
+      "version": 1,
+      "sourceKey": "https://job-boards.greenhouse.io/klaviyocampus/jobs/7990059003",
+      "sourceRepo": "SimplifyJobs/Summer2027-Internships",
+      "sourceCommit": "cd6d284e9ecba163966b8ded3c9d5bbd98113759",
+      "sourceUrl": "https://job-boards.greenhouse.io/klaviyocampus/jobs/7990059003",
+      "applyUrl": "https://job-boards.greenhouse.io/klaviyocampus/jobs/7990059003",
+      "checkedAt": "2026-09-19T00:00:00.000Z",
+      "title": "Product Manager Co-op (Spring 2027)",
+      "company": "Klaviyo",
+      "pathId": "product",
+      "roleType": "internship",
+      "location": "US",
+      "remote": "unknown",
+      "status": "open",
+      "requirements": [],
+      "qualificationNotes": ["Strong analytical skills"],
+      "eligibility": {
+        "noSponsorship": null,
+        "citizenship": null,
+        "advancedDegree": null
+      },
+      "synthetic": false
+    },
+    {
+      "id": "duolingo-intern",
+      "version": 1,
+      "sourceKey": "https://job-boards.greenhouse.io/duolingounirecruitment/jobs/8806188002",
+      "sourceRepo": "SimplifyJobs/Summer2027-Internships",
+      "sourceCommit": "cd6d284e9ecba163966b8ded3c9d5bbd98113759",
+      "sourceUrl": "https://job-boards.greenhouse.io/duolingounirecruitment/jobs/8806188002",
+      "applyUrl": "https://job-boards.greenhouse.io/duolingounirecruitment/jobs/8806188002",
+      "checkedAt": "2026-09-19T00:00:00.000Z",
+      "title": "Associate Product Manager, Intern",
+      "company": "Duolingo",
+      "pathId": "product",
+      "roleType": "internship",
+      "location": "unknown",
+      "remote": "unknown",
+      "status": "open",
+      "requirements": [
+        {
+          "id": "duolingo-intern-statistics",
+          "skill": "statistics",
+          "text": "Ability to utilize user insights, data, and statistical analyses to inform decisions",
+          "excerpt": "Ability to utilize user insights, data, and statistical analyses to inform decisions",
+          "importance": "required"
+        }
+      ],
+      "qualificationNotes": [],
+      "eligibility": {
+        "noSponsorship": null,
+        "citizenship": null,
+        "advancedDegree": null
+      },
+      "synthetic": false
+    },
+    {
+      "id": "hudl-intern",
+      "version": 1,
+      "sourceKey": "https://job-boards.greenhouse.io/hudl/jobs/8155103",
+      "sourceRepo": "SimplifyJobs/Summer2027-Internships",
+      "sourceCommit": "cd6d284e9ecba163966b8ded3c9d5bbd98113759",
+      "sourceUrl": "https://job-boards.greenhouse.io/hudl/jobs/8155103",
+      "applyUrl": "https://job-boards.greenhouse.io/hudl/jobs/8155103",
+      "checkedAt": "2026-09-19T00:00:00.000Z",
+      "title": "Product Management Intern",
+      "company": "Hudl",
+      "pathId": "product",
+      "roleType": "internship",
+      "location": "US",
+      "remote": "unknown",
+      "status": "open",
+      "requirements": [],
+      "qualificationNotes": ["Some Product Management exposure"],
+      "eligibility": {
+        "noSponsorship": null,
+        "citizenship": null,
+        "advancedDegree": null
+      },
+      "synthetic": false
+    },
+    {
+      "id": "metox-intern",
+      "version": 1,
+      "sourceKey": "https://job-boards.greenhouse.io/metoxinternationalinc/jobs/5427064008",
+      "sourceRepo": "SimplifyJobs/Summer2027-Internships",
+      "sourceCommit": "cd6d284e9ecba163966b8ded3c9d5bbd98113759",
+      "sourceUrl": "https://job-boards.greenhouse.io/metoxinternationalinc/jobs/5427064008",
+      "applyUrl": "https://job-boards.greenhouse.io/metoxinternationalinc/jobs/5427064008",
+      "checkedAt": "2026-09-19T00:00:00.000Z",
+      "title": "Data Science Intern (Spring 2027)",
+      "company": "MetOx International",
+      "pathId": "ml",
+      "roleType": "internship",
+      "location": "US",
+      "remote": "unknown",
+      "status": "open",
+      "requirements": [
+        {
+          "id": "metox-intern-sql",
+          "skill": "sql",
+          "text": "Basic familiarity with relational databases such as PostgreSQL or MySQL, including writing simple queries",
+          "excerpt": "Basic familiarity with relational databases such as PostgreSQL or MySQL, including writing simple queries",
+          "importance": "required"
+        }
+      ],
+      "qualificationNotes": [],
+      "eligibility": {
+        "noSponsorship": null,
+        "citizenship": null,
+        "advancedDegree": null
+      },
+      "synthetic": false
+    },
+    {
+      "id": "together-gpu",
+      "version": 1,
+      "sourceKey": "https://job-boards.greenhouse.io/togetherai/jobs/5238460007",
+      "sourceRepo": "SimplifyJobs/Summer2027-Internships",
+      "sourceCommit": "cd6d284e9ecba163966b8ded3c9d5bbd98113759",
+      "sourceUrl": "https://job-boards.greenhouse.io/togetherai/jobs/5238460007",
+      "applyUrl": "https://job-boards.greenhouse.io/togetherai/jobs/5238460007",
+      "checkedAt": "2026-09-19T00:00:00.000Z",
+      "title": "Systems Research Engineer Intern - GPU Programming (Summer 2027)",
+      "company": "Together AI",
+      "pathId": "ml",
+      "roleType": "internship",
+      "location": "US",
+      "remote": "unknown",
+      "status": "open",
+      "requirements": [
+        {
+          "id": "together-gpu-modeling",
+          "skill": "modeling",
+          "text": "Knowledge of ML/AI applications and models",
+          "excerpt": "Knowledge of ML/AI applications and models",
+          "importance": "required"
+        }
+      ],
+      "qualificationNotes": [],
+      "eligibility": {
+        "noSponsorship": null,
+        "citizenship": null,
+        "advancedDegree": null
+      },
+      "synthetic": false
+    },
+    {
+      "id": "rothesay-intern",
+      "version": 1,
+      "sourceKey": "https://job-boards.greenhouse.io/rothesaygraduates/jobs/8811533002",
+      "sourceRepo": "SimplifyJobs/Summer2027-Internships",
+      "sourceCommit": "cd6d284e9ecba163966b8ded3c9d5bbd98113759",
+      "sourceUrl": "https://job-boards.greenhouse.io/rothesaygraduates/jobs/8811533002",
+      "applyUrl": "https://job-boards.greenhouse.io/rothesaygraduates/jobs/8811533002",
+      "checkedAt": "2026-09-19T00:00:00.000Z",
+      "title": "2027 Summer Internship Programme - Quantitative Strategist",
+      "company": "Rothesay",
+      "pathId": "quant",
+      "roleType": "internship",
+      "location": "unknown",
+      "remote": "unknown",
+      "status": "open",
+      "requirements": [
+        {
+          "id": "rothesay-intern-python",
+          "skill": "python",
+          "text": "excellence in applied programming skills - Python, C, C++",
+          "excerpt": "excellence in applied programming skills - Python, C, C++",
+          "importance": "unspecified"
+        }
+      ],
+      "qualificationNotes": [
+        "London, UK. Language list does not establish that every listed language is mandatory."
+      ],
+      "eligibility": {
+        "noSponsorship": null,
+        "citizenship": null,
+        "advancedDegree": null
+      },
+      "synthetic": false
+    },
+    {
+      "id": "schonfeld-intern",
+      "version": 1,
+      "sourceKey": "https://job-boards.greenhouse.io/schonfeld/jobs/8207942",
+      "sourceRepo": "SimplifyJobs/Summer2027-Internships",
+      "sourceCommit": "cd6d284e9ecba163966b8ded3c9d5bbd98113759",
+      "sourceUrl": "https://job-boards.greenhouse.io/schonfeld/jobs/8207942",
+      "applyUrl": "https://job-boards.greenhouse.io/schonfeld/jobs/8207942",
+      "checkedAt": "2026-09-19T00:00:00.000Z",
+      "title": "2027 DMFI Quant Developer Intern",
+      "company": "Schonfeld",
+      "pathId": "quant",
+      "roleType": "internship",
+      "location": "unknown",
+      "remote": "unknown",
+      "status": "open",
+      "requirements": [
+        {
+          "id": "schonfeld-intern-python",
+          "skill": "python",
+          "text": "Working knowledge of C++ and/or Python",
+          "excerpt": "Working knowledge of C++ and/or Python",
+          "importance": "unspecified"
+        }
+      ],
+      "qualificationNotes": [
+        "C++ and Python are alternatives; Python alone is not a mandatory eligibility condition."
+      ],
+      "eligibility": {
+        "noSponsorship": null,
+        "citizenship": null,
+        "advancedDegree": null
+      },
+      "synthetic": false
+    },
+    {
+      "id": "belden-intern",
+      "version": 1,
+      "sourceKey": "https://careers.belden.com/job/Carmel-R&D-Cable-Internship-IN-46032/1431653800/",
+      "sourceRepo": "SimplifyJobs/Summer2027-Internships",
+      "sourceCommit": "cd6d284e9ecba163966b8ded3c9d5bbd98113759",
+      "sourceUrl": "https://careers.belden.com/job/Carmel-R&D-Cable-Internship-IN-46032/1431653800/",
+      "applyUrl": "https://careers.belden.com/job/Carmel-R&D-Cable-Internship-IN-46032/1431653800/",
+      "checkedAt": "2026-09-19T00:00:00.000Z",
+      "title": "R&D Cable Internship",
+      "company": "Belden",
+      "pathId": "hardware",
+      "roleType": "internship",
+      "location": "US",
+      "remote": "unknown",
+      "status": "open",
+      "requirements": [],
+      "qualificationNotes": [
+        "Current enrollment with pursuit of bachelor's degree in Electrical Engineering, Electrical Engineering Technology, or related field."
+      ],
+      "eligibility": {
+        "noSponsorship": null,
+        "citizenship": null,
+        "advancedDegree": null
+      },
+      "synthetic": false
+    },
+    {
+      "id": "corning-intern",
+      "version": 1,
+      "sourceKey": "https://corningjobs.corning.com/job/Keene-Imaging-Sciences-Engineering-Intern-Summer-2027-NH-03431/1431391900/",
+      "sourceRepo": "SimplifyJobs/Summer2027-Internships",
+      "sourceCommit": "cd6d284e9ecba163966b8ded3c9d5bbd98113759",
+      "sourceUrl": "https://corningjobs.corning.com/job/Keene-Imaging-Sciences-Engineering-Intern-Summer-2027-NH-03431/1431391900/",
+      "applyUrl": "https://corningjobs.corning.com/job/Keene-Imaging-Sciences-Engineering-Intern-Summer-2027-NH-03431/1431391900/",
+      "checkedAt": "2026-09-19T00:00:00.000Z",
+      "title": "Imaging Sciences Engineering Intern, Summer 2027",
+      "company": "Corning",
+      "pathId": "hardware",
+      "roleType": "internship",
+      "location": "US",
+      "remote": "unknown",
+      "status": "open",
+      "requirements": [],
+      "qualificationNotes": [
+        "Optics, Electronics, or related discipline with concentration in Optics or Imaging Science.",
+        "The reviewed excerpt describes a degree concentration; it is not evidence of a circuit-design skill requirement."
+      ],
+      "eligibility": {
+        "noSponsorship": null,
+        "citizenship": null,
+        "advancedDegree": null
+      },
+      "synthetic": false
+    },
+    {
+      "id": "together-grad",
+      "version": 1,
+      "sourceKey": "https://job-boards.greenhouse.io/togetherai/jobs/5211582007",
+      "sourceRepo": "SimplifyJobs/New-Grad-Positions",
+      "sourceCommit": "f996f85487afba30365b19f8188d7682cbecb4ad",
+      "sourceUrl": "https://job-boards.greenhouse.io/togetherai/jobs/5211582007",
+      "applyUrl": "https://job-boards.greenhouse.io/togetherai/jobs/5211582007",
+      "checkedAt": "2026-09-19T00:00:00.000Z",
+      "title": "Software Engineer, New Grad (2027)",
+      "company": "Together AI",
+      "pathId": "software",
+      "roleType": "new-grad",
+      "location": "US",
+      "remote": "onsite",
+      "status": "open",
+      "requirements": [
+        {
+          "id": "together-grad-git",
+          "skill": "git",
+          "text": "Experience with version control systems (e.g., Git) and collaborative development workflows.",
+          "excerpt": "Experience with version control systems (e.g., Git) and collaborative development workflows.",
+          "importance": "required"
+        }
+      ],
+      "qualificationNotes": [],
+      "eligibility": {
+        "noSponsorship": null,
+        "citizenship": null,
+        "advancedDegree": null
+      },
+      "synthetic": false
+    },
+    {
+      "id": "idme-grad",
+      "version": 1,
+      "sourceKey": "https://job-boards.greenhouse.io/idmeuniversityrecruiting/jobs/7986505003",
+      "sourceRepo": "SimplifyJobs/New-Grad-Positions",
+      "sourceCommit": "f996f85487afba30365b19f8188d7682cbecb4ad",
+      "sourceUrl": "https://job-boards.greenhouse.io/idmeuniversityrecruiting/jobs/7986505003",
+      "applyUrl": "https://job-boards.greenhouse.io/idmeuniversityrecruiting/jobs/7986505003",
+      "checkedAt": "2026-09-19T00:00:00.000Z",
+      "title": "Summer 2027 - Data Scientist (New Grad)",
+      "company": "ID.me",
+      "pathId": "ml",
+      "roleType": "new-grad",
+      "location": "US",
+      "remote": "onsite",
+      "status": "open",
+      "requirements": [
+        {
+          "id": "idme-grad-python",
+          "skill": "python",
+          "text": "Strong technical skills in Python, SQL, and data analysis libraries (pandas, numpy, scikit-learn).",
+          "excerpt": "Strong technical skills in Python, SQL, and data analysis libraries (pandas, numpy, scikit-learn).",
+          "importance": "required"
+        }
+      ],
+      "qualificationNotes": [
+        "The posting requires a master's degree with graduation in May/June 2027."
+      ],
+      "eligibility": {
+        "noSponsorship": null,
+        "citizenship": null,
+        "advancedDegree": true
+      },
+      "synthetic": false
+    },
+    {
+      "id": "maven-grad",
+      "version": 1,
+      "sourceKey": "https://job-boards.greenhouse.io/mavensecuritiesholdingltd/jobs/8048830",
+      "sourceRepo": "SimplifyJobs/New-Grad-Positions",
+      "sourceCommit": "f996f85487afba30365b19f8188d7682cbecb4ad",
+      "sourceUrl": "https://job-boards.greenhouse.io/mavensecuritiesholdingltd/jobs/8048830",
+      "applyUrl": "https://job-boards.greenhouse.io/mavensecuritiesholdingltd/jobs/8048830",
+      "checkedAt": "2026-09-19T00:00:00.000Z",
+      "title": "Graduate Quant Researcher 2027 - Chicago",
+      "company": "Maven Securities",
+      "pathId": "quant",
+      "roleType": "new-grad",
+      "location": "US",
+      "remote": "unknown",
+      "status": "open",
+      "requirements": [
+        {
+          "id": "maven-grad-python",
+          "skill": "python",
+          "text": "Relevant programming experience in at least one language (Python, C++, C#)",
+          "excerpt": "Relevant programming experience in at least one language (Python, C++, C#)",
+          "importance": "unspecified"
+        }
+      ],
+      "qualificationNotes": [
+        "Python/C++/C# are alternatives. Chicago role includes initial training in London."
+      ],
+      "eligibility": {
+        "noSponsorship": null,
+        "citizenship": null,
+        "advancedDegree": null
+      },
+      "synthetic": false
+    },
+    {
+      "id": "anduril-grad",
+      "version": 1,
+      "sourceKey": "https://job-boards.greenhouse.io/andurilindustries/jobs/5228868007",
+      "sourceRepo": "SimplifyJobs/New-Grad-Positions",
+      "sourceCommit": "f996f85487afba30365b19f8188d7682cbecb4ad",
+      "sourceUrl": "https://job-boards.greenhouse.io/andurilindustries/jobs/5228868007",
+      "applyUrl": "https://job-boards.greenhouse.io/andurilindustries/jobs/5228868007",
+      "checkedAt": "2026-09-19T00:00:00.000Z",
+      "title": "2027 Early Career Flight Software Engineer",
+      "company": "Anduril Industries",
+      "pathId": "hardware",
+      "roleType": "new-grad",
+      "location": "US",
+      "remote": "unknown",
+      "status": "open",
+      "requirements": [
+        {
+          "id": "anduril-grad-python",
+          "skill": "python",
+          "text": "Basic familiarity with electrical test equipment (such as multimeters or oscilloscopes) and post-flight data analysis using tools like Python or MATLAB.",
+          "excerpt": "Basic familiarity with electrical test equipment (such as multimeters or oscilloscopes) and post-flight data analysis using tools like Python or MATLAB.",
+          "importance": "preferred"
+        }
+      ],
+      "qualificationNotes": [
+        "Source category is Hardware. Python/MATLAB are alternatives in a preferred qualification. U.S.-person status is required; clearance eligibility may also be required. This is not equivalent to a citizenship-only rule."
+      ],
+      "eligibility": {
+        "noSponsorship": null,
+        "citizenship": null,
+        "advancedDegree": null
+      },
+      "synthetic": false
+    }
+  ],
+  "resources": [
+    {
+      "id": "bit-community",
+      "version": 1,
+      "title": "Blacks In Technology",
+      "kind": "community",
+      "pathIds": ["software", "ml", "product", "quant", "hardware"],
+      "skill": null,
+      "url": "https://www.blacksintechnology.net/about",
+      "claim": "Explore a technology community focused on Black participation.",
+      "excerpt": "a network for Black Techies to uplift and collaborate with one another through events, media, and various platforms",
+      "checkedAt": "2026-09-19T00:00:00.000Z",
+      "expiresAt": "2026-10-19T00:00:00.000Z",
+      "reviewStatus": "reviewed",
+      "region": "Check program availability",
+      "eligibility": "Program-specific eligibility is not stated on the checked page; confirm directly.",
+      "cost": "Not verified; check the program join page.",
+      "prerequisites": "Check the linked program details.",
+      "inclusionCategory": "community"
+    },
+    {
+      "id": "anitab-mentorship",
+      "version": 1,
+      "title": "AnitaB.org mentorship",
+      "kind": "mentorship",
+      "pathIds": ["software", "ml", "product", "quant", "hardware"],
+      "skill": null,
+      "url": "https://anitab.org/membership/",
+      "claim": "Explore mentorship through Premium membership.",
+      "excerpt": "Mentorship Program",
+      "checkedAt": "2026-09-19T00:00:00.000Z",
+      "expiresAt": "2026-10-19T00:00:00.000Z",
+      "reviewStatus": "reviewed",
+      "region": "Check program availability",
+      "eligibility": "Membership required; check current program eligibility before joining.",
+      "cost": "Premium membership required; current price not verified.",
+      "prerequisites": "Check the linked program details.",
+      "inclusionCategory": "women"
+    },
+    {
+      "id": "ncwit-resources",
+      "version": 1,
+      "title": "NCWIT programs and resources",
+      "kind": "community",
+      "pathIds": ["software", "ml", "product", "quant", "hardware"],
+      "skill": null,
+      "url": "https://www.ncwit.org/about-ncwit/",
+      "claim": "Explore technology inclusion programs and research resources.",
+      "excerpt": "widens inclusion in the technology ecosystem through innovative programs and research",
+      "checkedAt": "2026-09-19T00:00:00.000Z",
+      "expiresAt": "2026-10-19T00:00:00.000Z",
+      "reviewStatus": "reviewed",
+      "region": "Check program availability",
+      "eligibility": "Programs serve different audiences, including students and educators; check the selected program.",
+      "cost": "Varies by program; do not assume all programs are free.",
+      "prerequisites": "Check the linked program details.",
+      "inclusionCategory": "women"
+    }
+  ]
+}

@@ -262,6 +262,11 @@ test("homepage opens the demo on a narrow screen", async ({ page }) => {
   const bounds = await entry.boundingBox();
   expect(bounds!.x).toBeGreaterThanOrEqual(0);
   expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(390);
+  await page.screenshot({
+    path: "docs/screenshots/home-mobile.png",
+    fullPage: true,
+    animations: "disabled",
+  });
   await entry.click();
   await expect(page).toHaveURL(/\/demo$/);
   await expect(

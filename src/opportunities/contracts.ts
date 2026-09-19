@@ -18,11 +18,10 @@ export type Skill = z.infer<typeof SkillSchema>;
 export const EvidenceSchema = z
   .object({
     skill: SkillSchema,
-    excerpt: z.string().min(1).max(500),
+    excerpt: z.string().min(1).max(600),
     source: z.enum(["resume", "user_reported"]),
   })
   .strict();
-export type Evidence = z.infer<typeof EvidenceSchema>;
 export const ProfileSchema = z
   .object({
     id: z.string(),
@@ -68,6 +67,7 @@ export const JobSchema = z
     remote: z.enum(["remote", "onsite", "unknown"]),
     status: z.enum(["open", "closed", "unlisted"]),
     requirements: z.array(RequirementSchema),
+    qualificationNotes: z.array(z.string().max(800)).max(20).optional(),
     embedding: z.array(z.number().finite()),
     eligibility: z.object({
       noSponsorship: z.boolean().nullable(),
@@ -136,9 +136,17 @@ export type Confirmation = {
   confirmedAt: string;
 };
 export type Action = {
+  recommendation?: {
+    contextHash: string;
+    index: number;
+    why: string;
+    factIds: string[];
+    sourceIds: string[];
+    resourceIds: string[];
+  };
   id: string;
   pathId: string;
-  skill: Skill;
+  skill: Skill | null;
   title: string;
   deliverable: string;
   resourceId: string | null;
@@ -155,17 +163,17 @@ export type Plan = {
 export const CommandSchema = z.discriminatedUnion("kind", [
   z
     .object({
-      kind: z.literal("profile"),
+      kind: z.literal("select-recommendation"),
       expectedVersion: z.number().int(),
-      profileId: z.enum(["maya", "cloud", "starter", "reported", "draft"]),
+      contextHash: z.string().regex(/^[a-f0-9]{64}$/),
+      index: z.number().int().min(0).max(2),
     })
     .strict(),
   z
     .object({
-      kind: z.literal("import-profile"),
+      kind: z.literal("profile"),
       expectedVersion: z.number().int(),
-      name: z.string().min(1).max(100),
-      evidence: z.array(EvidenceSchema).max(skills.length),
+      profileId: z.enum(["maya", "cloud", "starter", "reported", "draft"]),
     })
     .strict(),
   z

@@ -1,6 +1,6 @@
 # Developer B plan: Opportunities track
 
-Status: proposed execution plan, recorded 2026-09-18. Expands owner **B**'s slice from the [three-person roadmap](../product.md#three-person-parallel-mvp-roadmap) and the [user story](../user-story.md#delivery-alignment) into concrete, ordered tasks. Scope, contracts and acceptance gates already fixed in product.md/architecture.md/data-model.md/api.md/user-story.md are authoritative; this file sequences work against them and does not redefine them.
+Status: proposed execution plan, recorded 2026-09-18. Expands owner **B**'s slice from the [delivery roadmap](../../roadmap.md) and the [user story](../user-story.md#delivery-alignment) into concrete, ordered tasks. Scope, contracts and acceptance gates already fixed in product.md/architecture.md/data-model.md/api.md/user-story.md are authoritative; this file provides track detail without redefining them; roadmap.md owns current execution ordering.
 
 ## Scope
 
@@ -19,7 +19,7 @@ Explicitly out of scope for this plan: Backboard coaching (P1, owner A once B's 
 5. **Resolve reuse terms before publishing source-derived fixtures** — prior review did not find a LICENSE file in either source repo; recheck terms for the selected snapshots (open question, flagged in [CLAUDE.md](../../CLAUDE.md)). Use synthetic catalog fixtures to unblock M1 development in parallel with that resolution; do not block coding on it.
 6. **Curate ≥3 sourced inclusion resources** (e.g., TAG, SWE mentoring per user-story.md) with source URL, excerpt, checked date, region, eligibility text — sign off the catalog batch per the M0 exit criteria.
 7. **Map source categories to path taxonomy**: the five source-aligned top-level categories (Software Engineering; Product Management; Data Science, AI & ML; Quantitative Finance; Hardware Engineering) plus the two EmployHER-proposed subpaths (Cybersecurity, Cloud/Infrastructure) — only categories with curated checklist content get an assessed progress view; others show "Path being curated."
-8. Propose schema module `catalog.ts` (jobs/requirements/resources) and `matches.ts` per product.md's M0 note; hand to C for migration ordering, not for C to author.
+8. Propose schema modules `catalog.ts` (jobs/requirements/resources) and `matches.ts` against the [data model](../data-model.md); hand to C for migration ordering, not for C to author.
 
 **Exit:** DTOs and path/checklist contracts reviewed by A/C; ≥15-role reviewed catalog batch (or clearly labeled synthetic equivalent while reuse terms are open) and ≥3 resources ready; embedding config agreed with A.
 

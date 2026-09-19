@@ -243,11 +243,7 @@ export function ResumeJourney() {
             </p>
             <div className="home-paths">
               {paths.map((path) => (
-                <Link
-                  href="/opportunities"
-                  className="home-path"
-                  key={path.name}
-                >
+                <Link href="/onboarding" className="home-path" key={path.name}>
                   <span className="home-path-icon" aria-hidden="true">
                     {path.icon}
                   </span>

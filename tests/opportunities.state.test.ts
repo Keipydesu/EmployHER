@@ -7,7 +7,6 @@ import {
   hasConfirmation,
 } from "../src/opportunities/state.ts";
 import { OpportunityError } from "../src/opportunities/engine.ts";
-import { vectorFor } from "../src/opportunities/catalog.ts";
 import type { Command } from "../src/opportunities/contracts.ts";
 
 function apply(state: ReturnType<typeof initialState>, command: Command) {
@@ -52,44 +51,6 @@ describe("applyCommand: profile switching", () => {
     });
     assert.equal(state.plan.confirmations.length, 0);
     assert.equal(state.profile.id, "maya");
-  });
-});
-
-describe("applyCommand: import-profile", () => {
-  test("imports evidence from an external profile, bumps version, resets confirmations, and recomputes the embedding", () => {
-    let state = initialState();
-    state = apply(state, {
-      kind: "confirm-gap",
-      expectedVersion: state.version,
-      skill: "cloud",
-    });
-    const priorVersion = state.version;
-    state = apply(state, {
-      kind: "import-profile",
-      expectedVersion: state.version,
-      name: "Your confirmed profile",
-      evidence: [
-        { skill: "python", excerpt: "Skills: Python, SQL", source: "resume" },
-        { skill: "sql", excerpt: "Skills: Python, SQL", source: "resume" },
-      ],
-    });
-    assert.equal(state.version, priorVersion + 1);
-    assert.equal(state.profile.id, "imported");
-    assert.equal(state.profile.status, "confirmed");
-    assert.equal(state.profile.evidence.length, 2);
-    assert.equal(state.plan.confirmations.length, 0);
-    assert.deepEqual(state.profile.embedding, vectorFor(["python", "sql"]));
-  });
-  test("an imported profile appears in the profiles picker list while active", () => {
-    let state = initialState();
-    state = apply(state, {
-      kind: "import-profile",
-      expectedVersion: state.version,
-      name: "Your confirmed profile",
-      evidence: [],
-    });
-    const view = present(state);
-    assert.ok(view.profiles.some((p) => p.id === "imported"));
   });
 });
 

@@ -12,7 +12,16 @@ import type { ProfileRepository } from "../ports";
 import { conflict, notFound, ProfileError } from "../errors";
 
 export class PostgresProfileRepository implements ProfileRepository {
-  constructor(private db: NodePgDatabase) {}
+  constructor(
+    private db: NodePgDatabase,
+    private onCommit?: (
+      tx: Parameters<Parameters<NodePgDatabase["transaction"]>[0]>[0],
+      profile: Profile,
+    ) => Promise<void>,
+    private beforeWrite?: (
+      tx: Parameters<Parameters<NodePgDatabase["transaction"]>[0]>[0],
+    ) => Promise<void>,
+  ) {}
   private values(p: Profile) {
     if (p.embedding?.simulated)
       throw new ProfileError(
@@ -34,6 +43,7 @@ export class PostgresProfileRepository implements ProfileRepository {
   }
   async create(p: Profile) {
     await this.db.transaction(async (tx) => {
+      await this.beforeWrite?.(tx);
       await tx
         .insert(profileOwnerLifecycle)
         .values({ ownerId: p.ownerId })
@@ -51,6 +61,7 @@ export class PostgresProfileRepository implements ProfileRepository {
         expiresAt: new Date(p.expiresAt),
       });
       await tx.insert(profileVersions).values(this.values(p));
+      await this.onCommit?.(tx, p);
     });
   }
   async get(ownerId: string, id: string): Promise<Profile | null> {
@@ -103,6 +114,7 @@ export class PostgresProfileRepository implements ProfileRepository {
   async replace(ownerId: string, expected: number, p: Profile) {
     if (p.ownerId !== ownerId || p.version !== expected + 1) throw conflict();
     await this.db.transaction(async (tx) => {
+      await this.beforeWrite?.(tx);
       const [owner] = await tx
         .select()
         .from(profileOwnerLifecycle)
@@ -134,6 +146,7 @@ export class PostgresProfileRepository implements ProfileRepository {
         version: p.version,
         createdAt: new Date(),
       });
+      await this.onCommit?.(tx, p);
     });
   }
   async deleteOwner(ownerId: string) {

@@ -215,6 +215,9 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
           <span aria-hidden="true">✳</span>
           <p>You don’t need to have it all figured out.</p>
           <small>Just a next step that feels like you.</small>
+          <Link className="jd-personal-entry" href="/onboarding">
+            Build a plan with my résumé →
+          </Link>
         </div>
         <div className="jd-person">
           <span className="jd-avatar">{profile.initials}</span>

@@ -19,13 +19,16 @@ export default async function Home() {
           <a className="home-nav-about" href="#skills">
             How it works
           </a>
-          <Link className="home-nav-about" href="/opportunities">
-            Opportunities
+          <Link className="home-nav-about" href="/onboarding">
+            Build my career
           </Link>
           {session ? (
-            <a href="/auth/logout">Log out</a>
+            <>
+              <Link href="/account">My account</Link>
+              <a href="/auth/logout">Log out</a>
+            </>
           ) : auth0 ? (
-            <a href="/auth/login">Log in</a>
+            <a href="/auth/login?returnTo=/onboarding">Log in</a>
           ) : null}
           <Link className="home-button home-button-small" href="/demo">
             Try the demo <span aria-hidden="true">↗</span>
@@ -39,7 +42,10 @@ export default async function Home() {
           <i />
         </Link>
         <p>More women. More possibilities.</p>
-        <span>Built around your experience.</span>
+        <nav aria-label="Sample workspaces">
+          <Link href="/demo/profile">Sample résumé</Link>
+          <Link href="/opportunities">Sample opportunities</Link>
+        </nav>
       </footer>
     </main>
   );

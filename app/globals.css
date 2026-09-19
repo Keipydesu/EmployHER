@@ -585,3 +585,150 @@ input {
 .resource-card {
   border-top: 2px solid var(--accent-deep);
 }
+
+/* Connected workspaces share the demo's sage palette and editorial grid. */
+.workspace-header {
+  max-width: 1320px;
+  margin: 0 auto 32px;
+  padding: 24px 0;
+  flex-wrap: wrap;
+}
+body > .workspace-header {
+  padding-inline: 28px;
+}
+.workspace-brand {
+  font-size: 27px;
+  letter-spacing: -1.4px;
+}
+.workspace-brand i {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-left: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.workspace-header nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+}
+.workspace-header nav a {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0;
+  padding-block: 8px;
+}
+.workspace-header nav [aria-current="page"] {
+  color: var(--accent-deep);
+  border-bottom: 2px solid var(--accent-deep);
+}
+.app-workspace {
+  max-width: 1240px;
+}
+.app-workspace h1 {
+  font-size: clamp(34px, 5vw, 58px);
+  letter-spacing: -1.8px;
+}
+.app-workspace .op-hero {
+  margin-bottom: 28px;
+  background: var(--gradient-sage);
+  border-top: 2px solid var(--accent-deep);
+}
+.app-workspace .panel {
+  padding: clamp(20px, 4vw, 36px);
+}
+.app-workspace button {
+  border-radius: 5px;
+}
+.app-workspace button:not(:disabled):hover {
+  background: var(--accent-pale);
+}
+.interests-workspace > .panel {
+  max-width: 880px;
+  margin-inline: auto;
+}
+.interests-workspace fieldset {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  border: 0;
+  padding: 10px 0;
+}
+.interest-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--rule);
+  padding: 22px 18px;
+  background: var(--paper);
+  cursor: pointer;
+  line-height: 1.5;
+}
+.interest-card:has(input:checked) {
+  border-color: var(--accent-deep);
+  background: var(--accent-pale);
+}
+.interest-card input {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.career-workspace .panel > ol,
+.career-workspace .panel > ul {
+  padding-left: 22px;
+}
+.career-workspace .job-card {
+  padding-block: 20px;
+  overflow-wrap: anywhere;
+}
+.career-workspace .job-card button {
+  margin: 4px 8px 4px 0;
+}
+.career-workspace fieldset label {
+  display: block;
+  margin-block: 12px;
+  line-height: 1.6;
+}
+.career-workspace fieldset select {
+  margin-top: 8px;
+}
+.account-workspace > .panel {
+  max-width: 850px;
+}
+@media (max-width: 640px) {
+  .workspace-header {
+    align-items: start;
+    gap: 16px;
+  }
+  .workspace-header nav {
+    gap: 4px 16px;
+  }
+  .interests-workspace fieldset {
+    grid-template-columns: 1fr;
+  }
+  .app-workspace {
+    padding: 20px;
+  }
+}
+.career-sections {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  padding: 18px 0;
+  margin-bottom: 22px;
+  border-bottom: 1px solid var(--rule);
+}
+.career-sections a {
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.career-workspace section[id] {
+  scroll-margin-top: 24px;
+}
+.home-footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
