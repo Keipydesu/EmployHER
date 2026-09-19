@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("judge walkthrough stays local, traces evidence, persists progress, and resets", async ({
+test("judge walkthrough stays local, traces evidence, persists progress, and connects with peers", async ({
   page,
 }) => {
   const apiRequests: string[] = [];
@@ -12,9 +12,7 @@ test("judge walkthrough stays local, traces evidence, persists progress, and res
   await expect(
     page.getByRole("heading", { name: "Julia Thomas", exact: true }),
   ).toBeVisible();
-  await expect(
-    page.getByText("Selected résumé evidence. Contact details omitted."),
-  ).toBeVisible();
+  await expect(page.getByText("Your experience, in focus.")).toBeVisible();
   expect(await page.locator(".jd-paper").innerText()).not.toMatch(
     /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}|\b\d{3}[-. ]\d{3}[-. ]\d{4}\b/i,
   );
@@ -32,7 +30,7 @@ test("judge walkthrough stays local, traces evidence, persists progress, and res
     path: "docs/screenshots/judges-demo-profile.png",
     fullPage: true,
   });
-  await page.getByRole("button", { name: "Build my sample plan" }).click();
+  await page.getByRole("button", { name: "Build my plan" }).click();
   await expect(
     page.getByText("You have a shareable demo.", { exact: false }),
   ).toBeVisible();
@@ -42,7 +40,7 @@ test("judge walkthrough stays local, traces evidence, persists progress, and res
     .click();
   const dialog = page.getByRole("dialog");
   await expect(
-    dialog.getByText("Illustrative ML research role:", { exact: false }),
+    dialog.getByText("ML research role:", { exact: false }),
   ).toBeVisible();
   await expect(
     dialog.getByRole("heading", { name: "Make it happen" }),
@@ -95,7 +93,7 @@ test("judge walkthrough stays local, traces evidence, persists progress, and res
   ).toBeVisible();
   await page.reload();
   await page
-    .getByRole("navigation", { name: "Demo workspace" })
+    .getByRole("navigation", { name: "Workspace" })
     .getByRole("button", { name: "Saved steps" })
     .click();
   await expect(
@@ -122,25 +120,25 @@ test("judge walkthrough stays local, traces evidence, persists progress, and res
   expect(contents).toContain(
     "https://scikit-learn.org/stable/modules/cross_validation.html",
   );
-  await page.getByRole("button", { name: "Reset demo" }).click();
-  await page.getByRole("button", { name: "Keep exploring" }).click();
-  await expect(
-    page.getByRole("heading", { name: "1 of 1 steps completed" }),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "Reset demo" }).click();
-  await page.getByRole("button", { name: "Reset sample", exact: true }).click();
-  await expect(
-    page.getByRole("checkbox", {
-      name: "I have a shareable demo (self-reported)",
-    }),
-  ).not.toBeChecked();
+  await expect(page.getByRole("button", { name: "Reset demo" })).toHaveCount(0);
+  await page.getByRole("button", { name: "Meet similar peers" }).click();
+  await expect(page.getByRole("heading", { name: "Priya Shah" })).toBeVisible();
   await page
-    .getByRole("navigation", { name: "Demo workspace" })
-    .getByRole("button", { name: "Saved steps" })
+    .getByRole("button", { name: "Software engineering", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Your next step is yours to choose." }),
+    page.getByRole("heading", { name: "Amara Lewis" }),
   ).toBeVisible();
+  await expect(page.getByText("amara.lewis@example.com")).toBeVisible();
+  await page.screenshot({
+    path: "docs/screenshots/workspace-connect-desktop.png",
+    fullPage: true,
+  });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.screenshot({
+    path: "docs/screenshots/workspace-connect-mobile.png",
+    fullPage: true,
+  });
   expect(apiRequests).toEqual([]);
 });
 
@@ -148,7 +146,7 @@ test("field switching changes recommendations and enforces a three-step plan", a
   page,
 }) => {
   await page.goto("/demo");
-  await page.getByRole("button", { name: "Build my sample plan" }).click();
+  await page.getByRole("button", { name: "Build my plan" }).click();
   for (let index = 0; index < 3; index++)
     await page
       .getByRole("button", { name: "+ Save this step", exact: true })
@@ -176,7 +174,7 @@ test("field switching changes recommendations and enforces a three-step plan", a
     })
     .click();
   await page
-    .getByRole("navigation", { name: "Demo workspace" })
+    .getByRole("navigation", { name: "Workspace" })
     .getByRole("button", { name: "Career plan" })
     .click();
   await page
@@ -202,9 +200,9 @@ test("mobile supports keyboard navigation, dialogs, and every view without overf
   await page.goto("/demo");
   await page.keyboard.press("Tab");
   await expect(
-    page.getByRole("link", { name: "Skip to demo content" }),
+    page.getByRole("link", { name: "Skip to workspace content" }),
   ).toBeFocused();
-  await page.getByRole("button", { name: "Build my sample plan" }).click();
+  await page.getByRole("button", { name: "Build my plan" }).click();
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({
     animations: "disabled",
@@ -224,7 +222,7 @@ test("mobile supports keyboard navigation, dialogs, and every view without overf
   ).toBeFocused();
   for (const name of ["Saved steps", "Your story", "Career plan"]) {
     await page
-      .getByRole("navigation", { name: "Demo workspace" })
+      .getByRole("navigation", { name: "Workspace" })
       .getByRole("button", { name })
       .click();
     expect(
@@ -250,7 +248,7 @@ test("unavailable browser storage does not prevent exploring the demo", async ({
   await expect(
     page.getByText("Browser storage is unavailable.", { exact: false }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Build my sample plan" }).click();
+  await page.getByRole("button", { name: "Build my plan" }).click();
   await page
     .getByRole("button", { name: "+ Save this step", exact: true })
     .first()
@@ -265,7 +263,7 @@ test("homepage opens the demo on a narrow screen", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
   const entry = page
-    .getByRole("link", { name: "Try the demo", exact: false })
+    .getByRole("link", { name: "Open my workspace", exact: false })
     .first();
   await expect(entry).toBeVisible();
   const bounds = await entry.boundingBox();

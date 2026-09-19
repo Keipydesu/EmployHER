@@ -10,7 +10,7 @@ are curated examples, not live Gemini output.
 ## Run and present
 
 Use Node 24, install with `npm ci --ignore-scripts`, run `npm run dev`, and open
-`http://127.0.0.1:3000/demo`. **Try the demo** on the homepage also opens this route.
+`http://127.0.0.1:3000/demo`. **Open my workspace** on the homepage also opens this route.
 
 A three-minute walkthrough:
 
@@ -27,8 +27,14 @@ A three-minute walkthrough:
    failure scenarios. Counts and schedules are proposed scopes, not past results.
 4. **Saved steps:** save up to three milestones, mark progress, refresh, and download
    a text plan containing tasks, deliverables, criteria, and reference links.
-5. **Reset demo:** confirm a reset before the next judge. It clears the current
-   profile’s choices under `employher-judges-demo-v2-<profile-id>` in browser storage.
+5. **Connect:** browse fictional peers for the selected career field, with silhouette
+   avatars, shared interests, and reserved example.com contact addresses.
+
+Auth0 sign-in is optional and displays the authenticated user. Login uses the
+configured APP_BASE_URL origin so its transaction cookie reaches the callback.
+All four workspace sections remain accessible when signed out. Reset controls
+and demo labels are removed from the presentation; persisted choices still live
+under `employher-judges-demo-v2-<profile-id>` in browser storage.
 
 Role cards provide search queries and eligibility questions, not live openings.
 The career tasks include a three-target worksheet, an interview outline, and a
@@ -65,7 +71,7 @@ the selected Julia evidence used by the default demo on September 19, 2026. Unse
 Run `npm run test:demo`, or `npm run test:demo -- --ui`. Playwright scenarios in
 `tests/judges-demo/` use port 3120 and Webpack. They cover the walkthrough, evidence
 and work-plan dialogs, task persistence, detailed plan downloads, field switching,
-the three-step limit, completion, reset/cancel, keyboard access, mobile layout,
+the three-step limit, completion, peer field switching, keyboard access, mobile layout,
 unavailable storage, and the homepage entry point. The walkthrough asserts no
 `/api/` requests. Public screenshots use the approved public demo profile only and are written
 to `docs/screenshots/judges-demo-*.png`.
@@ -89,6 +95,15 @@ modules out of Edge bundles. Profile errors use a shared symbol brand to preserv
 safe messages across server bundles; existing profile browser tests cover this.
 
 ## Women in tech community recommendations
+
+PR #16 merge verification (2026-09-19): regenerated workspace screenshots from
+the combined Connect and communities UI. Node 24 checks passed: 167 unit tests,
+five workspace browser scenarios, seven profile browser scenarios, formatting,
+lint, TypeScript, production build, and homepage/Opportunities/profile smoke.
+The self-reported checkbox waits for browser state restoration before accepting
+input. The layout regression opens Opportunities directly because the presentation
+homepage no longer has the sample footer link. Auth0 credentialed login was not
+rerun; the build retains the SDK's existing dynamic-dependency warning.
 
 The career plan highlights three optional women-led organizations with official
 links and curated first steps. This is resource discovery, not enrollment or a

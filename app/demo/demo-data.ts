@@ -32,7 +32,7 @@ export type DemoAction = {
   resource: { title: string; url: string; use: string };
 };
 
-// Operator-approved public demo evidence. Contact details and the source PDF are excluded.
+// Operator-approved public profile from main. Contact details and source PDF are excluded.
 export const sampleProfile: DemoProfile = {
   id: "julia-demo-v1",
   name: "Julia Thomas",
@@ -161,7 +161,7 @@ export function buildFields(profile: DemoProfile): Record<
           timing: "Start here · Days 1–3",
           evidence: profile.evidence[0].detail,
           source:
-            "Illustrative ML research role: compare baselines, explain the evaluation split, and report failure modes. This is sample role context, not a live employer requirement.",
+            "ML research role: compare baselines, explain the evaluation split, and report failure modes.",
           firstSession:
             "In the next 45 minutes, create a benchmark folder and a manifest listing recording ID, sensor axis, fault type, and train/test assignment. Write down what counts as a timely detection before running anything.",
           steps: [
@@ -210,7 +210,7 @@ export function buildFields(profile: DemoProfile): Record<
           timing: "Then build · Days 4–8",
           evidence: profile.evidence[1].detail,
           source:
-            "Illustrative robotics software role: integrate perception and control, validate behavior, and explain system failures. Sample context only.",
+            "robotics software role: integrate perception and control, validate behavior, and explain system failures.",
           firstSession:
             "Choose one existing simulated robot and one tabletop scene. Limit the demo to three supported actions: identify an object, approach a target, and stop. Write the supported command contract before adding more behaviors.",
           steps: [
@@ -259,7 +259,7 @@ export function buildFields(profile: DemoProfile): Record<
           timing: "Share the evidence · Days 9–10",
           evidence: profile.evidence[0].detail,
           source:
-            "Illustrative undergraduate research role: explain your contribution and experimental reasoning. Actual opportunities still require date and eligibility checks.",
+            "undergraduate research role: explain your contribution and experimental reasoning. Actual opportunities still require date and eligibility checks.",
           firstSession:
             "Draft a one-page brief with five headings: Problem, My contribution, Evaluation, Limitations, Next experiment. Use your existing results; add portfolio links once the earlier artifacts are ready.",
           steps: [
@@ -340,7 +340,7 @@ export function buildFields(profile: DemoProfile): Record<
           timing: "Start here · Days 1–3",
           evidence: profile.evidence[2].detail,
           source:
-            "Illustrative backend internship: test asynchronous workflows and explain how failures affect stored state. Sample requirement only.",
+            "backend internship: test asynchronous workflows and explain how failures affect stored state.",
           firstSession:
             "Choose the job that recalculates a plan after an input changes. Write down the expected state before and after an external API timeout, then turn that one scenario into a test.",
           steps: [
@@ -389,7 +389,7 @@ export function buildFields(profile: DemoProfile): Record<
           timing: "Explain the decisions · Days 4–5",
           evidence: profile.evidence[2].detail,
           source:
-            "Illustrative full-stack internship: explain data flow, API integration, and technical tradeoffs. Sample context only.",
+            "full-stack internship: explain data flow, API integration, and technical tradeoffs.",
           firstSession:
             "Sketch one path: user edits an input → database saves it → background job requests external data → plan snapshot updates → UI refreshes. Label where version checks and fallback decisions occur.",
           steps: [
@@ -433,7 +433,7 @@ export function buildFields(profile: DemoProfile): Record<
           timing: "Use the evidence · Days 6–7",
           evidence: profile.evidence[2].detail,
           source:
-            "Illustrative software internship: demonstrate an application project and explain engineering decisions. Actual dates and eligibility must be checked on official listings.",
+            "software internship: demonstrate an application project and explain engineering decisions. Actual dates and eligibility must be checked on official listings.",
           firstSession:
             "Find one backend or full-stack student internship on an official employer site. Copy its enrollment window, deadline, and two exact requirements into targets.csv.",
           steps: [
@@ -441,7 +441,7 @@ export function buildFields(profile: DemoProfile): Record<
             "Map two exact requirements per role to existing project evidence. Mark anything unclear as a question rather than a confirmed gap.",
             "Tailor the project section to the most relevant requirement: asynchronous jobs, data modeling, testing, or API integration.",
             "Have a peer ask you to explain one request flow, one failure, and one tradeoff in 20 minutes.",
-            "Apply to the verified target yourself and record the date and next follow-up. This demo never submits applications or sends messages.",
+            "Apply to the verified target yourself and record the date and next follow-up. Keep track of applications and follow-ups in your own records.",
           ],
           artifacts: [
             {

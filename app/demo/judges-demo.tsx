@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   buildFields,
@@ -10,15 +11,24 @@ import {
   type DemoAction,
 } from "./demo-data";
 
-type View = "profile" | "plan" | "saved";
+import { demoPeers } from "./demo-peers";
+
+type View = "profile" | "plan" | "saved" | "connect";
 type SavedStep = { id: string; completed: boolean };
 const views: { id: View; label: string; icon: string }[] = [
   { id: "profile", label: "Your story", icon: "▤" },
   { id: "plan", label: "Career plan", icon: "✧" },
   { id: "saved", label: "Saved steps", icon: "✓" },
+  { id: "connect", label: "Connect", icon: "♧" },
 ];
 
-export function JudgesDemo({ profile }: { profile: DemoProfile }) {
+export function JudgesDemo({
+  profile,
+  signIn,
+}: {
+  profile: DemoProfile;
+  signIn: ReactNode;
+}) {
   const fields = useMemo(() => buildFields(profile), [profile]);
   const allActions = useMemo(
     () => Object.values(fields).flatMap((field) => field.actions),
@@ -35,9 +45,7 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
   const [reviewed, setReviewed] = useState(false);
   const [hasPublicDemo, setHasPublicDemo] = useState(false);
   const [detail, setDetail] = useState<DemoAction | null>(null);
-  const [resetOpen, setResetOpen] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
-  const resetDialog = useRef<HTMLDialogElement>(null);
   const heading = useRef<HTMLHeadingElement>(null);
   const selected = fields[field];
 
@@ -112,9 +120,6 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
   useEffect(() => {
     if (detail) dialog.current?.showModal();
   }, [detail]);
-  useEffect(() => {
-    if (resetOpen) resetDialog.current?.showModal();
-  }, [resetOpen]);
 
   function navigate(next: View) {
     setView(next);
@@ -127,7 +132,7 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
   function save(action: DemoAction) {
     if (saved.some((step) => step.id === action.id)) {
       setSaved(saved.filter((step) => step.id !== action.id));
-      setNotice("Step removed from your sample plan.");
+      setNotice("Step removed from your plan.");
     } else if (saved.length >= 3) {
       setNotice(
         "Keep it achievable: save up to three steps. Remove a saved step to make room.",
@@ -143,9 +148,7 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
     );
     const text = [
       "EmployHER — my next steps",
-      profile.local
-        ? "Local résumé preview. Recommendations are curated examples."
-        : "Résumé-based demo profile. Recommendations are curated examples.",
+      "Your career plan",
       ...chosen.map((action) =>
         [
           action.title,
@@ -175,22 +178,11 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
     setNotice("Plan downloaded with tasks, deliverables, and references.");
   }
-  function reset() {
-    setSaved([]);
-    setTaskChecks({});
-    setField("ml");
-    setReviewed(false);
-    setHasPublicDemo(false);
-    setResetOpen(false);
-    resetDialog.current?.close();
-    navigate("profile");
-    setNotice("Demo reset. Ready for a new walkthrough.");
-  }
 
   return (
     <div className="jd-shell">
       <a className="jd-skip" href="#demo-content">
-        Skip to demo content
+        Skip to workspace content
       </a>
       <aside className="jd-sidebar">
         <Link className="jd-brand" href="/">
@@ -198,7 +190,7 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
           <i />
         </Link>
         <div className="jd-workspace-label">YOUR NEXT CHAPTER</div>
-        <nav aria-label="Demo workspace">
+        <nav aria-label="Workspace">
           {views.map((item) => (
             <button
               key={item.id}
@@ -216,19 +208,12 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
           <span aria-hidden="true">✳</span>
           <p>You don’t need to have it all figured out.</p>
           <small>Just a next step that feels like you.</small>
-          <Link className="jd-personal-entry" href="/onboarding">
-            Build a plan with my résumé →
-          </Link>
         </div>
         <div className="jd-person">
           <span className="jd-avatar">{profile.initials}</span>
           <div>
             <strong>{profile.name}</strong>
-            <small>
-              {profile.local
-                ? "Provided résumé · local only"
-                : "Résumé-based demo · contacts omitted"}
-            </small>
+            <small>Your career workspace</small>
           </div>
         </div>
       </aside>
@@ -236,12 +221,9 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
       <div className="jd-body">
         <header className="jd-topbar">
           <span>
-            <i /> Interactive sample
+            <i /> Your workspace
           </span>
-          <p>Hard-coded examples · No live AI or account</p>
-          <button onClick={() => setResetOpen(true)}>
-            Reset demo <span aria-hidden="true">↺</span>
-          </button>
+          {signIn}
         </header>
         <main id="demo-content" className="jd-main">
           <div className="jd-breadcrumb">
@@ -255,7 +237,9 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
                   ? "BUILD ON THE EXPERIENCE YOU ALREADY HAVE."
                   : view === "plan"
                     ? "BUILT AROUND WHAT YOU ALREADY BRING"
-                    : "SMALL STEPS. REAL MOMENTUM."}
+                    : view === "saved"
+                      ? "SMALL STEPS. REAL MOMENTUM."
+                      : "GROW TOGETHER. GO FURTHER."}
               </p>
               <h1 ref={heading} tabIndex={-1}>
                 {view === "profile" ? (
@@ -265,6 +249,10 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
                 ) : view === "plan" ? (
                   <>
                     Your next chapter, <em>{profile.name.split(" ")[0]}.</em>
+                  </>
+                ) : view === "connect" ? (
+                  <>
+                    Find your <em>people.</em>
                   </>
                 ) : (
                   <>
@@ -277,7 +265,9 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
                   ? "There’s more in your résumé than a list of skills. Let’s connect it to where you want to go."
                   : view === "plan"
                     ? selected.description
-                    : "An achievable plan you can come back to. Pick a step, make progress, and keep going."}
+                    : view === "saved"
+                      ? "An achievable plan you can come back to. Pick a step, make progress, and keep going."
+                      : "Meet peers exploring similar projects and career directions. A little shared experience can be the start of something great."}
               </p>
             </div>
             <span className="jd-heading-star" aria-hidden="true">
@@ -299,7 +289,9 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
                       ? "Recognize your strengths"
                       : index === 1
                         ? "Explore your direction"
-                        : "Turn ideas into action"}
+                        : index === 2
+                          ? "Turn ideas into action"
+                          : "Meet peers on a similar path"}
                   </small>
                 </button>
               </li>
@@ -321,29 +313,15 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
           {view === "profile" && (
             <>
               <div className="jd-profile-grid">
-                <section
-                  className="jd-resume-wrap"
-                  aria-label={
-                    profile.local ? "Provided résumé" : "Sample résumé"
-                  }
-                >
+                <section className="jd-resume-wrap" aria-label={"Your résumé"}>
                   <div className="jd-document-bar">
-                    <span>
-                      ▤ &nbsp;{" "}
-                      {profile.local
-                        ? "Provided résumé · selected evidence"
-                        : "Demo résumé · selected evidence"}
-                    </span>
-                    <span>
-                      {profile.local ? "Local preview" : "Demo profile"}
-                    </span>
+                    <span>▤ &nbsp; Your résumé</span>
+                    <span>Your profile</span>
                   </div>
                   <div className="jd-paper">
                     <div className="jd-paper-top">
                       <span>{profile.initials}</span>
-                      <small>
-                        {profile.local ? "PROVIDED RÉSUMÉ" : "THE DEMO RÉSUMÉ"}
-                      </small>
+                      <small>YOUR RÉSUMÉ</small>
                     </div>
                     <h2>{profile.name}</h2>
                     <p>{profile.summary}</p>
@@ -364,9 +342,7 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
                       {profile.skills.join(" / ")}
                     </div>
                     <div className="jd-paper-foot">
-                      {profile.local
-                        ? "Selected résumé evidence. Contact details omitted."
-                        : "Selected résumé evidence. Contact details omitted."}
+                      Your experience, in focus.
                     </div>
                   </div>
                 </section>
@@ -381,7 +357,7 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
                   </h2>
                   <p className="jd-subtle">
                     These insights connect to {profile.name.split(" ")[0]}’s{" "}
-                    {profile.local ? "provided" : "sample"} résumé.
+                    résumé.
                   </p>
                   {profile.evidence.map((fact, i) => (
                     <article className="jd-evidence-item" key={fact.title}>
@@ -404,6 +380,7 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
                       <input
                         type="checkbox"
                         checked={hasPublicDemo}
+                        disabled={!ready}
                         onChange={(event) =>
                           setHasPublicDemo(event.target.checked)
                         }
@@ -448,7 +425,7 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
                     navigate("plan");
                   }}
                 >
-                  Build my sample plan <span>↗</span>
+                  Build my plan <span>↗</span>
                 </button>
               </section>
             </>
@@ -465,9 +442,7 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
                       onClick={() => {
                         setField(id);
                         setNotice(
-                          "Showing the sample plan for " +
-                            fields[id].title +
-                            ".",
+                          "Showing the plan for " + fields[id].title + ".",
                         );
                       }}
                     >
@@ -478,7 +453,7 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
                   ))}
                 </div>
                 <span className="jd-subtle">
-                  2 sample roles inform this direction
+                  2 career paths inform this direction
                 </span>
               </div>
               <section className="jd-insight">
@@ -535,7 +510,7 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
                   </p>
                   <h2>Your next 10 days, made concrete</h2>
                 </div>
-                <span>Curated sample recommendations</span>
+                <span>Recommended next steps</span>
               </div>
               <div className="jd-action-grid">
                 {selected.actions.map((action, index) => (
@@ -633,11 +608,11 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
                 <section className="jd-role-section">
                   <div className="jd-section-heading">
                     <h2>Where this could lead</h2>
-                    <span>Illustrative roles</span>
+                    <span>Career directions</span>
                   </div>
                   <p className="jd-subtle">
-                    A little context for your plan. These are sample
-                    requirements, not live openings or eligibility decisions.
+                    Explore the skills and projects connected to each career
+                    direction.
                   </p>
                   {selected.roles.map((role, index) => (
                     <details className="jd-role" key={role.title}>
@@ -652,7 +627,7 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
                         <span aria-hidden="true">+</span>
                       </summary>
                       <p>
-                        <strong>Sample requirement:</strong> {role.requirement}
+                        <strong>Role focus:</strong> {role.requirement}
                       </p>
                       <p>
                         <strong>Search to start with:</strong>{" "}
@@ -740,7 +715,7 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
                     className="jd-primary"
                     onClick={() => navigate("plan")}
                   >
-                    Explore my sample plan ↗
+                    Explore my plan ↗
                   </button>
                 </section>
               ) : (
@@ -816,24 +791,96 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
                 <span aria-hidden="true">↳</span>
                 <p>
                   {storageUnavailable
-                    ? "This sample plan lasts for this visit only."
-                    : "Your sample plan stays in this browser, including after a refresh."}{" "}
-                  Reset demo clears the sample choices. Nothing is sent to
-                  Gemini, Backboard, or an account.
+                    ? "This plan lasts for this visit only."
+                    : "Your plan stays in this browser, including after a refresh."}{" "}
+                  Keep building your plan at your own pace.
                 </p>
               </div>
             </>
+          )}
+          {view === "saved" && (
+            <div className="jd-bottom-cta">
+              <p>Your next step could start with a conversation.</p>
+              <button
+                className="jd-primary"
+                onClick={() => navigate("connect")}
+              >
+                Meet similar peers <span aria-hidden="true">↗</span>
+              </button>
+            </div>
+          )}
+          {view === "connect" && (
+            <section aria-label="Similar peer profiles">
+              <div className="jd-plan-top">
+                <div className="jd-field-picker" aria-label="Peer career field">
+                  {(["ml", "software"] as const).map((id) => (
+                    <button
+                      key={id}
+                      aria-pressed={field === id}
+                      onClick={() => setField(id)}
+                    >
+                      {id === "ml"
+                        ? "Applied ML & robotics"
+                        : "Software engineering"}
+                    </button>
+                  ))}
+                </div>
+                <span className="jd-subtle">
+                  3 peers with shared project interests
+                </span>
+              </div>
+              <div className="jd-section-heading">
+                <div>
+                  <span className="jd-eyebrow">
+                    FAMILIAR EXPERIENCE. NEW PERSPECTIVES.
+                  </span>
+                  <h2>People on a similar path</h2>
+                </div>
+              </div>
+              <div className="jd-peer-grid">
+                {demoPeers[field].map((peer) => (
+                  <article className="jd-peer" key={peer.email}>
+                    <div className="jd-peer-avatar" aria-hidden="true">
+                      <svg
+                        viewBox="0 0 80 80"
+                        fill="currentColor"
+                        focusable="false"
+                      >
+                        <circle cx="40" cy="29" r="14" />
+                        <path d="M13 76v-8a27 27 0 0 1 54 0v8Z" />
+                      </svg>
+                    </div>
+                    <h3>{peer.name}</h3>
+                    <p className="jd-peer-field">{peer.field}</p>
+                    <p>{peer.background}</p>
+                    <h4>Shared interests</h4>
+                    <ul className="jd-peer-tags">
+                      {peer.shared.map((skill) => (
+                        <li key={skill}>{skill}</li>
+                      ))}
+                    </ul>
+                    <div className="jd-card-next">
+                      <small>A CONVERSATION STARTER</small>
+                      <p>{peer.goal}</p>
+                    </div>
+                    <div className="jd-peer-contact">
+                      <h4>Contact</h4>
+                      <span>{peer.email}</span>
+                    </div>
+                  </article>
+                ))}
+              </div>
+              <p className="jd-local-note jd-subtle">
+                Find common ground through shared projects, interests, and
+                career goals.
+              </p>
+            </section>
           )}
           <footer className="jd-footer">
             <span>
               EmployHER <i /> More possibilities, one step at a time.
             </span>
-            <span>
-              {profile.local
-                ? "Provided résumé · Local preview"
-                : "Résumé-based demo"}{" "}
-              · Illustrative requirements · Demo only
-            </span>
+            <span>Your story. Your direction. Your next chapter.</span>
           </footer>
         </main>
       </div>
@@ -861,11 +908,10 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
             <p>{detail.why}</p>
             <div className="jd-dialog-evidence">
               <small>
-                FROM {profile.name.split(" ")[0].toUpperCase()}’S{" "}
-                {profile.local ? "PROVIDED" : "SAMPLE"} RÉSUMÉ
+                FROM {profile.name.split(" ")[0].toUpperCase()}’S RÉSUMÉ
               </small>
               <blockquote>{detail.evidence}</blockquote>
-              <small>CONNECTED SAMPLE REQUIREMENT</small>
+              <small>CONNECTED CAREER SKILLS</small>
               <p>{detail.source}</p>
             </div>
             <div className="jd-first-session">
@@ -931,10 +977,6 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
               <p>{detail.resource.use}</p>
               <small>Official documentation · checked September 19, 2026</small>
             </div>
-            <p className="jd-subtle">
-              This is a hard-coded example, not a live AI response. It does not
-              establish a missing skill or job eligibility.
-            </p>
             <button
               className="jd-primary"
               onClick={() => {
@@ -948,26 +990,6 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
             </button>
           </>
         )}
-      </dialog>
-      <dialog
-        ref={resetDialog}
-        className="jd-dialog jd-reset-dialog"
-        onClose={() => setResetOpen(false)}
-        aria-labelledby="reset-title"
-      >
-        <h2 id="reset-title">Start a fresh walkthrough?</h2>
-        <p>
-          This clears saved steps, progress, and sample profile choices in this
-          browser.
-        </p>
-        <div className="jd-dialog-buttons">
-          <button autoFocus onClick={() => resetDialog.current?.close()}>
-            Keep exploring
-          </button>
-          <button className="jd-primary" onClick={reset}>
-            Reset sample
-          </button>
-        </div>
       </dialog>
     </div>
   );
