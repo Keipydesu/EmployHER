@@ -61,10 +61,26 @@ test("sample PDF upload works and no-evidence case shows a recoverable error", a
   await page.goto("/demo/profile");
   await page.getByRole("button", { name: "Start sample session" }).click();
   await page.getByRole("button", { name: "Upload PDF", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Review my experience" }),
+  ).toBeDisabled();
   await page.getByLabel("Choose a text-based sample PDF").setInputFiles({
     name: "sample.pdf",
     mimeType: "application/pdf",
     buffer: Buffer.from(syntheticPdf(resumeFixtures[0].text)),
+  });
+  await expect(page.getByRole("status")).toContainText("sample.pdf");
+  await page.screenshot({
+    path: "docs/screenshots/resume-upload-desktop.png",
+    fullPage: true,
+  });
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth),
+  ).toBeLessThanOrEqual(390);
+  await page.screenshot({
+    path: "docs/screenshots/resume-upload-mobile.png",
+    fullPage: true,
   });
   await page.getByRole("button", { name: "Review my experience" }).click();
   await expect(

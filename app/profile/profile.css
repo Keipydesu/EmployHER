@@ -1,5 +1,11 @@
 .profile-demo {
   & {
+    --paper: #f8f9f5;
+    --ink: #223d34;
+    --muted: #64766e;
+    --rule: #dae2dc;
+    --accent-deep: #285e50;
+    --accent-pale: #eaf0e5;
     --line: var(--rule);
     --soft: var(--accent-pale);
   }
@@ -8,6 +14,7 @@
   }
   & {
     margin: 0;
+    min-height: 100vh;
     background: var(--paper);
     color: var(--ink);
     font-family: var(--font-sans);
@@ -31,7 +38,7 @@
     cursor: pointer;
   }
   button:disabled {
-    cursor: wait;
+    cursor: not-allowed;
     opacity: 0.55;
   }
   a {
@@ -68,16 +75,16 @@
   .pill {
     display: inline-block;
     border: 1px solid var(--line);
-    border-radius: 0;
+    border-radius: 8px;
     font-size: 10px;
     letter-spacing: 1px;
     padding: 7px 12px;
     white-space: nowrap;
   }
   .profile-workspace {
-    max-width: 1240px;
-    margin: auto;
-    padding: 44px 40px;
+    max-width: 1440px;
+    margin: 0 auto 0 235px;
+    padding: 42px;
   }
   .eyebrow {
     font-size: 10px;
@@ -90,17 +97,15 @@
     justify-content: space-between;
     align-items: center;
     margin: 14px 0 34px;
-    padding: 40px 32px;
-    border-top: 1px solid var(--ink);
-    border-bottom: 1px solid var(--rule-strong);
-    border-radius: 0;
-    background: var(--gradient-hero);
+    padding: 30px 0;
+    border: 0;
+    background: transparent;
     gap: 40px;
   }
   h1 {
     font-family: var(--font-display);
-    font-size: clamp(38px, 5vw, 62px);
-    font-weight: 550;
+    font-size: clamp(34px, 3.6vw, 52px);
+    font-weight: 600;
     line-height: 1.08;
     letter-spacing: -2px;
     margin: 0 0 18px;
@@ -115,7 +120,7 @@
   .hero-note {
     border-left: 1px solid var(--rule-strong);
     padding: 16px 0 16px 30px;
-    min-width: 270px;
+    min-width: 210px;
   }
   .hero-note > span {
     font-size: 9px;
@@ -124,8 +129,8 @@
   .hero .hero-note p {
     font-family: var(--font-display);
     color: var(--accent-deep);
-    font-size: 24px;
-    line-height: 1.25;
+    font-size: 21px;
+    line-height: 1.4;
     margin-top: 12px;
   }
   .profile-steps {
@@ -161,39 +166,40 @@
     color: white;
   }
   .demo-banner {
-    background: var(--peach-pale);
+    background: var(--accent-pale);
     border: 1px solid var(--rule);
-    border-radius: 0;
+    border-radius: 8px;
     padding: 12px 16px;
     display: flex;
     gap: 12px;
     font-size: 12px;
   }
   .demo-banner strong {
-    white-space: nowrap;
+    white-space: normal;
+    min-width: 150px;
   }
   .session-button {
     margin-top: 16px;
   }
   .columns {
     display: grid;
-    grid-template-columns: 0.9fr 1.25fr;
-    gap: 0;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: 24px;
     align-items: stretch;
   }
   .card {
     background: var(--raised);
     border: 1px solid var(--line);
-    border-radius: 0;
+    border-radius: 8px;
     box-shadow: none;
     padding: 26px;
   }
   .columns > .card:nth-child(2) {
     background: var(--raised);
-    border-left: 0;
+    border-left: 1px solid var(--line);
   }
   .suggestions.card {
-    background: var(--gradient-peach);
+    background: var(--accent-pale);
   }
   .profile-section-heading {
     display: flex;
@@ -202,7 +208,7 @@
   }
   .profile-section-heading h2 {
     font-size: 19px;
-    font-weight: 500;
+    font-weight: 600;
     letter-spacing: -0.4px;
     margin: 0;
     flex: 1;
@@ -237,7 +243,7 @@
     font-size: 12px;
   }
   .tabs button {
-    border-radius: 0;
+    border-radius: 8px;
   }
   .tabs button.selected {
     border-bottom: 2px solid var(--accent-deep);
@@ -261,7 +267,7 @@
     align-items: center;
     padding: 13px 12px;
     border: 1px solid var(--line);
-    border-radius: 0;
+    border-radius: 8px;
     cursor: pointer;
   }
   .sample-option:hover {
@@ -289,11 +295,11 @@
     margin-top: 3px;
   }
   .button {
-    background: var(--ink);
+    background: var(--accent-deep);
     color: white;
-    border: 1px solid var(--ink);
+    border: 1px solid var(--accent-deep);
     padding: 12px 18px;
-    border-radius: 0;
+    border-radius: 8px;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
@@ -315,7 +321,7 @@
     background: var(--raised);
     color: var(--accent-deep);
     border: 1px solid var(--rule-strong);
-    border-radius: 0;
+    border-radius: 8px;
     padding: 11px 14px;
     font-size: 12px;
   }
@@ -353,7 +359,7 @@
   .placeholder-row {
     height: 10px;
     background: var(--accent-pale);
-    border-radius: 0;
+    border-radius: 8px;
     width: 180px;
     margin-top: 20px;
   }
@@ -373,7 +379,7 @@
   .field textarea,
   .field select {
     border: 1px solid var(--line);
-    border-radius: 0;
+    border-radius: 8px;
     padding: 9px 10px;
     background: var(--raised);
     color: var(--ink);
@@ -399,7 +405,7 @@
   }
   .source {
     font-size: 9px;
-    border-radius: 0;
+    border-radius: 8px;
     padding: 3px 7px;
     background: var(--soft);
     color: var(--accent-deep);
@@ -459,14 +465,14 @@
   .notice {
     background: var(--soft);
     padding: 12px;
-    border-radius: 0;
+    border-radius: 8px;
     color: var(--accent-deep);
   }
   .error {
     background: var(--peach-pale);
     border: 1px solid var(--rule-strong);
     padding: 14px;
-    border-radius: 0;
+    border-radius: 8px;
     margin-bottom: 20px;
     font-size: 13px;
     color: var(--warning);
@@ -478,7 +484,7 @@
     font-size: 11px;
     background: var(--soft);
     padding: 12px;
-    border-radius: 0;
+    border-radius: 8px;
   }
   .suggestions {
     margin-top: 24px;
@@ -495,9 +501,9 @@
   }
   .upload-box {
     text-align: center;
-    padding: 24px 12px;
+    padding: 32px 18px;
     border: 1px dashed var(--accent);
-    border-radius: 0;
+    border-radius: 8px;
     background: var(--raised);
   }
   .upload-icon {
@@ -540,7 +546,126 @@
     color: var(--muted);
     margin-bottom: 30px;
   }
+  .site-header,
+  .workspace-header {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: 235px;
+    height: 100vh;
+    margin: 0;
+    flex-wrap: nowrap;
+    padding: 36px 22px 24px;
+    background: #f0f3ed;
+    border: 0;
+    border-right: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 24px;
+  }
+  .header-caption {
+    margin-top: 30px;
+    font: 600 10px var(--font-sans);
+    letter-spacing: 1.5px;
+  }
+  .site-header nav,
+  .workspace-header nav {
+    display: grid;
+    gap: 8px;
+  }
+  .site-header nav a,
+  .workspace-header nav a {
+    padding: 12px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0;
+    border-radius: 6px;
+  }
+  nav [aria-current="page"] {
+    background: #dfe8d9;
+    color: var(--accent-deep);
+  }
+  .profile-sidebar-note {
+    margin-top: auto;
+    font-size: 21px;
+    line-height: 1.4;
+  }
+  .profile-sidebar-note small {
+    display: block;
+    margin-top: 14px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .processing-consent {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: start;
+    gap: 10px;
+    margin-top: 20px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .processing-consent input {
+    margin-top: 4px;
+    accent-color: var(--accent-deep);
+  }
+  .upload-icon {
+    width: 56px;
+    margin: 0 auto 16px;
+    border-radius: 14px;
+    background: var(--accent-pale);
+    color: var(--accent-deep);
+  }
+  .upload-box input::file-selector-button {
+    background: var(--accent-pale);
+    color: var(--accent-deep);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-right: 8px;
+    cursor: pointer;
+  }
+  .selected-file {
+    overflow-wrap: anywhere;
+    color: var(--accent-deep);
+  }
+  :is(button, a, input, textarea, select):focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 3px;
+  }
+  @media (max-width: 1100px) {
+    .hero-note {
+      display: none;
+    }
+    .columns {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
   @media (max-width: 800px) {
+    .site-header,
+    .workspace-header {
+      position: static;
+      width: auto;
+      height: auto;
+      padding: 20px;
+      gap: 14px;
+      border-right: 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .site-header nav,
+    .workspace-header nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .profile-sidebar-note {
+      display: none;
+    }
+    .profile-workspace {
+      margin-left: 0;
+    }
+
     .columns {
       grid-template-columns: 1fr;
       gap: 20px;
@@ -550,10 +675,6 @@
     }
     .profile-workspace {
       padding: 26px 18px;
-    }
-    .site-header {
-      height: 70px;
-      padding: 0 20px;
     }
     .header-caption {
       display: none;
