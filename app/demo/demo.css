@@ -1322,3 +1322,251 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Concrete work plans: keep the first task visible before opening details. */
+.jd-target {
+  display: flex;
+  gap: 22px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 26px 0 20px;
+}
+.jd-target h2 {
+  font-size: 19px;
+  margin: 8px 0;
+}
+.jd-target p {
+  color: var(--jd-muted);
+  font-size: 11px;
+  max-width: 700px;
+}
+.jd-target-badge {
+  flex-shrink: 0;
+  font-size: 10px;
+  color: #557049;
+  border: 1px solid #c9d6c1;
+  padding: 7px 11px;
+  border-radius: 4px;
+}
+.jd-roadmap {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 8px 0 25px;
+}
+.jd-roadmap button {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  text-align: left;
+  background: #edf1e8;
+  border: 1px solid #d8e1d1;
+  border-radius: 5px;
+  padding: 17px 14px;
+}
+.jd-roadmap button > span:first-child {
+  font-size: 12px;
+  color: #6f875d;
+}
+.jd-roadmap button > span:last-child {
+  margin-left: auto;
+  color: var(--jd-green);
+}
+.jd-roadmap small {
+  font-size: 9px;
+  display: block;
+  color: var(--jd-muted);
+}
+.jd-roadmap strong {
+  display: block;
+  font-size: 12px;
+  line-height: 1.5;
+  margin-top: 6px;
+  font-weight: 550;
+}
+.jd-card-next {
+  background: #f2f4ec;
+  border-left: 2px solid #bac9ac;
+  padding: 12px;
+  margin-top: 17px;
+}
+.jd-card-next small {
+  font-size: 8px;
+  letter-spacing: 1.1px;
+  color: #506c41;
+}
+.jd-card-next p {
+  font-size: 11px;
+  line-height: 1.75;
+  color: #3c5141;
+  margin-top: 6px;
+}
+.jd-order {
+  font-size: 9px;
+  color: var(--jd-green);
+  margin-top: 6px;
+}
+.jd-dialog {
+  max-width: 780px;
+}
+.jd-dialog h3 {
+  margin-top: 24px;
+}
+.jd-first-session {
+  padding: 20px;
+  background: #f5eedf;
+  border-left: 3px solid #b49a69;
+  margin: 20px 0;
+}
+.jd-first-session p {
+  margin-top: 8px;
+  color: #5c533d;
+  line-height: 1.85;
+}
+.jd-task-count {
+  margin: 9px 0 !important;
+  font-size: 11px !important;
+}
+.jd-task-list {
+  list-style: none;
+  padding: 0 !important;
+  counter-reset: task;
+}
+.jd-task-list li {
+  padding: 13px 0 !important;
+  border-bottom: 1px solid var(--jd-line);
+}
+.jd-task-list label {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1.85;
+}
+.jd-task-list input {
+  flex-shrink: 0;
+  width: 17px;
+  height: 17px;
+  margin: 4px 0 0;
+  accent-color: var(--jd-green);
+}
+.jd-task-list input:checked + span {
+  color: #677e59;
+}
+.jd-artifacts {
+  display: grid;
+  gap: 10px;
+  margin: 14px 0 20px;
+}
+.jd-artifacts > div {
+  padding: 14px 17px;
+  border: 1px solid var(--jd-line);
+  border-radius: 4px;
+}
+.jd-artifacts code {
+  font-size: 12px;
+  color: var(--jd-green);
+  overflow-wrap: anywhere;
+}
+.jd-artifacts p {
+  font-size: 12px;
+  margin-top: 6px;
+}
+.jd-done-list {
+  font-size: 13px;
+  padding-left: 20px;
+}
+.jd-worked-example {
+  background: #243d34;
+  border-radius: 5px;
+  padding: 22px;
+  margin: 24px 0;
+  color: #f6f7ed;
+}
+.jd-worked-example h3 {
+  margin-top: 0;
+  font-size: 14px;
+  color: #e4eccf;
+}
+.jd-worked-example pre {
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.85;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin-bottom: 0;
+}
+.jd-resource {
+  margin: 22px 0;
+  padding: 17px;
+  border: 1px solid #ccd8c2;
+  background: #f2f5ec;
+  border-radius: 4px;
+}
+.jd-resource a {
+  display: block;
+  font-size: 14px;
+  margin: 8px 0;
+  text-underline-offset: 4px;
+}
+.jd-resource p {
+  font-size: 12px;
+}
+.jd-resource small {
+  display: block;
+  margin-top: 10px;
+  font-size: 10px;
+  color: var(--jd-muted);
+}
+.jd-role code {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  font-size: 11px;
+}
+.jd-export {
+  margin-top: 25px;
+}
+.jd-reset-dialog {
+  max-width: 450px;
+}
+@media (max-width: 1100px) {
+  .jd-target-badge {
+    display: none;
+  }
+}
+@media (max-width: 650px) {
+  .jd-roadmap {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .jd-roadmap button {
+    padding: 14px;
+  }
+  .jd-card-next p {
+    font-size: 12px;
+  }
+  .jd-worked-example {
+    padding: 17px;
+  }
+  .jd-document-bar {
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .jd-dialog {
+    max-height: 90dvh;
+  }
+}
+.jd-dialog-top {
+  position: sticky;
+  top: -32px;
+  z-index: 2;
+  background: #fffefa;
+  padding-block: 8px;
+}
+
+@media (max-width: 650px) {
+  .jd-dialog-top {
+    top: -24px;
+  }
+}

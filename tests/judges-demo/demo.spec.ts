@@ -14,7 +14,7 @@ test("judge walkthrough stays local, traces evidence, persists progress, and res
   ).toBeVisible();
   await page
     .getByRole("checkbox", {
-      name: "Add testing as sample self-reported experience",
+      name: "I have a shareable demo (self-reported)",
     })
     .check();
   await page.evaluate(() => window.scrollTo(0, 0));
@@ -25,16 +25,44 @@ test("judge walkthrough stays local, traces evidence, persists progress, and res
   });
   await page.getByRole("button", { name: "Build my sample plan" }).click();
   await expect(
-    page.getByText("You also added testing experience.", { exact: false }),
+    page.getByText("You have a shareable demo.", { exact: false }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Why this step?" }).first().click();
+  await page
+    .getByRole("button", { name: "Open the work plan" })
+    .first()
+    .click();
   const dialog = page.getByRole("dialog");
   await expect(
-    dialog.getByText("Sample ML internship A:", { exact: false }),
+    dialog.getByText("Illustrative ML research role:", { exact: false }),
   ).toBeVisible();
   await expect(
     dialog.getByRole("heading", { name: "Make it happen" }),
   ).toBeVisible();
+  await expect(
+    dialog.getByText("split-manifest.csv", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    dialog.getByRole("heading", { name: "You’re done when" }),
+  ).toBeVisible();
+  await expect(
+    dialog.getByRole("link", { name: "scikit-learn: cross-validation" }),
+  ).toHaveAttribute(
+    "href",
+    "https://scikit-learn.org/stable/modules/cross_validation.html",
+  );
+  await dialog.getByRole("checkbox").first().check();
+  await expect(
+    dialog.getByText("1 of 5 tasks checked", { exact: false }),
+  ).toBeVisible();
+  await dialog.screenshot({
+    path: "docs/screenshots/judges-demo-work-plan.png",
+  });
+  await dialog
+    .getByRole("heading", { name: "You’re done when" })
+    .scrollIntoViewIfNeeded();
+  await dialog.screenshot({
+    path: "docs/screenshots/judges-demo-deliverables.png",
+  });
   await page.keyboard.press("Escape");
   await expect(dialog).not.toBeVisible();
   await page
@@ -50,7 +78,7 @@ test("judge walkthrough stays local, traces evidence, persists progress, and res
   await page.getByRole("button", { name: "See my saved steps" }).click();
   await page
     .getByRole("checkbox", {
-      name: "Mark Give your model a proper report card complete",
+      name: "Mark Package a reproducible sensor-fault benchmark complete",
     })
     .check();
   await expect(
@@ -70,6 +98,21 @@ test("judge walkthrough stays local, traces evidence, persists progress, and res
     path: "docs/screenshots/judges-demo-saved.png",
     fullPage: true,
   });
+  await page.getByRole("button", { name: "Open step-by-step guide" }).click();
+  await expect(dialog.getByRole("checkbox").first()).toBeChecked();
+  await page.keyboard.press("Escape");
+  const downloaded = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Download my detailed plan" }).click();
+  const download = await downloaded;
+  expect(download.suggestedFilename()).toBe("employher-next-steps.txt");
+  const stream = await download.createReadStream();
+  let contents = "";
+  for await (const chunk of stream!) contents += chunk.toString();
+  expect(contents).toContain("[x] Create split-manifest.csv");
+  expect(contents).toContain("DONE WHEN:");
+  expect(contents).toContain(
+    "https://scikit-learn.org/stable/modules/cross_validation.html",
+  );
   await page.getByRole("button", { name: "Reset demo" }).click();
   await page.getByRole("button", { name: "Keep exploring" }).click();
   await expect(
@@ -79,7 +122,7 @@ test("judge walkthrough stays local, traces evidence, persists progress, and res
   await page.getByRole("button", { name: "Reset sample", exact: true }).click();
   await expect(
     page.getByRole("checkbox", {
-      name: "Add testing as sample self-reported experience",
+      name: "I have a shareable demo (self-reported)",
     }),
   ).not.toBeChecked();
   await page
@@ -106,7 +149,9 @@ test("field switching changes recommendations and enforces a three-step plan", a
     .getByRole("button", { name: "Software engineering", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Make your study-group app dependable" }),
+    page.getByRole("heading", {
+      name: "Prove your background jobs handle failure",
+    }),
   ).toBeVisible();
   await page
     .getByRole("button", { name: "+ Save this step", exact: true })
@@ -118,7 +163,7 @@ test("field switching changes recommendations and enforces a three-step plan", a
   await page.getByRole("button", { name: "See my saved steps" }).click();
   await page
     .getByRole("button", {
-      name: "Remove Give your model a proper report card",
+      name: "Remove Package a reproducible sensor-fault benchmark",
     })
     .click();
   await page
@@ -134,7 +179,9 @@ test("field switching changes recommendations and enforces a three-step plan", a
     page.getByRole("heading", { name: "0 of 3 steps completed" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Make your study-group app dependable" }),
+    page.getByRole("heading", {
+      name: "Prove your background jobs handle failure",
+    }),
   ).toBeVisible();
 });
 
@@ -155,13 +202,16 @@ test("mobile supports keyboard navigation, dialogs, and every view without overf
     path: "docs/screenshots/judges-demo-mobile.png",
     fullPage: true,
   });
-  await page.getByRole("button", { name: "Why this step?" }).first().click();
+  await page
+    .getByRole("button", { name: "Open the work plan" })
+    .first()
+    .click();
   await expect(
     page.getByRole("button", { name: "Close step details" }),
   ).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(
-    page.getByRole("button", { name: "Why this step?" }).first(),
+    page.getByRole("button", { name: "Open the work plan" }).first(),
   ).toBeFocused();
   for (const name of ["Saved steps", "Your story", "Career plan"]) {
     await page

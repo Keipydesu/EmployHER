@@ -1,48 +1,86 @@
 # Hackathon judge demo
 
-`/demo` is a self-contained, hard-coded product walkthrough on top of the scrolling
-résumé site. It needs no sign-in, API keys, database, personal uploads, or provider
-calls. Maya Chen, the résumé, role requirements, and recommendations are synthetic.
-The UI labels them as samples; it does not claim that Gemini generated them.
+`/demo` is a hard-coded product walkthrough on the scrolling résumé site. It needs
+no sign-in, API keys, database, personal uploads, or provider calls. The committed
+profile is fictional; role descriptions are illustrative and recommendations are
+curated examples, not live Gemini output.
 
 ## Run and present
 
-Use Node 24, install the lockfile with `npm ci --ignore-scripts`, and run
-`npm run dev`. Open `http://127.0.0.1:3000/demo`, or use **Try the demo** on the
-homepage. The production flow and existing profile routes remain separate.
+Use Node 24, install with `npm ci --ignore-scripts`, run `npm run dev`, and open
+`http://127.0.0.1:3000/demo`. **Try the demo** on the homepage also opens this route.
 
-A two-minute walkthrough:
+A three-minute walkthrough:
 
-1. **Your story:** show the supplied résumé beside three evidence-linked strengths.
-   Add the sample testing experience to demonstrate that omitted evidence does not
-   mean a missing skill. Select Data science & ML or Software engineering.
-2. **Career plan:** build the sample plan. Open **Why this step?** to connect résumé
-   evidence, a labeled sample requirement, and an actionable deliverable. Switch
-   fields to show different recommendations. Expand a role for its sample context.
-3. **Saved steps:** save up to three steps, mark one complete, then refresh. Choices
-   persist in this browser. Completion does not create new résumé evidence.
-4. **Reset demo:** confirm a reset before the next judge. It clears only the
-   `employher-judges-demo-v1` local-storage entry's sample choices.
+1. **Your story:** review evidence of sensor research, robot integration, and tested
+   full-stack software. The question about a shareable demo is self-reported and
+   does not invent résumé evidence. Choose Applied ML & robotics or Software
+   engineering.
+2. **Career plan:** inspect the suggested sequence, time estimates, and role
+   directions. Every card shows the first work session before opening a dialog.
+3. **Open the work plan:** see five concrete tasks, named portfolio files, completion
+   criteria, a worked example or outreach draft, and a relevant official reference.
+   Check off a task. The benchmark includes split-manifest/results/report artifacts;
+   the robotics task defines 20 prompts and traces; the backend task defines five
+   failure scenarios. Counts and schedules are proposed scopes, not past results.
+4. **Saved steps:** save up to three milestones, mark progress, refresh, and download
+   a text plan containing tasks, deliverables, criteria, and reference links.
+5. **Reset demo:** confirm a reset before the next judge. It clears the current
+   profile’s choices under `employher-judges-demo-v2-<profile-id>` in browser storage.
 
-The demo has no fake upload or application controls. Role cards are illustrative,
-not current openings. Community steps are peer-feedback activities, not invented
-organizations. Browser-storage failure falls back to the current visit.
+Role cards provide search queries and eligibility questions, not live openings.
+The career tasks include a three-target worksheet, an interview outline, and a
+review-request draft. No applications or messages are sent. With browser storage
+blocked, exploration still works for the current visit.
+
+## Optional provided-résumé preview (local only)
+
+Keep the PDF and any derived personal content outside tracked files. The demo can
+read a minimized, manually reviewed profile JSON from an ignored local file:
+
+```sh
+EMPLOYHER_DEMO_PROFILE=.local/judges-profile.json npm run dev -- --port 3131
+```
+
+Only loopback Host values are accepted for this override; Vercel always uses the
+fictional fixture. Do not configure the override on other hosted servers. The route
+is dynamic so a local profile is not embedded into build-time static HTML. The
+file is read at request time, validated, and never sent to an AI provider.
+The browser receives the selected profile for presentation; anyone with access to
+that local demo can see it. Keep contact details and full raw text out of this file.
+
+The schema is in `app/demo/load-profile.ts`; use `sampleProfile` in
+`app/demo/demo-data.ts` as its structural reference. Set `local` to `true` and use a
+unique `id`. Include at least three projects and exactly three evidence groups in
+this order: research, robotics integration, full-stack software. These are curated
+scenarios, not a general-purpose résumé parser. Preserve original conditions and
+denominators in any résumé metric. A real profile and its screenshots must not be
+committed to the public PR. Unset the variable to return to the fictional profile.
 
 ## Verification
 
-Playwright is the existing browser runner. Demo regressions are named `*.spec.ts`
-in `tests/judges-demo/`. Run `npm run test:demo`, or
-`npm run test:demo -- --ui`. Its isolated server uses port 3120 and Webpack.
-The suite covers the full walkthrough, evidence dialogs, field changes, the
-three-step limit, completion and refresh, reset/cancel, keyboard access, mobile
-layout, and unavailable local storage. It also asserts no `/api/` calls during
-the walkthrough. Screenshots are written to `docs/screenshots/judges-demo-*.png`.
+Run `npm run test:demo`, or `npm run test:demo -- --ui`. Playwright scenarios in
+`tests/judges-demo/` use port 3120 and Webpack. They cover the walkthrough, evidence
+and work-plan dialogs, task persistence, detailed plan downloads, field switching,
+the three-step limit, completion, reset/cancel, keyboard access, mobile layout,
+unavailable storage, and the homepage entry point. The walkthrough asserts no
+`/api/` requests. Public screenshots use the fictional profile only and are written
+to `docs/screenshots/judges-demo-*.png`.
 
-These checks verify the hard-coded presentation, not live AI, authentication,
-provider memory, or production career guidance. See the localhost boundary in
-[decision 003](decisions/003-localhost-demo.md).
+Official task references checked September 19, 2026:
 
-The demo browser suite is included in CI. The shared instrumentation guard keeps
-Node-only database modules out of the Edge bundle. Profile errors use a shared
-symbol brand so the existing sample-session routes preserve safe error messages
-across Next.js bundles; the profile browser regressions cover those messages.
+- [scikit-learn cross-validation](https://scikit-learn.org/stable/modules/cross_validation.html)
+  for choosing an evaluation split and preparing to explain it.
+- [Isaac Lab quickstart](https://isaac-sim.github.io/IsaacLab/main/source/setup/quickstart.html)
+  for organizing a repeatable simulation in an existing setup.
+- [Rails testing](https://guides.rubyonrails.org/testing.html) for job/system test
+  references when implementing a failure matrix.
+
+The work plans and proposed acceptance criteria are authored demo content; these
+references do not claim that an employer requires a particular project. Tests do
+not establish live AI, authentication, provider memory, or production guidance.
+See [decision 003](decisions/003-localhost-demo.md) for the localhost boundary.
+
+The suite runs in CI. The shared instrumentation guard keeps Node-only database
+modules out of Edge bundles. Profile errors use a shared symbol brand to preserve
+safe messages across server bundles; existing profile browser tests cover this.

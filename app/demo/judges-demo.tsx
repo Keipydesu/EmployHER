@@ -1,25 +1,30 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  fields,
-  sampleProfile as profile,
+  buildFields,
+  type DemoProfile,
   type DemoField,
   type DemoAction,
 } from "./demo-data";
 
 type View = "profile" | "plan" | "saved";
 type SavedStep = { id: string; completed: boolean };
-const storageKey = "employher-judges-demo-v1";
-const allActions = Object.values(fields).flatMap((field) => field.actions);
 const views: { id: View; label: string; icon: string }[] = [
   { id: "profile", label: "Your story", icon: "▤" },
   { id: "plan", label: "Career plan", icon: "✧" },
   { id: "saved", label: "Saved steps", icon: "✓" },
 ];
 
-export function JudgesDemo() {
+export function JudgesDemo({ profile }: { profile: DemoProfile }) {
+  const fields = useMemo(() => buildFields(profile), [profile]);
+  const allActions = useMemo(
+    () => Object.values(fields).flatMap((field) => field.actions),
+    [fields],
+  );
+  const storageKey = `employher-judges-demo-v2-${profile.id}`;
+  const [taskChecks, setTaskChecks] = useState<Record<string, number[]>>({});
   const [view, setView] = useState<View>("profile");
   const [field, setField] = useState<DemoField>("ml");
   const [saved, setSaved] = useState<SavedStep[]>([]);
@@ -27,7 +32,7 @@ export function JudgesDemo() {
   const [notice, setNotice] = useState("");
   const [storageUnavailable, setStorageUnavailable] = useState(false);
   const [reviewed, setReviewed] = useState(false);
-  const [hasTesting, setHasTesting] = useState(false);
+  const [hasPublicDemo, setHasPublicDemo] = useState(false);
   const [detail, setDetail] = useState<DemoAction | null>(null);
   const [resetOpen, setResetOpen] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
@@ -62,26 +67,45 @@ export function JudgesDemo() {
               .slice(0, 3),
           );
         }
+        if (value.taskChecks && typeof value.taskChecks === "object") {
+          const restored: Record<string, number[]> = {};
+          for (const action of allActions) {
+            const indexes = value.taskChecks[action.id];
+            if (Array.isArray(indexes))
+              restored[action.id] = [
+                ...new Set(
+                  indexes.filter(
+                    (index: unknown): index is number =>
+                      typeof index === "number" &&
+                      Number.isInteger(index) &&
+                      index >= 0 &&
+                      index < action.steps.length,
+                  ),
+                ),
+              ];
+          }
+          setTaskChecks(restored);
+        }
         setReviewed(value.reviewed === true);
-        setHasTesting(value.hasTesting === true);
+        setHasPublicDemo(value.hasPublicDemo === true);
       }
     } catch {
       setStorageUnavailable(true);
     }
     setReady(true);
-  }, []);
+  }, [allActions, storageKey]);
 
   useEffect(() => {
     if (!ready) return;
     try {
       localStorage.setItem(
         storageKey,
-        JSON.stringify({ field, saved, reviewed, hasTesting }),
+        JSON.stringify({ field, saved, reviewed, hasPublicDemo, taskChecks }),
       );
     } catch {
       setStorageUnavailable(true);
     }
-  }, [field, saved, reviewed, hasTesting, ready]);
+  }, [field, saved, reviewed, hasPublicDemo, taskChecks, ready, storageKey]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
   useEffect(() => {
@@ -112,11 +136,50 @@ export function JudgesDemo() {
       setNotice("Step saved. Find it in Saved steps.");
     }
   }
+  function exportPlan() {
+    const chosen = saved.map((item) =>
+      allActions.find((action) => action.id === item.id)!,
+    );
+    const text = [
+      "EmployHER — my next steps",
+      profile.local
+        ? "Local résumé preview. Recommendations are curated examples."
+        : "Synthetic demo profile. Recommendations are curated examples.",
+      ...chosen.map((action) =>
+        [
+          action.title,
+          action.timing + " · " + action.effort,
+          "FIRST SESSION: " + action.firstSession,
+          ...action.steps.map(
+            (step, index) =>
+              `${(taskChecks[action.id] ?? []).includes(index) ? "[x]" : "[ ]"} ${step}`,
+          ),
+          "DELIVERABLES:",
+          ...action.artifacts.map(
+            (artifact) => artifact.name + ": " + artifact.detail,
+          ),
+          "DONE WHEN:",
+          ...action.done,
+          "REFERENCE: " + action.resource.url,
+        ].join("\n"),
+      ),
+    ].join("\n\n");
+    const url = URL.createObjectURL(
+      new Blob([text], { type: "text/plain;charset=utf-8" }),
+    );
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "employher-next-steps.txt";
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    setNotice("Plan downloaded with tasks, deliverables, and references.");
+  }
   function reset() {
     setSaved([]);
+    setTaskChecks({});
     setField("ml");
     setReviewed(false);
-    setHasTesting(false);
+    setHasPublicDemo(false);
     setResetOpen(false);
     resetDialog.current?.close();
     navigate("profile");
@@ -154,10 +217,14 @@ export function JudgesDemo() {
           <small>Just a next step that feels like you.</small>
         </div>
         <div className="jd-person">
-          <span className="jd-avatar">MC</span>
+          <span className="jd-avatar">{profile.initials}</span>
           <div>
-            <strong>Maya Chen</strong>
-            <small>Fictional student profile</small>
+            <strong>{profile.name}</strong>
+            <small>
+              {profile.local
+                ? "Provided résumé · local only"
+                : "Fictional student profile"}
+            </small>
           </div>
         </div>
       </aside>
@@ -181,7 +248,7 @@ export function JudgesDemo() {
             <div>
               <p className="jd-eyebrow">
                 {view === "profile"
-                  ? "A LITTLE EXPERIENCE. A LOT OF POSSIBILITY."
+                  ? "BUILD ON THE EXPERIENCE YOU ALREADY HAVE."
                   : view === "plan"
                     ? "BUILT AROUND WHAT YOU ALREADY BRING"
                     : "SMALL STEPS. REAL MOMENTUM."}
@@ -193,7 +260,7 @@ export function JudgesDemo() {
                   </>
                 ) : view === "plan" ? (
                   <>
-                    Your next chapter, <em>Maya.</em>
+                    Your next chapter, <em>{profile.name.split(" ")[0]}.</em>
                   </>
                 ) : (
                   <>
@@ -250,40 +317,54 @@ export function JudgesDemo() {
           {view === "profile" && (
             <>
               <div className="jd-profile-grid">
-                <section className="jd-resume-wrap" aria-label="Sample résumé">
+                <section
+                  className="jd-resume-wrap"
+                  aria-label={
+                    profile.local ? "Provided résumé" : "Sample résumé"
+                  }
+                >
                   <div className="jd-document-bar">
-                    <span>▤ &nbsp; maya-chen-sample.pdf</span>
-                    <span>1 page · Sample</span>
+                    <span>
+                      ▤ &nbsp;{" "}
+                      {profile.local
+                        ? "Provided résumé · selected evidence"
+                        : "Fictional résumé · selected evidence"}
+                    </span>
+                    <span>
+                      {profile.local ? "Local preview" : "Demo profile"}
+                    </span>
                   </div>
                   <div className="jd-paper">
                     <div className="jd-paper-top">
-                      <span>MC</span>
-                      <small>THE SAMPLE RÉSUMÉ</small>
+                      <span>{profile.initials}</span>
+                      <small>
+                        {profile.local
+                          ? "PROVIDED RÉSUMÉ"
+                          : "THE SAMPLE RÉSUMÉ"}
+                      </small>
                     </div>
                     <h2>{profile.name}</h2>
-                    <p>Curious about data. Excited to build.</p>
+                    <p>{profile.summary}</p>
                     <h3>EDUCATION</h3>
                     <strong>{profile.school}</strong>
                     <p>
                       {profile.degree} · Expected {profile.graduation}
                     </p>
                     <h3>PROJECTS & EXPERIENCE</h3>
-                    <h4>Campus energy project</h4>
-                    <p>
-                      Compared three classifiers using Python and scikit-learn.
-                      Cleaned and explored energy data with pandas.
-                    </p>
-                    <h4>Study-group finder</h4>
-                    <p>
-                      Built a React app backed by SQL. Collaborated with three
-                      classmates using Git branches and pull requests.
-                    </p>
+                    {profile.projects.map((project) => (
+                      <div key={project.title}>
+                        <h4>{project.title}</h4>
+                        <p>{project.description}</p>
+                      </div>
+                    ))}
                     <h3>TECHNICAL SKILLS</h3>
                     <div className="jd-resume-skills">
                       {profile.skills.join(" / ")}
                     </div>
                     <div className="jd-paper-foot">
-                      A fictional profile, made for this demo.
+                      {profile.local
+                        ? "Selected résumé evidence. Contact details omitted."
+                        : "A fictional profile, made for this demo."}
                     </div>
                   </div>
                 </section>
@@ -297,7 +378,8 @@ export function JudgesDemo() {
                     from zero.
                   </h2>
                   <p className="jd-subtle">
-                    These sample insights connect directly to Maya’s résumé.
+                    These insights connect to {profile.name.split(" ")[0]}’s{" "}
+                    {profile.local ? "provided" : "sample"} résumé.
                   </p>
                   {profile.evidence.map((fact, i) => (
                     <article className="jd-evidence-item" key={fact.title}>
@@ -312,20 +394,21 @@ export function JudgesDemo() {
                   <div className="jd-clarification">
                     <strong>Your résumé doesn’t tell the whole story.</strong>
                     <p>
-                      Have you also written automated tests? Missing from the
-                      résumé doesn’t mean missing from your experience.
+                      Is there already a shareable project demo? Your résumé
+                      shows testing experience; the question now is what a
+                      reviewer can inspect.
                     </p>
                     <label>
                       <input
                         type="checkbox"
-                        checked={hasTesting}
+                        checked={hasPublicDemo}
                         onChange={(event) =>
-                          setHasTesting(event.target.checked)
+                          setHasPublicDemo(event.target.checked)
                         }
                       />{" "}
-                      Add testing as sample self-reported experience
+                      I have a shareable demo (self-reported)
                     </label>
-                    {hasTesting && (
+                    {hasPublicDemo && (
                       <small>
                         Added as self-reported, separate from résumé evidence.
                       </small>
@@ -348,7 +431,7 @@ export function JudgesDemo() {
                         onClick={() => setField(id)}
                       >
                         {id === "ml"
-                          ? "Data science & ML"
+                          ? "Applied ML & robotics"
                           : "Software engineering"}
                         <span>{field === id ? "✓" : "+"}</span>
                       </button>
@@ -387,7 +470,7 @@ export function JudgesDemo() {
                       }}
                     >
                       {id === "ml"
-                        ? "Data science & ML"
+                        ? "Applied ML & robotics"
                         : "Software engineering"}
                     </button>
                   ))}
@@ -404,8 +487,8 @@ export function JudgesDemo() {
                   <span className="jd-eyebrow">YOUR STARTING POINT</span>
                   <h2>{selected.signal}</h2>
                   <p>
-                    {hasTesting
-                      ? "You also added testing experience. Use it as a foundation and show a concrete example."
+                    {hasPublicDemo
+                      ? "You have a shareable demo. Use it as a starting point; update it with the evaluation and failure cases below."
                       : "We see evidence to build on. These suggestions are possibilities, not a list of skills you lack."}
                   </p>
                 </div>
@@ -416,12 +499,39 @@ export function JudgesDemo() {
                   <span>↗</span>
                 </div>
               </section>
+              <section className="jd-target">
+                <div>
+                  <span className="jd-eyebrow">
+                    DIRECTIONS WORTH INVESTIGATING
+                  </span>
+                  <h2>{selected.target}</h2>
+                  <p>{selected.timing}</p>
+                </div>
+                <span className="jd-target-badge">
+                  Build on your existing work
+                </span>
+              </section>
+              <section
+                className="jd-roadmap"
+                aria-label="Suggested work sequence"
+              >
+                {selected.actions.map((action, index) => (
+                  <button key={action.id} onClick={() => setDetail(action)}>
+                    <span>0{index + 1}</span>
+                    <div>
+                      <small>{action.timing}</small>
+                      <strong>{action.title}</strong>
+                    </div>
+                    <span aria-hidden="true">↗</span>
+                  </button>
+                ))}
+              </section>
               <div className="jd-section-heading">
                 <div>
                   <p className="jd-eyebrow">
                     A PLAN THAT FITS YOUR NEXT CHAPTER
                   </p>
-                  <h2>Three ways to move forward</h2>
+                  <h2>Your next 10 days, made concrete</h2>
                 </div>
                 <span>Curated sample recommendations</span>
               </div>
@@ -440,12 +550,17 @@ export function JudgesDemo() {
                       <small>YOU’LL WALK AWAY WITH</small>
                       <p>{action.deliverable}</p>
                     </div>
+                    <div className="jd-card-next">
+                      <small>DO THIS FIRST</small>
+                      <p>{action.firstSession}</p>
+                    </div>
                     <div className="jd-effort">◷ &nbsp; {action.effort}</div>
+                    <small className="jd-order">{action.timing}</small>
                     <button
                       className="jd-evidence-link"
                       onClick={() => setDetail(action)}
                     >
-                      Why this step? <span>↗</span>
+                      Open the work plan <span>↗</span>
                     </button>
                     <button
                       disabled={!ready}
@@ -486,8 +601,11 @@ export function JudgesDemo() {
                         <strong>Sample requirement:</strong> {role.requirement}
                       </p>
                       <p>
-                        Confirm dates, location, and eligibility against an
-                        actual listing before applying.
+                        <strong>Search to start with:</strong>{" "}
+                        <code>{role.query}</code>
+                      </p>
+                      <p>
+                        <strong>Check before applying:</strong> {role.check}
                       </p>
                     </details>
                   ))}
@@ -499,11 +617,11 @@ export function JudgesDemo() {
                     <br />
                     Still entirely yours.
                   </h2>
-                  <small>SAMPLE RÉSUMÉ REWRITE</small>
+                  <small>EVIDENCE-BACKED RÉSUMÉ BULLET</small>
                   <blockquote>
                     {field === "ml"
-                      ? "“Compared three classifiers for a campus energy project using Python and scikit-learn.”"
-                      : "“Built a React study-group finder with SQL-backed course and meeting data; collaborated through Git pull requests.”"}
+                      ? profile.researchBullet
+                      : profile.softwareBullet}
                   </blockquote>
                   <p>
                     No invented outcomes. No inflated numbers. Just a clearer
@@ -635,6 +753,11 @@ export function JudgesDemo() {
                   })}
                 </div>
               )}
+              {saved.length > 0 && (
+                <button className="jd-primary jd-export" onClick={exportPlan}>
+                  Download my detailed plan ↓
+                </button>
+              )}
               <div className="jd-local-note">
                 <span aria-hidden="true">↳</span>
                 <p>
@@ -652,7 +775,10 @@ export function JudgesDemo() {
               EmployHER <i /> More possibilities, one step at a time.
             </span>
             <span>
-              Synthetic résumé · Illustrative requirements · Demo only
+              {profile.local
+                ? "Provided résumé · Local preview"
+                : "Synthetic résumé"}{" "}
+              · Illustrative requirements · Demo only
             </span>
           </footer>
         </main>
@@ -680,17 +806,77 @@ export function JudgesDemo() {
             <h2 id="step-title">{detail.title}</h2>
             <p>{detail.why}</p>
             <div className="jd-dialog-evidence">
-              <small>FROM MAYA’S SAMPLE RÉSUMÉ</small>
+              <small>
+                FROM {profile.name.split(" ")[0].toUpperCase()}’S{" "}
+                {profile.local ? "PROVIDED" : "SAMPLE"} RÉSUMÉ
+              </small>
               <blockquote>{detail.evidence}</blockquote>
               <small>CONNECTED SAMPLE REQUIREMENT</small>
               <p>{detail.source}</p>
             </div>
+            <div className="jd-first-session">
+              <span className="jd-eyebrow">YOUR FIRST WORK SESSION</span>
+              <p>{detail.firstSession}</p>
+            </div>
             <h3>Make it happen</h3>
-            <ol>
-              {detail.steps.map((step) => (
-                <li key={step}>{step}</li>
+            <p className="jd-task-count">
+              {(taskChecks[detail.id] ?? []).length} of {detail.steps.length}{" "}
+              tasks checked ·{" "}
+              {storageUnavailable ? "this visit only" : "saved in this browser"}
+            </p>
+            <ol className="jd-task-list">
+              {detail.steps.map((step, index) => (
+                <li key={step}>
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={(taskChecks[detail.id] ?? []).includes(index)}
+                      onChange={() =>
+                        setTaskChecks((current) => {
+                          const checked = current[detail.id] ?? [];
+                          return {
+                            ...current,
+                            [detail.id]: checked.includes(index)
+                              ? checked.filter((item) => item !== index)
+                              : [...checked, index],
+                          };
+                        })
+                      }
+                    />
+                    <span>{step}</span>
+                  </label>
+                </li>
               ))}
             </ol>
+            <h3>What to put in your portfolio</h3>
+            <div className="jd-artifacts">
+              {detail.artifacts.map((artifact) => (
+                <div key={artifact.name}>
+                  <code>{artifact.name}</code>
+                  <p>{artifact.detail}</p>
+                </div>
+              ))}
+            </div>
+            <h3>You’re done when</h3>
+            <ul className="jd-done-list">
+              {detail.done.map((criterion) => (
+                <li key={criterion}>{criterion}</li>
+              ))}
+            </ul>
+            <div className="jd-worked-example">
+              <h3>{detail.example.title}</h3>
+              <pre>{detail.example.text}</pre>
+            </div>
+            <div className="jd-resource">
+              <span className="jd-eyebrow">
+                USE THIS REFERENCE FOR THIS TASK
+              </span>
+              <a href={detail.resource.url} target="_blank" rel="noreferrer">
+                {detail.resource.title} ↗
+              </a>
+              <p>{detail.resource.use}</p>
+              <small>Official documentation · checked September 19, 2026</small>
+            </div>
             <p className="jd-subtle">
               This is a hard-coded example, not a live AI response. It does not
               establish a missing skill or job eligibility.
