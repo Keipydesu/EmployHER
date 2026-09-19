@@ -1,0 +1,4 @@
+import { demoProfileHandlers } from "@/profile/http";
+export const runtime = "nodejs";
+export const maxDuration = 60;
+export const POST = demoProfileHandlers.post;

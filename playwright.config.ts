@@ -10,7 +10,8 @@ export default defineConfig({
     screenshot: "only-on-failure",
   },
   webServer: {
-    command: "PROFILE_DEMO_MODE=true npm run dev -- --port 3100",
+    command:
+      "APP_BASE_URL=http://127.0.0.1:3100 NEXT_TEST_OUTPUT=true PROFILE_DEMO_MODE=true PROFILE_DEMO_GEMINI=false npm run dev -- --port 3100",
     url: "http://127.0.0.1:3100",
     reuseExistingServer: true,
     timeout: 120000,

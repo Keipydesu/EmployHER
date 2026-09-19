@@ -1,3 +1,4 @@
+import { getDemoProfileRuntime } from "../src/profile/runtime";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
@@ -50,9 +51,9 @@ test("live demo embeds only approved summaries; HTTP corrections stay simulated"
       });
     };
     const token = createDemoSession();
-    const handlers = createProfileHandlers();
+    const handlers = createProfileHandlers(getDemoProfileRuntime);
     const request = (method: string, body: unknown) =>
-      new Request("http://localhost/api/resumes", {
+      new Request("http://localhost/api/demo/resumes", {
         method,
         headers: {
           origin: "http://localhost",

@@ -136,7 +136,16 @@ function demoState() {
   return state.employherProfileDemo;
 }
 export function getProfileRuntime(): ProfileRuntime {
-  return state.employherProfileRuntime ?? demoState().runtime;
+  if (!state.employherProfileRuntime)
+    throw new ProfileError(
+      "PLATFORM_NOT_CONFIGURED",
+      503,
+      "The authenticated profile runtime is not configured.",
+    );
+  return state.employherProfileRuntime;
+}
+export function getDemoProfileRuntime(): ProfileRuntime {
+  return demoState().runtime;
 }
 export function createDemoSession(): string {
   const { sessions } = demoState();

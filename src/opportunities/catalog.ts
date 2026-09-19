@@ -10,7 +10,7 @@ import {
   type Skill,
 } from "./contracts.ts";
 
-export const snapshot = "synthetic-opportunities-v1";
+export const snapshot = "synthetic-opportunities-v2";
 export const embeddingConfig = "synthetic-skill-basis-v1";
 export const checkedAt = "2026-09-18T00:00:00.000Z";
 export function vectorFor(input: Skill[]): number[] {
@@ -47,7 +47,12 @@ const definitions: {
     parentId: null,
     skills: ["research", "statistics"],
   },
-  { id: "quant", title: "Quantitative Finance", parentId: null, skills: [] },
+  {
+    id: "quant",
+    title: "Quantitative Finance",
+    parentId: null,
+    skills: ["python", "statistics", "testing"],
+  },
   {
     id: "hardware",
     title: "Hardware Engineering",
@@ -157,7 +162,7 @@ export const resources: Resource[] = [
     "Python tutorial",
     "course",
     "https://docs.python.org/3/tutorial/",
-    ["software", "cloud", "ml"],
+    ["software", "cloud", "ml", "quant"],
     "python",
     "Official Python language tutorial.",
   ),

@@ -2,7 +2,7 @@
 
 ## Résumé data
 
-Use synthetic fixtures in the public hackathon demo. Enable real input only after consent text, provider handling, ownership, retention, and deletion are verified. Explain that minimized résumé content is processed by Gemini, structured data lives in Tiger Data, and selected coaching messages/context go to Backboard. Do not promise no training or zero retention without confirming the actual service/tier terms.
+The public sample demo requires no sign-in and accepts supplied synthetic fixtures only. Keep its sample state isolated from authenticated user data; anonymous demo sessions must never authorize personal uploads, saved private profiles or coaching memory. The real app uses the signed-in user’s own résumé. Enable real input only after consent text, provider handling, ownership, retention, and deletion are verified. Explain that minimized résumé content is processed by Gemini, structured data lives in Tiger Data, and selected coaching messages/context go to Backboard. Do not promise no training or zero retention without confirming the actual service/tier terms.
 
 Raw PDF/full text lives only for bounded request processing, with temporary files removed on success/failure; no raw résumé storage or document upload to Backboard. Structured profiles, excerpts, vectors, matches, and coaching state are sensitive data. Proposed application retention: 30 days from creation, without automatic extension. Expire access immediately at the deadline and reconcile provider cleanup. Provider and backup retention must be documented separately before pilot launch.
 
@@ -19,3 +19,17 @@ Do not label an employer safe, inclusive, or discriminatory based on missing dat
 No invented employers, programs, contact details, credentials, salary outcomes, or hiring probabilities. Separate résumé evidence from user-reported skills and uncertain model interpretation. User corrections matter more than stale conversational memory.
 
 Treat source files, résumé text, and model output as untrusted. Model calls get no unrestricted tools, network browsing, SQL, or authorization powers. Render escaped text, validate links against the curated catalog, rate-limit costly operations, and provide accessible empty/error/uncertainty states.
+
+## Verified Gemini tier constraint (2026-09-19)
+
+[Google's current Gemini API terms](https://ai.google.dev/gemini-api/terms) state
+that unpaid-service inputs/outputs may be used to improve products and reviewed by
+humans, and instruct users not to submit personal, confidential or sensitive
+information. The terms specify an EEA/Switzerland/UK exception. API paid-service
+status depends on the project's active billing association; a student app
+subscription is not evidence of that API status. The operator selected a free
+tier, so supplied synthetic inputs remain the verified test mode. A consent
+checkbox alone does not resolve this provider constraint. Verify the actual
+project/region and compatible handling before personal résumé release; do not
+enable billing automatically. Paid-service terms still describe limited abuse
+monitoring retention, so do not promise zero provider retention.

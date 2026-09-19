@@ -18,7 +18,10 @@
     "smoke:opportunities": "node scripts/smoke-opportunities.mjs",
     "test": "node --import tsx --test tests/*.test.ts",
     "test:browser": "playwright test",
-    "smoke:profile": "node scripts/smoke-profile.mjs"
+    "smoke:profile": "node scripts/smoke-profile.mjs",
+    "db:migrate": "node --env-file=.env --import tsx scripts/migrate.ts",
+    "test:database": "node --import tsx --test tests/integration/*.test.ts",
+    "catalog:seed": "node --env-file=.env --import tsx scripts/seed-catalog.ts"
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "4.29.0",

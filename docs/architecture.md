@@ -1,9 +1,10 @@
 # Architecture and data flow
 
 ```text
-Browser → Auth0 login → Next.js on localhost
+Browser → anonymous supplied-sample demo → isolated sample state
+Browser → Auth0 login → personal résumé flow → Next.js on localhost
                            ├─ Zod validation + ownership + quotas
-                           ├─ Drizzle → Tiger Data PostgreSQL / pgvector
+                           ├─ Drizzle + pg → Tiger Data PostgreSQL / pgvector
                            ├─ Gemini: extraction, embeddings, gap analysis
                            └─ Backboard: private coaching assistant / threads
 Curated GitHub source → Octokit ingestion → normalized roles + source evidence
@@ -12,7 +13,7 @@ Curated GitHub source → Octokit ingestion → normalized roles + source eviden
 
 ## Boundaries
 
-Auth0 authenticates people; each backend route still checks ownership. Resolve a validated issuer/subject pair to an internal user ID. Never trust a submitted user ID. Protect cookie-authenticated mutations against CSRF and origin abuse.
+The anonymous demo exposes only supplied sample data and cannot access personal-upload or private-state routes. Auth0 authenticates real-app users; each private backend route still checks ownership. Resolve a validated issuer/subject pair to an internal user ID. Never trust a submitted user ID. Protect cookie-authenticated mutations against CSRF and origin abuse.
 
 Tiger Data is the source of truth. Gemini suggests structured facts, semantic representations, and explanations; deterministic validators and user confirmation govern what is stored. Backboard owns conversational continuity, not authoritative skills, eligibility, permissions, or match state. Use a separate assistant per user because assistant memory may span threads. Resolve provider IDs on the server.
 
@@ -26,7 +27,7 @@ A separate, proposed shared resource-research cache (see [product.md](product.md
 4. The user confirms/corrects the profile. Embed the minimized skill/experience summary with a pinned Gemini embedding configuration.
 5. Ingestion reads only the configured GitHub repository/path/ref. Parse into a normalized contract, validate source links, record commit SHA and retrieval time, and upsert by stable source key. Embed changed role content only.
 6. Filter roles by explicit user criteria, then retrieve a small semantic candidate set. Compare structured requirements and send only needed evidence to Gemini for explanations and bounded next steps. Persist versioned matches.
-7. Show source links, freshness, evidence, uncertainty, and documented resources. Confirmed edits or role changes invalidate cached matches.
+7. Aggregate recurring requirements across deduplicated, reviewed listings for the chosen path/cohort. Compare those patterns with confirmed profile evidence to guide projects, skills and contextual organizations, not just individual job fit. Show known-requirement denominators, missing-data counts, sources and snapshot dates; temporal trends require comparable snapshots. Show source links, freshness, evidence, uncertainty, and documented resources. Confirmed edits or role changes invalidate cached matches.
 8. For coaching, send the user's message and selected minimized context to Backboard. Load current profile/match state from the database, and never let old memory override it.
 
 ## Ingestion contract

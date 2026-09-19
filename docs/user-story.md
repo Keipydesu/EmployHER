@@ -1,10 +1,10 @@
 # User Story: From an Uncertain Student to a Clear Tech Career Path
 
-Status: proposed product experience, recorded 2026-09-18. This story expands the path-exploration experience in [product.md](product.md); no application or scoring model has been implemented.
+Status: intended product experience, clarified 2026-09-19. Synthetic profile and Opportunities slices exist; the connected personal-résumé journey remains to be implemented. This story expands [product.md](product.md).
 
 ## Primary user story
 
-**As a college student exploring a career in tech, I want EmployHER to turn my résumé into a visual map of possible career paths, show what experience I already bring and what to work on next, and connect me with useful learning and mentorship resources, so I can choose a direction and take my next step with confidence.**
+**As an early-career person in tech, I want to upload my own résumé and understand which projects, skills and organizations can help me grow, using patterns in job and internship requirements alongside my goals and experience, so I can build a stronger career over time.**
 
 ## Meet Maya
 
@@ -12,11 +12,15 @@ Maya is a college student in Georgia. She has coursework, a class project and a 
 
 Maya is a young woman, reflecting EmployHER's motivating audience. Her uncertainty is about navigating a new field, not a presumed lack of ability. The app does not infer or verify gender; anyone can explore paths and opt into women-focused resources.
 
-## The journey
+## Try the app without signing in
+
+A visitor can choose a supplied synthetic résumé and explore an example career-path assessment without an account. This is a separate demo, clearly labeled sample data; it does not accept personal résumés or create a personal saved profile. Trying it is optional, not a required step before using the real app.
+
+## The real-user journey
 
 ### 1. Start with what she has done
 
-Maya signs in, sees how her information will be used, and uploads her résumé or pastes its text. The public demo uses a synthetic résumé instead. EmployHER extracts experience and skills with supporting excerpts, then asks her to correct the draft. Classwork, personal projects, volunteering and hackathons can all provide relevant evidence.
+Maya signs in, sees how her information will be used, and uploads her résumé or pastes its text. Her own résumé is the input for real use; the separate no-sign-in demo uses a supplied synthetic résumé. EmployHER extracts experience and skills with supporting excerpts, then asks her to correct the draft. Classwork, personal projects, volunteering and hackathons can all provide relevant evidence.
 
 She confirms the profile. If extraction fails, she can retry or use the text fallback; the app does not invent a profile to keep the flow moving.
 
@@ -61,6 +65,12 @@ Instead, the path card shows a **field-context panel** built only from facts alr
 
 If a comparable, reliable competition dataset becomes available, show its precise measure, sample, geography, career level, period and limitations separately from personal progress. Never infer applicant competition from listing counts or employer prestige.
 
+### 3b. See patterns across relevant listings
+
+For a chosen field and internship/new-grad cohort, Maya sees recurring skills and project-relevant requirements across reviewed job listings, compared with her confirmed evidence. Recommendations are career-development guidance across a field, not only advice for one vacancy. Each pattern shows source links, snapshot/review dates, filters, the number of distinct reviewed roles mentioning it and the number with available requirements. Listings without reviewed requirements are counted separately as unknown, not as evidence that a skill is unnecessary; duplicate listings must not inflate frequency.
+
+A single snapshot supports “commonly requested in this reviewed sample,” not “demand is rising.” Claims of change over time require comparable dated snapshots. The catalog is a limited sample, not a census of the job market. Projects and skills connect to reviewed patterns; organizations and mentorship resources connect to her selected field, location and preferences, with their own checked sources.
+
 ### 4. Open a gap and find a useful next step
 
 Maya opens “Cloud deployment.” The app first asks whether she has deployed something that her résumé omits. If yes, she adds user-reported details for review. If she confirms she has not, the node offers a small, relevant learning action: deploy a simple project and document the setup, access controls and results.
@@ -94,6 +104,9 @@ Success means she can explain what she will do next and why it matters—not mer
 
 | Given / when | Expected result |
 | --- | --- |
+| A visitor opens the demo | Supplied sample résumé and example guidance work without sign-in; no personal upload or private account data is exposed |
+| Maya uses the real app | After sign-in and processing explanation, she uploads her own résumé and receives guidance based on confirmed evidence and reviewed listing patterns |
+| Maya views recurring skill demand | Show deduplicated counts, known-requirement denominator, unknowns, sources, dates and cohort; no time-trend claim from one snapshot |
 | A confirmed profile opens the path view | Curated paths show explainable coverage and expandable checkpoints; uncurated paths show unavailable status |
 | A skill is absent from the résumé | Ask for clarification before treating it as a learning gap |
 | A path lacks reviewed requirements | No fabricated percentage, readiness judgment or skill-gap claim |
@@ -106,6 +119,6 @@ Success means she can explain what she will do next and why it matters—not mer
 
 ## Delivery alignment
 
-This refines [the three-person roadmap](product.md#three-person-parallel-mvp-roadmap): **A** owns profile evidence/corrections and truthful résumé suggestions; **B** owns path taxonomy, reviewed checklist definitions, progress/tree UI, job links and contextual learning/community resources; **C** owns authenticated persistence, navigation, accessible shared components and localhost setup. All three agree checkpoint states, versioning and saved-action contracts in M0. Existing API/schema proposals need those contracts added before implementation; this story does not pretend they already exist.
+This refines [the delivery roadmap](../roadmap.md): **A** owns profile evidence/corrections and truthful résumé suggestions; **B** owns path taxonomy, reviewed checklist definitions, progress/tree UI, job links and contextual learning/community resources; **C** owns authenticated persistence, navigation, accessible shared components and localhost setup. All three agree checkpoint states, versioning and saved-action contracts in M0. Existing API/schema proposals need those contracts added before implementation; this story does not pretend they already exist.
 
-The MVP uses a small reviewed static path/resource set, synthetic demo profiles and up to three next actions. It does not require a full curriculum, live job refresh, mentor marketplace or a hiring-probability score. Keep this file as the experience and acceptance reference; [product.md](product.md) remains the single backlog.
+The real product uses the user’s own résumé, a small reviewed static path/resource set and up to three next actions. A separate anonymous demo uses supplied synthetic profiles. Synthetic fixtures also support integration testing; they do not replace the real-user journey. Privacy and lifecycle checks are required before enabling personal uploads. It does not require a full curriculum, live job refresh, mentor marketplace or a hiring-probability score. Keep this file as the experience and acceptance reference; [product.md](product.md) remains the single backlog.

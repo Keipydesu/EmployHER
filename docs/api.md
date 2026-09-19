@@ -49,3 +49,63 @@ Expensive POST requests require an `Idempotency-Key`. Bind it to authenticated u
 ## Implemented synthetic Opportunities API
 
 The local fixture workflow is isolated at `/api/demo/opportunities`; see [implementation and adapter contract](opportunities-implementation.md). Its anonymous demo cookie is not an Auth0 session, and the production routes above remain proposals. Exact command schemas live in `src/opportunities/contracts.ts`. Saved path/actions and explicit profile/checklist-versioned learning-gap confirmations live in server-side demo state; the A/C-backed production schema remains an integration gate.
+
+## Career-guidance contracts to define
+
+The personal product needs field-level requirement patterns and a career-building plan, not only per-job matches. These contracts are not yet implemented: R0 must agree path/cohort/filter scope, distinct reviewed requirement references, sample and unknown counts, snapshot dates, profile/catalog versions, personalized action rationale and invalidation. Organizations/resources keep their own checked sources; they are not inferred to be employer requirements. R1 implements the agreed endpoints/storage and the UI can show guidance without requiring a job-card selection.
+
+The no-sign-in supplied-sample demo is separate from the authenticated personal APIs above. Demo credentials cannot authorize personal uploads or private account state; the same distinction applies when an authenticated integration test uses synthetic input. See [decision 004](decisions/004-career-building-and-anonymous-demo.md).
+
+## Implemented integration primitives (not mounted private endpoints)
+
+`src/opportunities/profile-bridge.ts` maps explicit skill labels from confirmed, unexpired profiles to guidance evidence. It retains fact IDs, source spans and unmapped facts; `data` aliases to `ml`. Only compatible, non-simulated 768-dimensional provider vectors pass the bridge. The chosen low-cost text model is `gemini-embedding-001`; the same model/configuration must embed both profiles and roles.
+
+`aggregatePatterns()` groups reviewed requirement excerpts by skill across source-deduplicated filtered listings, returning sample/known/unknown counts, source references, all checked dates and catalog/checklist versions. `careerGuidance()` adds evidence and current learning-gap confirmations. The anonymous Opportunities view now displays these synthetic patterns. Private route/storage integration is still pending.
+
+`validateExplanation()` requires a current context containing checklist version, confirmations and inclusion preferences for confirmed gaps and personalized learning steps. Omitted context fails closed. `PostgresOperations` stores profile writes and replay results in the same transaction via repository hooks; its connection/migration/runtime integration remains separately verified work.
+
+### Authenticated career guidance (implemented, live acceptance pending)
+
+`GET /api/career?profileId=<uuid>&profileVersion=<integer>` resolves the Auth0 owner,
+loads the owned confirmed profile and active reviewed catalog, and returns the
+saved plan, selected-path patterns, evidence references, up to ten supporting roles
+and currently visible resources. Embedding vectors are not returned.
+
+`POST /api/career` requires same-origin JSON and an `Idempotency-Key` header. Its
+body contains `profileId`, `profileVersion`, `catalogVersion` and `command` (with
+`expectedVersion`). Supported plan commands are `path`, `preferences`,
+`confirm-gap`, `select-action`, and `action-state`; fixture profile/evidence/reset
+commands are rejected. Stale profile/catalog/state versions fail explicitly.
+The saved state and original replay result commit atomically. Read-time resource
+expiry and opt-in checks apply when rendering a response.
+
+This route requires platform initialization, migrations and an activated catalog.
+It is separate from `/api/demo/*`; a sample cookie grants no private access.
+Onboarding interest selection and the personal career UI remain integration work.
+
+### Account interests (implemented)
+
+Authenticated `GET /api/me/interests` returns `{version, fields}`. `PUT` accepts
+`{expectedVersion, fields}` with a same-origin request, JSON body (2 KiB maximum)
+and an idempotency key. Choose one to five distinct catalog field IDs: `software`,
+`ml`, `product`, `quant`, `hardware`. Account ownership comes from Auth0, never the
+body. Stale edits return 409; retries return the stored operation result.
+
+`/onboarding` collects these choices after signup and allows later edits. Private
+profile intake redirects there if choices are empty. Career reads, retrieval and
+Gemini context use only selected fields. Interest versions fence late analysis
+and plan writes; removing a field selects an available remaining field for reads
+without rewriting the saved plan. Deletion clears account interests. Personal-data
+retention acceptance and authenticated browser verification remain release work.
+
+### Saving Gemini recommendations (implemented)
+
+`POST /api/career` accepts a `select-recommendation` command with
+`expectedVersion`, `contextHash` and a zero-based `index` (0–2). The server loads
+its persisted analysis and validates current evidence/resource references before
+saving; request bodies cannot supply recommendation prose or citations. Saved
+actions preserve the model rationale and source IDs, share the three-active-action
+limit, and support existing `action-state` completion/removal commands. Completion
+does not create skill evidence. The analysis content hash includes actual context
+and preferences, while plan versions still guard reads/commits, allowing unchanged
+analysis to survive action-only changes without another Gemini call.
