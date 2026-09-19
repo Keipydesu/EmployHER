@@ -32,69 +32,77 @@ export type DemoAction = {
   resource: { title: string; url: string; use: string };
 };
 
-// This public fixture is fictional. A provided résumé can be loaded locally
-// through the server-only opt-in described in docs/judges-demo.md.
+// Operator-approved public demo evidence. Contact details and the source PDF are excluded.
 export const sampleProfile: DemoProfile = {
-  id: "maya-v2",
-  name: "Maya Chen",
-  initials: "MC",
+  id: "julia-demo-v1",
+  name: "Julia Thomas",
+  initials: "JT",
   local: false,
-  degree: "B.S. Computer Engineering",
-  school: "Sample State University",
+  degree: "B.S. Computer Engineering · GPA 4.0",
+  school: "Kennesaw State University · Journey Honors College",
   graduation: "May 2029",
   summary:
-    "Sensor research, simulated robotics, and full-stack applications. Interested in applied ML and robotics internships.",
+    "Research experience at Georgia Tech and KSU in hyperdimensional computing, robot fault diagnosis, language-guided robotics, and computer vision. Seeking machine learning and robotics opportunities.",
   skills: [
     "Python",
-    "C++",
+    "C/C++",
     "PyTorch",
+    "TensorFlow",
     "OpenCV",
-    "Isaac Lab",
+    "GroundingDINO",
+    "Isaac Sim / Lab",
+    "Ollama / MCP",
     "Ruby on Rails",
     "PostgreSQL",
     "Playwright",
+    "Docker",
   ],
   projects: [
     {
-      title: "Sensor anomaly research",
+      title: "Few-Shot Robot IMU Fault Diagnosis · Georgia Tech",
       description:
-        "Compared a compact classifier with simple baselines on held-out sensor recordings. Measured false alerts and detection delay.",
+        "Developed an HDC pipeline for cross-axis fault diagnosis. Reported 79–81% timely diagnosis of injected abrupt faults on two held-out robot recording sessions, using one labeled example per fault type. Compared nearest-neighbor, centroid, and Extra Trees baselines.",
     },
     {
-      title: "Language-guided robot simulation",
+      title: "Language-guided robotics · KSU Research Assistant",
       description:
-        "Connected a local language model to a simulated robot through Python tools. Used vision outputs to select objects and plan actions.",
+        "Integrates small language models, Ollama, MCP, OpenCV, GroundingDINO, and robotic hardware. Uses Isaac Sim/Lab, behavior trees, Python clients/servers, REST, and JSON-RPC.",
     },
     {
-      title: "Campus event planner",
+      title: "Otostoper carpool coordination platform",
       description:
-        "Built a Rails and PostgreSQL application with background jobs, an external API fallback, and automated system tests.",
+        "Rails/PostgreSQL application with route-aware assignments, plan snapshots, Google Maps APIs, a local fallback provider, and background recalculation. Includes Rails, system, and Playwright end-to-end tests.",
+    },
+    {
+      title: "Thermal-imaging drone & calendar automation",
+      description:
+        "Custom Pixhawk drone with a thermal camera payload and sensor processing; separate OCR tool parses dates and time zones into Google Calendar events.",
     },
   ],
   evidence: [
     {
-      title: "You already evaluate ML systems",
+      title: "You already evaluate few-shot ML systems",
       detail:
-        "Compared a compact classifier with simple baselines on held-out sensor recordings. Measured false alerts and detection delay.",
-      tag: "Sensor anomaly research",
+        "Benchmarked HDC against nearest-neighbor, centroid, and Extra Trees; analyzed accuracy, false alarms, latency, and model storage.",
+      tag: "Georgia Tech · IMU fault diagnosis",
     },
     {
-      title: "You connect AI to robot behavior",
+      title: "You connect language, vision, and robots",
       detail:
-        "Connected a local language model to a simulated robot through Python tools. Used vision outputs to select objects and plan actions.",
-      tag: "Robot simulation",
+        "Integrate Python-based MCP clients and servers with REST APIs, JSON-RPC, Raspberry Pi hardware, servos, cameras, and physical robot actuators.",
+      tag: "KSU · Research Assistant",
     },
     {
-      title: "You already test full-stack software",
+      title: "You already build and test full-stack software",
       detail:
-        "Built a Rails and PostgreSQL application with background jobs, an external API fallback, and automated system tests.",
-      tag: "Campus event planner",
+        "Built a responsive interface using Hotwire, Stimulus, Bootstrap, and SCSS; added automated Rails, system, and Playwright end-to-end tests.",
+      tag: "Otostoper · Rails/PostgreSQL",
     },
   ],
   researchBullet:
-    "Compared a compact sensor-anomaly classifier with simple baselines on held-out recordings, measuring false alerts and detection delay.",
+    "Developed a few-shot HDC pipeline for cross-axis robot IMU fault diagnosis; achieved 79–81% timely diagnosis of injected abrupt faults across two held-out recording sessions using one labeled example per fault type.",
   softwareBullet:
-    "Built a Rails/PostgreSQL event-planning application with background jobs, external API fallback, and automated system tests.",
+    "Built a Rails/PostgreSQL carpool coordination platform with route-aware assignments, plan snapshots, Google Maps API integration and fallback, background recalculation, and Rails/system/Playwright tests.",
 };
 
 const validationGuide = {

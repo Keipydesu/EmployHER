@@ -2,8 +2,10 @@
 
 `/demo` is a hard-coded product walkthrough on the scrolling résumé site. It needs
 no sign-in, API keys, database, personal uploads, or provider calls. The committed
-profile is fictional; role descriptions are illustrative and recommendations are
-curated examples, not live Gemini output.
+profile uses Julia Thomas’s selected résumé evidence, explicitly approved by the
+operator for publication. Phone numbers, email addresses, contact links, and the
+source PDF are excluded. Role descriptions are illustrative and recommendations
+are curated examples, not live Gemini output.
 
 ## Run and present
 
@@ -43,7 +45,7 @@ EMPLOYHER_DEMO_PROFILE=.local/judges-profile.json npm run dev -- --port 3131
 ```
 
 Only loopback Host values are accepted for this override; Vercel always uses the
-fictional fixture. Do not configure the override on other hosted servers. The route
+public demo profile. Do not configure the override on other hosted servers. The route
 is dynamic so a local profile is not embedded into build-time static HTML. The
 file is read at request time, validated, and never sent to an AI provider.
 The browser receives the selected profile for presentation; anyone with access to
@@ -54,8 +56,9 @@ The schema is in `app/demo/load-profile.ts`; use `sampleProfile` in
 unique `id`. Include at least three projects and exactly three evidence groups in
 this order: research, robotics integration, full-stack software. These are curated
 scenarios, not a general-purpose résumé parser. Preserve original conditions and
-denominators in any résumé metric. A real profile and its screenshots must not be
-committed to the public PR. Unset the variable to return to the fictional profile.
+denominators in any résumé metric. Additional private profiles and their screenshots must not be
+committed without explicit publication authorization. The operator authorized
+the selected Julia evidence used by the default demo on September 19, 2026. Unset the variable to return to the public demo profile.
 
 ## Verification
 
@@ -64,7 +67,7 @@ Run `npm run test:demo`, or `npm run test:demo -- --ui`. Playwright scenarios in
 and work-plan dialogs, task persistence, detailed plan downloads, field switching,
 the three-step limit, completion, reset/cancel, keyboard access, mobile layout,
 unavailable storage, and the homepage entry point. The walkthrough asserts no
-`/api/` requests. Public screenshots use the fictional profile only and are written
+`/api/` requests. Public screenshots use the approved public demo profile only and are written
 to `docs/screenshots/judges-demo-*.png`.
 
 Official task references checked September 19, 2026:

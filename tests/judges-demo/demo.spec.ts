@@ -10,6 +10,15 @@ test("judge walkthrough stays local, traces evidence, persists progress, and res
   });
   await page.goto("/demo");
   await expect(
+    page.getByRole("heading", { name: "Julia Thomas", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Selected résumé evidence. Contact details omitted."),
+  ).toBeVisible();
+  expect(await page.locator(".jd-paper").innerText()).not.toMatch(
+    /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}|\b\d{3}[-. ]\d{3}[-. ]\d{4}\b/i,
+  );
+  await expect(
     page.getByRole("heading", { name: "Your story starts here." }),
   ).toBeVisible();
   await page
