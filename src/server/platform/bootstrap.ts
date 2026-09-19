@@ -1,3 +1,5 @@
+import { BackboardStorage } from "./backboard";
+import { BackboardSync } from "./backboard-sync";
 import { AccountInterests } from "./interests";
 import { Lifecycle } from "./lifecycle";
 import { CareerPlans } from "./career-plans";
@@ -25,6 +27,11 @@ import {
   summaryForEmbedding,
 } from "../../profile/evidence";
 import type { ProfileAI } from "../../profile/ports";
+import {
+  PERSONAL_CONSENT_VERSION,
+  personalResumeEnabled,
+  requirePersonalConsent,
+} from "../../profile/personal-mode";
 const fixtureOnly = () =>
   new ProfileError(
     "FIXTURE_ONLY",
@@ -34,6 +41,7 @@ const fixtureOnly = () =>
 type PlatformServices = {
   owners: Owners;
   interests: AccountInterests;
+  memory: BackboardSync;
   lifecycle: Lifecycle;
   career: CareerService;
   authorize: (write?: boolean, allowDeleted?: boolean) => Promise<string>;
@@ -67,6 +75,11 @@ export function initializePlatform() {
   const { pool, db } = createDatabase();
   const owners = new Owners(pool);
   const lifecycle = new Lifecycle(pool);
+  const memory = new BackboardSync(
+    pool,
+    new BackboardStorage(process.env.BACKBOARD_API_KEY ?? ""),
+    !!process.env.BACKBOARD_API_KEY,
+  );
   const authorize = async (write = false, allowDeleted = false) => {
     const session = await authClient.getSession();
     const subject = session?.user.sub;
@@ -94,8 +107,8 @@ export function initializePlatform() {
     process.env.GEMINI_MODEL ?? "",
     process.env.GEMINI_EMBEDDING_MODEL ?? "",
   );
-  // Until the release gate is implemented, personal processing always stays off.
-  // Unknown edited summaries must not leak to the free-tier provider.
+  const personal = personalResumeEnabled();
+  // Default-off fixture boundary; local personal mode is explicit and disclosed.
   const rejecting: ProfileAI = {
     model: "fixture-boundary",
     extract: async () => {
@@ -118,7 +131,7 @@ export function initializePlatform() {
       ),
       store: new CareerAnalyses(db, operations),
       authorize: async (profile) => {
-        if (!allowed.has(summaryForEmbedding(profile.facts)))
+        if (!personal && !allowed.has(summaryForEmbedding(profile.facts)))
           throw fixtureOnly();
       },
     },
@@ -128,13 +141,17 @@ export function initializePlatform() {
   const ai: ProfileAI = {
     model: live.model,
     extract: async (text, signal) => {
-      if (!resumeFixtures.some((f) => normalized(f.text) === normalized(text)))
+      if (
+        !personal &&
+        !resumeFixtures.some((f) => normalized(f.text) === normalized(text))
+      )
         throw fixtureOnly();
       const extracted = await live.extract(text, signal);
       allowed.add(summaryForEmbedding(validateEvidence(extracted, text)));
       return extracted;
     },
-    embed: (summary, signal) => guarded.embed(summary, signal),
+    embed: (summary, signal) =>
+      personal ? live.embed(summary, signal) : guarded.embed(summary, signal),
   };
   const normalized = (text: string) =>
     prepareText(text).replace(/\s+/g, " ").replace(/—/g, "-");
@@ -163,7 +180,12 @@ export function initializePlatform() {
       },
     }),
     authorize: async (_request, operation) => authorize(operation === "write"),
-    authorizeIntake: async (_owner, text) => {
+    authorizeIntake: async (owner, text, request) => {
+      if (personal) {
+        requirePersonalConsent(request);
+        await owners.recordConsent(owner, PERSONAL_CONSENT_VERSION);
+        return;
+      }
       if (!resumeFixtures.some((f) => normalized(f.text) === normalized(text)))
         throw fixtureOnly();
     },
@@ -171,6 +193,7 @@ export function initializePlatform() {
   globalPlatform.employherPlatform = {
     owners,
     interests,
+    memory,
     lifecycle,
     career,
     authorize,
@@ -182,6 +205,7 @@ export function initializePlatform() {
       running = true;
       try {
         await lifecycle.reconcile();
+        await memory.reconcile();
         await lifecycle.expire();
       } catch {
         console.error(

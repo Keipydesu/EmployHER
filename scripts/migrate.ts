@@ -12,6 +12,7 @@ async function main() {
     "migrations/005-reviewed-catalog.sql",
     "migrations/006-career-analyses.sql",
     "migrations/007-account-interests.sql",
+    "migrations/008-backboard-storage.sql",
   ];
   const client = await pool.connect();
   try {

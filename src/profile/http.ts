@@ -83,7 +83,7 @@ export function createProfileHandlers(
         const owner = await dependencies.authorize(request, "write");
         const requestKey = key(request);
         const text = await readResumeInput(request);
-        await dependencies.authorizeIntake(owner, text);
+        await dependencies.authorizeIntake(owner, text, request);
         return publicProfile(
           await dependencies.service.intake(owner, requestKey, text),
         );

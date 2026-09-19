@@ -13,5 +13,7 @@ test-results/
 playwright-report/
 
 .next-test
+.next-auth-test
+.next-smoke
 
 .catalog-cache/

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ProfileError } from "../profile/errors.ts";
+import { geminiHttpError } from "../profile/gemini-errors.ts";
 import { SkillSchema } from "./contracts.ts";
 const text = z
   .string()
@@ -136,13 +137,10 @@ export class GeminiCareerAI {
           }),
         },
       );
-      if (!response.ok)
-        throw new ProfileError(
-          "AI_UNAVAILABLE",
-          response.status === 429 ? 429 : 502,
-          "Gemini career analysis is unavailable. Please retry shortly.",
-          true,
-        );
+      if (!response.ok) {
+        await response.body?.cancel();
+        throw geminiHttpError(response.status);
+      }
       const raw = await response.text();
       if (raw.length > 100000) throw new Error("oversize");
       const envelope = z

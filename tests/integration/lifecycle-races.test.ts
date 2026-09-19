@@ -25,6 +25,9 @@ async function isolatedDatabase(
     await pool.query(
       await readFile("migrations/007-account-interests.sql", "utf8"),
     );
+    await pool.query(
+      await readFile("migrations/008-backboard-storage.sql", "utf8"),
+    );
     await pool.query(await readFile("migrations/003-lifecycle.sql", "utf8"));
     // This suite tests lifecycle fencing, not the separate pgvector migration gate.
     await pool.query(

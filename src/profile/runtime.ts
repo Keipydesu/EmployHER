@@ -39,7 +39,11 @@ export type ProfileRuntime = {
   service: ProfileService;
   // C resolves Auth0 issuer/sub to an internal UUID, checks deletion/expiry and quotas.
   authorize(request: Request, operation: "read" | "write"): Promise<string>;
-  authorizeIntake(owner: string, text: string): Promise<void>;
+  authorizeIntake(
+    owner: string,
+    text: string,
+    request?: Request,
+  ): Promise<void>;
 };
 type DemoSession = { owner: string; expires: number; writes: number };
 const state = globalThis as typeof globalThis & {

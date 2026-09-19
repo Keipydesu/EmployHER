@@ -22,6 +22,11 @@ Treat source files, résumé text, and model output as untrusted. Model calls ge
 
 ## Verified Gemini tier constraint (2026-09-19)
 
+Local MVP exception: [decision 008](decisions/008-local-personal-resume-demo.md)
+records the operator's explicit opt-in to real authenticated uploads despite the
+unpaid-tier constraint. The default-off local mode requires processing consent;
+it does not establish compliance with provider terms or hosted release readiness.
+
 [Google's current Gemini API terms](https://ai.google.dev/gemini-api/terms) state
 that unpaid-service inputs/outputs may be used to improve products and reviewed by
 humans, and instruct users not to submit personal, confidential or sensitive

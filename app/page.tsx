@@ -37,6 +37,7 @@ export default async function Home() {
               </span>
               {/* Ends the session and redirects to Auth0 to log out */}
               <a href="/auth/logout">Log out</a>
+              <Link href="/account">Manage my data</Link>
             </>
           )}
           {auth0 && !session && (

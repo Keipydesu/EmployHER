@@ -3,6 +3,13 @@ import type { Pool } from "pg";
 import { ProfileError } from "../../profile/errors.ts";
 export class Lifecycle {
   constructor(private pool: Pool) {}
+  async latest(owner: string) {
+    const result = await this.pool.query(
+      "SELECT id FROM app_deletions WHERE owner_id=$1",
+      [owner],
+    );
+    return result.rowCount ? this.status(owner, result.rows[0].id) : null;
+  }
   async request(owner: string) {
     const client = await this.pool.connect();
     try {
@@ -58,13 +65,13 @@ export class Lifecycle {
       completedAt: row.completed_at,
       scope: "application-data",
       providerNotice:
-        "Provider and backup retention follow the published service terms; this status covers application records.",
+        "Completion covers application content and tracked Backboard context cleanup. A minimal deletion record prevents late writes. Auth0 account deletion and provider/backup retention are separate.",
     };
   }
-  async reconcile(limit = 20) {
+  async reconcile(limit = 20, owner: string | null = null) {
     const pending = await this.pool.query(
-      "SELECT id,owner_id FROM app_deletions WHERE status<>'completed' AND next_attempt_at<=now() ORDER BY requested_at LIMIT $1",
-      [Math.min(100, Math.max(1, limit))],
+      "SELECT id,owner_id FROM app_deletions WHERE status<>'completed' AND next_attempt_at<=now() AND ($2::uuid IS NULL OR owner_id=$2::uuid) ORDER BY requested_at LIMIT $1",
+      [Math.min(100, Math.max(1, limit)), owner],
     );
     let completed = 0;
     for (const deletion of pending.rows) {
@@ -99,6 +106,22 @@ export class Lifecycle {
           "UPDATE app_users SET consent_version=NULL,consent_at=NULL,interest_fields='[]'::jsonb,interest_version=interest_version+1 WHERE id=$1",
           [deletion.owner_id],
         );
+        await client.query(
+          "UPDATE backboard_context SET desired=NULL,enabled=false,version=version+1,status=CASE WHEN assistant_id IS NULL THEN 'disabled' ELSE 'deleting' END,next_attempt_at=now() WHERE owner_id=$1 AND (enabled OR desired IS NOT NULL)",
+          [deletion.owner_id],
+        );
+        const remote = await client.query(
+          "SELECT 1 FROM backboard_context WHERE owner_id=$1 AND assistant_id IS NOT NULL",
+          [deletion.owner_id],
+        );
+        if (remote.rowCount) {
+          await client.query(
+            "UPDATE app_deletions SET status='pending',next_attempt_at=now()+interval '1 minute' WHERE id=$1",
+            [deletion.id],
+          );
+          await client.query("COMMIT");
+          continue;
+        }
         await client.query(
           "UPDATE app_deletions SET status='completed',completed_at=now(),attempts=attempts+1 WHERE id=$1",
           [deletion.id],

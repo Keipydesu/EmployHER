@@ -19,6 +19,9 @@ test(
       await pool.query(
         await readFile("migrations/007-account-interests.sql", "utf8"),
       );
+      await pool.query(
+        await readFile("migrations/008-backboard-storage.sql", "utf8"),
+      );
       await assert.rejects(() => owners.resolve(null), /Sign in/);
       first = await owners.resolve({
         issuer: "https://issuer-a.test",
@@ -33,6 +36,22 @@ test(
         subject,
       });
       assert.notEqual(second, first);
+      await owners.recordConsent(first, "local-resume-v1");
+      const consent = await pool.query(
+        "SELECT consent_version,consent_at FROM app_users WHERE id=$1",
+        [first],
+      );
+      assert.equal(consent.rows[0].consent_version, "local-resume-v1");
+      assert(consent.rows[0].consent_at instanceof Date);
+      assert.equal(
+        (
+          await pool.query(
+            "SELECT consent_version FROM app_users WHERE id=$1",
+            [second],
+          )
+        ).rows[0].consent_version,
+        null,
+      );
       for (let i = 0; i < 30; i++)
         await owners.resolve(
           { issuer: "https://issuer-a.test", subject },
@@ -54,6 +73,19 @@ test(
       await assert.rejects(
         () => owners.resolve({ issuer: "https://issuer-b.test", subject }),
         /deletion/,
+      );
+      await assert.rejects(
+        () => owners.recordConsent(second, "local-resume-v1"),
+        /unavailable/,
+      );
+      assert.equal(
+        (
+          await pool.query(
+            "SELECT consent_version FROM app_users WHERE id=$1",
+            [second],
+          )
+        ).rows[0].consent_version,
+        null,
       );
     } finally {
       await pool.query("DELETE FROM app_request_quotas WHERE scope=ANY($1)", [

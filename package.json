@@ -18,7 +18,10 @@
     "smoke:opportunities": "node scripts/smoke-opportunities.mjs",
     "test": "node --import tsx --test tests/*.test.ts",
     "test:browser": "playwright test",
+    "test:browser:auth": "playwright test --config playwright.auth.config.ts",
+    "test:browser:ui": "playwright test --config playwright.all.config.ts --ui",
     "smoke:profile": "node scripts/smoke-profile.mjs",
+    "smoke:services": "node --env-file=.env --import tsx scripts/smoke-services.ts",
     "db:migrate": "node --env-file=.env --import tsx scripts/migrate.ts",
     "test:database": "node --import tsx --test tests/integration/*.test.ts",
     "catalog:seed": "node --env-file=.env --import tsx scripts/seed-catalog.ts"

@@ -4,6 +4,18 @@ import { ProfileError } from "../../profile/errors.ts";
 export type Identity = { issuer: string; subject: string };
 export class Owners {
   constructor(private pool: Pool) {}
+  async recordConsent(owner: string, version: string) {
+    const result = await this.pool.query(
+      "UPDATE app_users SET consent_version=$2,consent_at=clock_timestamp() WHERE id=$1 AND deletion_requested_at IS NULL RETURNING id",
+      [owner, version],
+    );
+    if (!result.rowCount)
+      throw new ProfileError(
+        "ACCOUNT_DELETING",
+        403,
+        "Your account is unavailable for résumé processing.",
+      );
+  }
   async resolve(
     identity: Identity | null,
     write = false,

@@ -2,6 +2,8 @@ import Link from "next/link";
 import { auth0 } from "@/server/auth0";
 import { getPlatformServices } from "@/server/platform/bootstrap";
 import { InterestWorkspace } from "@/components/interest-workspace";
+import { ProfileError } from "@/profile/errors";
+import { redirect } from "next/navigation";
 export const dynamic = "force-dynamic";
 export default async function OnboardingPage() {
   const session = auth0 ? await auth0.getSession() : null;
@@ -23,9 +25,13 @@ export default async function OnboardingPage() {
       </main>
     );
   const platform = getPlatformServices();
-  return (
-    <InterestWorkspace
-      initial={await platform.interests.read(await platform.authorize())}
-    />
-  );
+  let owner: string;
+  try {
+    owner = await platform.authorize();
+  } catch (error) {
+    if (error instanceof ProfileError && error.code === "ACCOUNT_DELETING")
+      redirect("/account");
+    throw error;
+  }
+  return <InterestWorkspace initial={await platform.interests.read(owner)} />;
 }

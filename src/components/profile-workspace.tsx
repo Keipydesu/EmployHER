@@ -7,6 +7,7 @@ import type {
   ResumeSuggestion,
 } from "@/profile/contracts";
 import { resumeFixtures, demoPaths } from "@/profile/fixtures";
+import { PERSONAL_CONSENT_VERSION } from "@/profile/personal-mode";
 import { reconcileAfterSessionRecovery } from "@/profile/recovery";
 
 type Edit = Pick<Fact, "id" | "kind" | "label" | "detail" | "dateText">;
@@ -40,14 +41,18 @@ export function ProfileWorkspace({
   localDemo,
   liveGemini,
   authenticated = false,
+  personalUpload = false,
 }: {
   localDemo: boolean;
   liveGemini: boolean;
   authenticated?: boolean;
+  personalUpload?: boolean;
 }) {
   const baseUrl = localDemo ? "/api/demo/resumes" : "/api/resumes";
   const profileStorageKey = localDemo ? "profile-id" : "private-profile-id";
   const [session, setSession] = useState(authenticated);
+  const [consent, setConsent] = useState(false);
+  const personal = personalUpload && authenticated && !localDemo;
   const [sessionExpired, setSessionExpired] = useState(false);
   const pristineRef = useRef<Edit[]>([]);
   const capturedInputRef = useRef("");
@@ -144,9 +149,13 @@ export function ProfileWorkspace({
   }
   async function performExtraction(): Promise<PublicProfile> {
     const headers: Record<string, string> = {};
+    if (personal) {
+      if (!consent) throw new Error("Confirm résumé processing first.");
+      headers["x-resume-consent"] = PERSONAL_CONSENT_VERSION;
+    }
     let body: BodyInit;
     if (mode === "pdf") {
-      if (!file) throw new Error("Choose a sample PDF first.");
+      if (!file) throw new Error("Choose a PDF first.");
       if (file.size > 2 * 1024 * 1024)
         throw new Error("PDFs must be 2 MB or smaller.");
       const form = new FormData();
@@ -304,7 +313,9 @@ export function ProfileWorkspace({
             {localDemo
               ? "Local synthetic-data demo"
               : authenticated
-                ? "Authenticated integration — supplied samples only"
+                ? personal
+                  ? "Private résumé — local MVP"
+                  : "Authenticated integration — supplied samples only"
                 : "Integration required"}
           </strong>
           <span>
@@ -313,7 +324,9 @@ export function ProfileWorkspace({
                 ? "Gemini processes approved samples only. Edited summaries use simulated embeddings. No real résumés."
                 : "Extraction and vectors are simulated fixtures. No model calls or real matching."
               : authenticated
-                ? "Your account uses database storage and Gemini. Personal uploads remain disabled until release verification."
+                ? personal
+                  ? "Your résumé is processed by Gemini; structured profile data is saved in your account. Local operation still uses external services."
+                  : "Your account uses database storage and Gemini. Personal uploads remain disabled until release verification."
                 : "Sign-in and storage are not connected yet. This preview is available in local sample mode."}
           </span>
         </div>
@@ -382,8 +395,9 @@ export function ProfileWorkspace({
               <h2>Start with a résumé</h2>
             </div>
             <p className="profile-muted">
-              Only the supplied samples are accepted in this local demo. They
-              are fictional and contain no personal contact information.
+              {personal
+                ? "Upload your own text-based PDF or paste your résumé. Review extracted facts before confirming."
+                : "Only the supplied samples are accepted in this local demo. They are fictional and contain no personal contact information."}
             </p>
             <div className="tabs" role="group" aria-label="Résumé input method">
               {(["sample", "text", "pdf"] as const).map((value) => (
@@ -429,7 +443,7 @@ export function ProfileWorkspace({
               )}
               {mode === "text" && (
                 <label className="field">
-                  Sample résumé text
+                  {personal ? "Résumé text" : "Sample résumé text"}
                   <textarea
                     rows={10}
                     maxLength={20000}
@@ -437,8 +451,8 @@ export function ProfileWorkspace({
                     onChange={(e) => setText(e.target.value)}
                   />
                   <small>
-                    {text.length.toLocaleString()} / 20,000 characters. Use the
-                    supplied sample text.
+                    {text.length.toLocaleString()} / 20,000 characters.
+                    {!personal && " Use the supplied sample text."}
                   </small>
                 </label>
               )}
@@ -446,7 +460,9 @@ export function ProfileWorkspace({
                 <div className="upload-box">
                   <span className="upload-icon">↥</span>
                   <label htmlFor="resume-file">
-                    Choose a text-based sample PDF
+                    {personal
+                      ? "Choose your text-based résumé PDF"
+                      : "Choose a text-based sample PDF"}
                   </label>
                   <input
                     id="resume-file"
@@ -460,14 +476,35 @@ export function ProfileWorkspace({
                   </a>
                 </div>
               )}
-              <button className="button wide" onClick={extract}>
+              {personal && (
+                <label className="field">
+                  <input
+                    type="checkbox"
+                    checked={consent}
+                    onChange={(e) => setConsent(e.target.checked)}
+                  />
+                  I agree to send my résumé content to Gemini for extraction,
+                  embeddings and career suggestions, and save structured facts
+                  and excerpts in Tiger Data for up to 30 days. I can request
+                  deletion through Manage my data. Optional Backboard memory is
+                  separate. On unpaid Gemini quota, Google may use inputs and
+                  outputs to improve products and human reviewers may review
+                  them; its terms say not to submit personal information.
+                  Running locally does not change that handling.
+                </label>
+              )}
+              <button
+                className="button wide"
+                onClick={extract}
+                disabled={personal && !consent}
+              >
                 Review my experience <span>→</span>
               </button>
             </fieldset>
             <p className="privacy-note">
-              ↳ Raw files and full text are not saved. The demo stores reviewed
-              facts in server memory until restart; production retention and
-              login are Person C’s integration.
+              {authenticated
+                ? "Raw files and full text are not saved. Structured facts, excerpts and vectors are stored in your account; account deletion is available through Manage my data."
+                : "Raw files and full text are not saved. This sample demo keeps profile state in server memory until restart."}
             </p>
           </section>
           <section className="card review">

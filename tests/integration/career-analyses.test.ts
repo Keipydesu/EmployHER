@@ -57,6 +57,9 @@ test(
         await readFile("migrations/007-account-interests.sql", "utf8"),
       );
       await pool.query(
+        await readFile("migrations/008-backboard-storage.sql", "utf8"),
+      );
+      await pool.query(
         "CREATE TABLE resume_profile_heads(id uuid PRIMARY KEY,owner_id uuid NOT NULL,current_version integer NOT NULL,expires_at timestamptz NOT NULL,UNIQUE(id,owner_id))",
       );
       await pool.query(

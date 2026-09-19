@@ -21,6 +21,9 @@ test(
       await pool.query(
         await readFile("migrations/007-account-interests.sql", "utf8"),
       );
+      await pool.query(
+        await readFile("migrations/008-backboard-storage.sql", "utf8"),
+      );
       // Exact non-vector lifecycle/head shapes; vector/version migration is a separate gate.
       await pool.query(
         "CREATE TABLE IF NOT EXISTS profile_owner_lifecycle(owner_id uuid PRIMARY KEY,deleted_at timestamptz)",
@@ -60,6 +63,13 @@ test(
       await assert.rejects(
         () => lifecycle.status(other, requested.deletionId),
         /unavailable/,
+      );
+      const otherDeletion = await lifecycle.request(other);
+      assert.equal((await lifecycle.reconcile(20, owner)).completed, 1);
+      assert.equal(
+        (await lifecycle.status(other, otherDeletion.deletionId)).status,
+        "pending",
+        "scoped smoke cleanup must not process another account",
       );
       assert.equal((await lifecycle.reconcile()).completed, 1);
       assert.equal(

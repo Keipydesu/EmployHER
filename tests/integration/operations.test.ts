@@ -34,6 +34,9 @@ test(
         await readFile("migrations/007-account-interests.sql", "utf8"),
       );
       await pool.query(
+        await readFile("migrations/008-backboard-storage.sql", "utf8"),
+      );
+      await pool.query(
         "CREATE TABLE IF NOT EXISTS test_operation_effects (id uuid PRIMARY KEY, value integer NOT NULL)",
       );
       await pool.query(
@@ -147,6 +150,9 @@ test(
         await readFile("migrations/007-account-interests.sql", "utf8"),
       );
       await pool.query(
+        await readFile("migrations/008-backboard-storage.sql", "utf8"),
+      );
+      await pool.query(
         "INSERT INTO app_users(id,auth_issuer,auth_subject) VALUES($1,$2,$3)",
         [owner, "test", owner],
       );
@@ -232,6 +238,9 @@ test(
         await readFile("migrations/007-account-interests.sql", "utf8"),
       );
       await pool.query(
+        await readFile("migrations/008-backboard-storage.sql", "utf8"),
+      );
+      await pool.query(
         "INSERT INTO app_users(id,auth_issuer,auth_subject) VALUES($1,$2,$3)",
         [owner, "test", owner],
       );
@@ -295,6 +304,9 @@ test(
       await pool.query(await readFile("migrations/001-platform.sql", "utf8"));
       await pool.query(
         await readFile("migrations/007-account-interests.sql", "utf8"),
+      );
+      await pool.query(
+        await readFile("migrations/008-backboard-storage.sql", "utf8"),
       );
       await pool.query(
         "INSERT INTO app_users(id,auth_issuer,auth_subject) VALUES($1,$2,$3)",

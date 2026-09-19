@@ -9,7 +9,17 @@ import {
   type Confirmation,
 } from "./contracts.ts";
 
+const opportunityErrorBrand = Symbol.for("employher.OpportunityError");
 export class OpportunityError extends Error {
+  readonly [opportunityErrorBrand] = true;
+  static [Symbol.hasInstance](value: unknown) {
+    return (
+      !!value &&
+      typeof value === "object" &&
+      Symbol.for("employher.OpportunityError") in value &&
+      Reflect.get(value, Symbol.for("employher.OpportunityError")) === true
+    );
+  }
   code: string;
   status: number;
   constructor(code: string, message: string, status = 422) {
