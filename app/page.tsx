@@ -27,8 +27,8 @@ export default async function Home() {
           ) : auth0 ? (
             <a href="/auth/login">Log in</a>
           ) : null}
-          <Link className="home-button home-button-small" href="/profile">
-            Get started <span aria-hidden="true">↗</span>
+          <Link className="home-button home-button-small" href="/demo">
+            Try the demo <span aria-hidden="true">↗</span>
           </Link>
         </nav>
       </header>

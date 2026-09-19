@@ -40,3 +40,5 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Check profile browser flow
         run: npm run test:browser
+      - name: Check judge demo walkthrough
+        run: npm run test:demo
