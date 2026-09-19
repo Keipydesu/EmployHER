@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   buildFields,
+  demoCommunities,
   type DemoProfile,
   type DemoField,
   type DemoAction,
@@ -379,6 +380,7 @@ export function JudgesDemo({
                       <input
                         type="checkbox"
                         checked={hasPublicDemo}
+                        disabled={!ready}
                         onChange={(event) =>
                           setHasPublicDemo(event.target.checked)
                         }
@@ -550,6 +552,58 @@ export function JudgesDemo({
                   </article>
                 ))}
               </div>
+              <section
+                className="jd-community"
+                aria-labelledby="community-title"
+              >
+                <div className="jd-community-heading">
+                  <div>
+                    <span className="jd-eyebrow">
+                      WOMEN LED · COMMUNITY POWERED
+                    </span>
+                    <h2 id="community-title">
+                      Your next chapter has a community.
+                    </h2>
+                    <p>
+                      Meet women building careers in tech. Pick one community
+                      and take one small step this week.
+                    </p>
+                  </div>
+                  <span className="jd-community-star" aria-hidden="true">
+                    ✳
+                  </span>
+                </div>
+                <div className="jd-community-grid">
+                  {demoCommunities.map((community) => (
+                    <article className="jd-community-card" key={community.name}>
+                      <span className="jd-community-tag">{community.tag}</span>
+                      <h3>{community.name}</h3>
+                      <p>{community.description}</p>
+                      <div className="jd-community-next">
+                        <small>YOUR FIRST STEP</small>
+                        <p>{community.next}</p>
+                      </div>
+                      <p className="jd-community-access">{community.access}</p>
+                      <a
+                        href={community.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {community.link} <span aria-hidden="true">↗</span>
+                        <span className="jd-sr-only">
+                          {" "}
+                          (opens in a new tab)
+                        </span>
+                      </a>
+                    </article>
+                  ))}
+                </div>
+                <p className="jd-community-note">
+                  Optional communities to explore · Official pages checked
+                  September 19, 2026 · Suggested first steps are curated for
+                  this demo.
+                </p>
+              </section>
               <div className="jd-context-grid">
                 <section className="jd-role-section">
                   <div className="jd-section-heading">

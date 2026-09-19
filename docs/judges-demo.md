@@ -93,3 +93,24 @@ See [decision 003](decisions/003-localhost-demo.md) for the localhost boundary.
 The suite runs in CI. The shared instrumentation guard keeps Node-only database
 modules out of Edge bundles. Profile errors use a shared symbol brand to preserve
 safe messages across server bundles; existing profile browser tests cover this.
+
+## Women in tech community recommendations
+
+PR #16 merge verification (2026-09-19): regenerated workspace screenshots from
+the combined Connect and communities UI. Node 24 checks passed: 167 unit tests,
+five workspace browser scenarios, seven profile browser scenarios, formatting,
+lint, TypeScript, production build, and homepage/Opportunities/profile smoke.
+The self-reported checkbox waits for browser state restoration before accepting
+input. The layout regression opens Opportunities directly because the presentation
+homepage no longer has the sample footer link. Auth0 credentialed login was not
+rerun; the build retains the SDK's existing dynamic-dependency warning.
+
+The career plan highlights three optional women-led organizations with official
+links and curated first steps. This is resource discovery, not enrollment or a
+promise of mentorship. Membership conditions remain on each provider’s site.
+
+Official sources reviewed September 19, 2026:
+
+- Rewriting the Code: [student benefits and free membership](https://rewritingthecode.org/students/), [founder and CEO Sue Harnett](https://rewritingthecode.org/about-us/).
+- Women in Robotics: [chapters and online community](https://www.womeninrobotics.org/chapters/), [leadership](https://www.womeninrobotics.org/about/), [audience](https://www.womeninrobotics.org/).
+- AnitaB.org: [membership tiers and benefits](https://www.anitab.org/membership), [leadership](https://www.anitab.org/our-team).
