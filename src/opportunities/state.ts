@@ -1,3 +1,4 @@
+import { careerGuidance } from "./patterns.ts";
 import {
   CommandSchema,
   defaultPreferences,
@@ -6,6 +7,9 @@ import {
   type Preferences,
   type Profile,
   type Skill,
+  type Job,
+  type Path,
+  type Resource,
 } from "./contracts.ts";
 import {
   jobs,
@@ -30,6 +34,12 @@ export type State = {
   preferences: Preferences;
   plan: Plan;
 };
+export type PlanningCatalog = {
+  jobs: Job[];
+  paths: Path[];
+  resources: Resource[];
+};
+export const demoPlanningCatalog: PlanningCatalog = { jobs, paths, resources };
 export function initialState(): State {
   return {
     version: 1,
@@ -38,8 +48,13 @@ export function initialState(): State {
     plan: { version: 1, pathId: "cloud", actions: [], confirmations: [] },
   };
 }
-export function hasConfirmation(state: State, skill: Skill) {
-  const path = paths.find((p) => p.id === state.plan.pathId)!;
+export function hasConfirmation(
+  state: State,
+  skill: Skill,
+  catalog = demoPlanningCatalog,
+) {
+  const path = catalog.paths.find((p) => p.id === state.plan.pathId);
+  if (!path) return false;
   return state.plan.confirmations.some(
     (c) =>
       c.skill === skill &&
@@ -73,8 +88,16 @@ export function applyCommand(
   current: State,
   raw: Command,
   now = new Date(),
+  catalog: PlanningCatalog = demoPlanningCatalog,
 ): State {
+  const { paths, jobs, resources } = catalog;
   const command = CommandSchema.parse(raw);
+  if (command.kind === "select-recommendation")
+    throw new OpportunityError(
+      "INVALID_COMMAND",
+      "Save Gemini recommendations through the authenticated career service.",
+      400,
+    );
   if (command.expectedVersion !== current.version)
     throw new OpportunityError(
       "STALE_VERSION",
@@ -83,6 +106,7 @@ export function applyCommand(
     );
   const state = structuredClone(current);
   const path = paths.find((p) => p.id === state.plan.pathId)!;
+  if (!path) throw new OpportunityError("NOT_FOUND", "Path not found.", 404);
   if (command.kind === "reset") {
     const reset = initialState();
     reset.version = current.version + 1;
@@ -94,16 +118,6 @@ export function applyCommand(
     state.profile = {
       ...structuredClone(profile),
       version: state.profile.version + 1,
-    };
-    state.plan.confirmations = [];
-  } else if (command.kind === "import-profile") {
-    state.profile = {
-      id: "imported",
-      version: state.profile.version + 1,
-      status: "confirmed",
-      name: command.name,
-      evidence: command.evidence,
-      embedding: vectorFor(command.evidence.map((e) => e.skill)),
     };
     state.plan.confirmations = [];
   } else if (command.kind === "preferences")
@@ -160,12 +174,12 @@ export function applyCommand(
         confirmedAt: now.toISOString(),
       });
     } else if (command.kind === "select-action") {
-      if (!hasConfirmation(state, command.skill))
+      if (!hasConfirmation(state, command.skill, catalog))
         throw new OpportunityError(
           "CONFIRMATION_REQUIRED",
           "Clarify the learning need before selecting an action.",
         );
-      const id = `${path.id}:${command.skill}:${state.profile.version}`;
+      const id = `${state.profile.id}:${path.id}:${command.skill}:${state.profile.version}`;
       if (state.plan.actions.some((a) => a.id === id))
         throw new OpportunityError(
           "ACTION_EXISTS",
@@ -225,12 +239,7 @@ export function present(state: State, now = new Date()) {
     mode: "synthetic-demo" as const,
     version: state.version,
     profile: state.profile,
-    profiles: [
-      ...profiles.map((p) => ({ id: p.id, name: p.name })),
-      ...(state.profile.id === "imported"
-        ? [{ id: state.profile.id, name: state.profile.name }]
-        : []),
-    ],
+    profiles: profiles.map((p) => ({ id: p.id, name: p.name })),
     preferences: state.preferences,
     plan: state.plan,
     paths: paths.map((p) => ({
@@ -274,6 +283,16 @@ export function present(state: State, now = new Date()) {
         state.preferences,
       ).length,
     context: fieldContext(path, jobs, state.preferences),
+    guidance: careerGuidance(
+      state.profile,
+      path,
+      state.plan,
+      jobs,
+      state.preferences,
+      resources,
+      snapshot,
+      now,
+    ),
     resources: visibleResources(path.id, state.preferences, resources, now),
     catalogVersion: snapshot,
     embeddingConfig,

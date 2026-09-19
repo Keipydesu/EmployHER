@@ -2,6 +2,7 @@ import { z } from "zod";
 import { extractionSchema, LIMITS, type Embedding } from "../contracts";
 import { ProfileError } from "../errors";
 import type { ProfileAI } from "../ports";
+import { geminiHttpError } from "../gemini-errors.ts";
 
 export class GeminiProfileAI implements ProfileAI {
   constructor(
@@ -41,13 +42,10 @@ export class GeminiProfileAI implements ProfileAI {
           body: JSON.stringify(body),
         },
       );
-      if (!response.ok)
-        throw new ProfileError(
-          "AI_UNAVAILABLE",
-          response.status === 429 ? 429 : 502,
-          "The AI service is unavailable. Please try again shortly.",
-          true,
-        );
+      if (!response.ok) {
+        await response.body?.cancel();
+        throw geminiHttpError(response.status);
+      }
       const bodyText = await response.text();
       if (bodyText.length > 200_000) throw new Error("oversize");
       return JSON.parse(bodyText);
@@ -71,6 +69,12 @@ export class GeminiProfileAI implements ProfileAI {
   async extract(text: string, signal: AbortSignal) {
     const schema = z.toJSONSchema(extractionSchema);
     delete schema.$schema;
+    // Large bounds on arrays of nested objects can exceed Gemini's schema
+    // compilation budget. Keep the 60-fact cap in extractionSchema.parse().
+    // Removing only this wire constraint resolved the observed HTTP 400.
+    const factsSchema = schema.properties?.facts;
+    if (factsSchema && typeof factsSchema === "object")
+      delete factsSchema.maxItems;
     const response = await this.call(
       this.model,
       "generateContent",

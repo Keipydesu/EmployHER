@@ -10,7 +10,7 @@ export default defineConfig({
     screenshot: "only-on-failure",
   },
   webServer: {
-    command: "npm run dev -- --webpack --port 3120",
+    command: "NEXT_TEST_OUTPUT=demo npm run dev -- --webpack --port 3120",
     url: "http://127.0.0.1:3120/demo",
     reuseExistingServer: false,
     timeout: 120000,

@@ -3,7 +3,11 @@ import { z } from "zod";
 import { ProfileError } from "./errors";
 import { publicProfile } from "./contracts";
 import { readBoundedBody, readResumeInput } from "./intake";
-import { getProfileRuntime, type ProfileRuntime } from "./runtime";
+import {
+  getProfileRuntime,
+  getDemoProfileRuntime,
+  type ProfileRuntime,
+} from "./runtime";
 
 export function checkOrigin(request: Request) {
   const expected = new URL(process.env.APP_BASE_URL || request.url);
@@ -79,7 +83,7 @@ export function createProfileHandlers(
         const owner = await dependencies.authorize(request, "write");
         const requestKey = key(request);
         const text = await readResumeInput(request);
-        await dependencies.authorizeIntake(owner, text);
+        await dependencies.authorizeIntake(owner, text, request);
         return publicProfile(
           await dependencies.service.intake(owner, requestKey, text),
         );
@@ -150,3 +154,5 @@ export function createProfileHandlers(
   };
 }
 export const profileHandlers = createProfileHandlers();
+
+export const demoProfileHandlers = createProfileHandlers(getDemoProfileRuntime);

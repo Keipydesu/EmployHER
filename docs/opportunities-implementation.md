@@ -25,13 +25,13 @@ A learning-gap confirmation records checkpoint, profile/checklist version and ti
 
 `service.ts` exports `OpportunitiesPorts`, `generateMatches`, `snapshotToken`, and a parameterized pgvector retrieval query. C supplies authenticated owner resolution, owned profile snapshots, atomic idempotency acquisition, filtered retrieval and compare-and-set commit. A supplies only current confirmed profiles and compatible model/configured embeddings. The demo uses an 11-dimensional skill basis; it must **never** be mixed with proposed 768-dimensional Gemini vectors.
 
-The service retrieves at most 20 and returns at most 10, uses deterministic annotations (no generative prose/provider call), validates vectors, and commits only through the version/deletion guard. C must bind operation keys to owner + full input + snapshot token, enforce deadlines/quotas, and implement transactional stale-write rejection. The SQL helper expects `opportunity_jobs(id, payload, status, embedding_config, role_type, remote_mode, location, embedding)`; this is an adapter proposal, not an applied migration. Map the query to C's approved Drizzle schema before integration. The catalog helper validates the whole incoming batch before returning a replacement; it does not itself persist to PostgreSQL.
+The service retrieves at most 20 and returns at most 10, uses deterministic annotations (no generative prose/provider call), validates vectors, and commits only through the version/deletion guard. C must bind operation keys to owner + full input + snapshot token, enforce deadlines/quotas, and implement transactional stale-write rejection. The SQL helper expects `opportunity_jobs(id, payload, status, embedding_config, role_type, remote_mode, location, embedding)`; this is an adapter proposal, not an applied migration. Map the query to C's approved database schema before integration. The catalog helper validates the whole incoming batch before returning a replacement; it does not itself persist to PostgreSQL.
 
 Existing `/api/matches`, `/api/jobs`, `/api/resources`, path and saved-plan production routes in the design remain unmounted until C's ownership adapter is available. The demo does not install pretend authenticated endpoints. B's domain functions and port interfaces are the integration seam, not proof of real-provider execution.
 
 ## Remaining acceptance gates
 
-- A/C producer-consumer review and real Auth0/profile/DB adapters, Drizzle migrations and Gemini compatible embeddings; real PostgreSQL query/ownership/deletion-race verification.
+- A/C producer-consumer review and real Auth0/profile/DB adapters, reviewed database migrations and Gemini compatible embeddings; real PostgreSQL query/ownership/deletion-race verification.
 - Source-derived snapshot curation with resolved reuse terms, actual posting excerpts and application links; no live scraping or ingestion is enabled.
 - The full B1 production DTO vocabulary/API/schema migration agreement; current fixture skills are a bounded enum.
 - Real persisted matches and provider-failure reconciliation; currently the demo derives fresh results per request.
