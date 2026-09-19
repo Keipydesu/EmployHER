@@ -1,10 +1,9 @@
 import Link from "next/link";
-import { auth0 } from "../src/server/auth0";
+import { SignInWidget } from "./sign-in-widget";
 import { ResumeJourney } from "./resume-journey";
 import "./home.css";
 
 export default async function Home() {
-  const session = auth0 ? await auth0.getSession() : null;
   return (
     <main className="home-page">
       <a className="home-skip" href="#journey">
@@ -19,16 +18,12 @@ export default async function Home() {
           <a className="home-nav-about" href="#skills">
             How it works
           </a>
-          <Link className="home-nav-about" href="/opportunities">
+          <Link className="home-nav-about" href="/demo">
             Opportunities
           </Link>
-          {session ? (
-            <a href="/auth/logout">Log out</a>
-          ) : auth0 ? (
-            <a href="/auth/login">Log in</a>
-          ) : null}
+          <SignInWidget />
           <Link className="home-button home-button-small" href="/demo">
-            Try the demo <span aria-hidden="true">↗</span>
+            Open my workspace <span aria-hidden="true">↗</span>
           </Link>
         </nav>
       </header>

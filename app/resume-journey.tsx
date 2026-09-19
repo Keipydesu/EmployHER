@@ -136,7 +136,7 @@ export function ResumeJourney() {
               <span>YOUR EXPERIENCE HAS POTENTIAL.</span>
               <span>01</span>
             </div>
-            <span className="home-sample-label">Illustrative résumé</span>
+            <span className="home-sample-label">Your résumé</span>
           </div>
         </div>
 
@@ -290,10 +290,10 @@ export function ResumeJourney() {
           <span>Your possibilities.</span>
         </h2>
         <Link href="/demo" className="home-button">
-          Try the interactive demo <span aria-hidden="true">↗</span>
+          Explore my career plan <span aria-hidden="true">↗</span>
         </Link>
         <p className="home-small">
-          Explore with a sample résumé in the local demo.
+          Discover your strengths and choose your next steps.
         </p>
       </section>
     </>

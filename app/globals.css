@@ -585,3 +585,22 @@ input {
 .resource-card {
   border-top: 2px solid var(--accent-deep);
 }
+.account-sign-in,
+.account-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 14px;
+  border: 1px solid #bacbb8;
+  border-radius: 5px;
+  background: #edf2e8;
+  color: #294b38;
+  font: inherit;
+  font-size: 12px;
+}
+.account-sign-in {
+  cursor: pointer;
+}
+.account-sign-in:focus-visible {
+  outline: 2px solid #3e8175;
+  outline-offset: 3px;
+}

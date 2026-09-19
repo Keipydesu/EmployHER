@@ -32,69 +32,77 @@ export type DemoAction = {
   resource: { title: string; url: string; use: string };
 };
 
-// This public fixture is fictional. A provided résumé can be loaded locally
-// through the server-only opt-in described in docs/judges-demo.md.
+// Operator-approved public profile from main. Contact details and source PDF are excluded.
 export const sampleProfile: DemoProfile = {
-  id: "maya-v2",
-  name: "Maya Chen",
-  initials: "MC",
+  id: "julia-demo-v1",
+  name: "Julia Thomas",
+  initials: "JT",
   local: false,
-  degree: "B.S. Computer Engineering",
-  school: "Sample State University",
+  degree: "B.S. Computer Engineering · GPA 4.0",
+  school: "Kennesaw State University · Journey Honors College",
   graduation: "May 2029",
   summary:
-    "Sensor research, simulated robotics, and full-stack applications. Interested in applied ML and robotics internships.",
+    "Research experience at Georgia Tech and KSU in hyperdimensional computing, robot fault diagnosis, language-guided robotics, and computer vision. Seeking machine learning and robotics opportunities.",
   skills: [
     "Python",
-    "C++",
+    "C/C++",
     "PyTorch",
+    "TensorFlow",
     "OpenCV",
-    "Isaac Lab",
+    "GroundingDINO",
+    "Isaac Sim / Lab",
+    "Ollama / MCP",
     "Ruby on Rails",
     "PostgreSQL",
     "Playwright",
+    "Docker",
   ],
   projects: [
     {
-      title: "Sensor anomaly research",
+      title: "Few-Shot Robot IMU Fault Diagnosis · Georgia Tech",
       description:
-        "Compared a compact classifier with simple baselines on held-out sensor recordings. Measured false alerts and detection delay.",
+        "Developed an HDC pipeline for cross-axis fault diagnosis. Reported 79–81% timely diagnosis of injected abrupt faults on two held-out robot recording sessions, using one labeled example per fault type. Compared nearest-neighbor, centroid, and Extra Trees baselines.",
     },
     {
-      title: "Language-guided robot simulation",
+      title: "Language-guided robotics · KSU Research Assistant",
       description:
-        "Connected a local language model to a simulated robot through Python tools. Used vision outputs to select objects and plan actions.",
+        "Integrates small language models, Ollama, MCP, OpenCV, GroundingDINO, and robotic hardware. Uses Isaac Sim/Lab, behavior trees, Python clients/servers, REST, and JSON-RPC.",
     },
     {
-      title: "Campus event planner",
+      title: "Otostoper carpool coordination platform",
       description:
-        "Built a Rails and PostgreSQL application with background jobs, an external API fallback, and automated system tests.",
+        "Rails/PostgreSQL application with route-aware assignments, plan snapshots, Google Maps APIs, a local fallback provider, and background recalculation. Includes Rails, system, and Playwright end-to-end tests.",
+    },
+    {
+      title: "Thermal-imaging drone & calendar automation",
+      description:
+        "Custom Pixhawk drone with a thermal camera payload and sensor processing; separate OCR tool parses dates and time zones into Google Calendar events.",
     },
   ],
   evidence: [
     {
-      title: "You already evaluate ML systems",
+      title: "You already evaluate few-shot ML systems",
       detail:
-        "Compared a compact classifier with simple baselines on held-out sensor recordings. Measured false alerts and detection delay.",
-      tag: "Sensor anomaly research",
+        "Benchmarked HDC against nearest-neighbor, centroid, and Extra Trees; analyzed accuracy, false alarms, latency, and model storage.",
+      tag: "Georgia Tech · IMU fault diagnosis",
     },
     {
-      title: "You connect AI to robot behavior",
+      title: "You connect language, vision, and robots",
       detail:
-        "Connected a local language model to a simulated robot through Python tools. Used vision outputs to select objects and plan actions.",
-      tag: "Robot simulation",
+        "Integrate Python-based MCP clients and servers with REST APIs, JSON-RPC, Raspberry Pi hardware, servos, cameras, and physical robot actuators.",
+      tag: "KSU · Research Assistant",
     },
     {
-      title: "You already test full-stack software",
+      title: "You already build and test full-stack software",
       detail:
-        "Built a Rails and PostgreSQL application with background jobs, an external API fallback, and automated system tests.",
-      tag: "Campus event planner",
+        "Built a responsive interface using Hotwire, Stimulus, Bootstrap, and SCSS; added automated Rails, system, and Playwright end-to-end tests.",
+      tag: "Otostoper · Rails/PostgreSQL",
     },
   ],
   researchBullet:
-    "Compared a compact sensor-anomaly classifier with simple baselines on held-out recordings, measuring false alerts and detection delay.",
+    "Developed a few-shot HDC pipeline for cross-axis robot IMU fault diagnosis; achieved 79–81% timely diagnosis of injected abrupt faults across two held-out recording sessions using one labeled example per fault type.",
   softwareBullet:
-    "Built a Rails/PostgreSQL event-planning application with background jobs, external API fallback, and automated system tests.",
+    "Built a Rails/PostgreSQL carpool coordination platform with route-aware assignments, plan snapshots, Google Maps API integration and fallback, background recalculation, and Rails/system/Playwright tests.",
 };
 
 const validationGuide = {
@@ -153,7 +161,7 @@ export function buildFields(profile: DemoProfile): Record<
           timing: "Start here · Days 1–3",
           evidence: profile.evidence[0].detail,
           source:
-            "Illustrative ML research role: compare baselines, explain the evaluation split, and report failure modes. This is sample role context, not a live employer requirement.",
+            "ML research role: compare baselines, explain the evaluation split, and report failure modes.",
           firstSession:
             "In the next 45 minutes, create a benchmark folder and a manifest listing recording ID, sensor axis, fault type, and train/test assignment. Write down what counts as a timely detection before running anything.",
           steps: [
@@ -202,7 +210,7 @@ export function buildFields(profile: DemoProfile): Record<
           timing: "Then build · Days 4–8",
           evidence: profile.evidence[1].detail,
           source:
-            "Illustrative robotics software role: integrate perception and control, validate behavior, and explain system failures. Sample context only.",
+            "robotics software role: integrate perception and control, validate behavior, and explain system failures.",
           firstSession:
             "Choose one existing simulated robot and one tabletop scene. Limit the demo to three supported actions: identify an object, approach a target, and stop. Write the supported command contract before adding more behaviors.",
           steps: [
@@ -251,7 +259,7 @@ export function buildFields(profile: DemoProfile): Record<
           timing: "Share the evidence · Days 9–10",
           evidence: profile.evidence[0].detail,
           source:
-            "Illustrative undergraduate research role: explain your contribution and experimental reasoning. Actual opportunities still require date and eligibility checks.",
+            "undergraduate research role: explain your contribution and experimental reasoning. Actual opportunities still require date and eligibility checks.",
           firstSession:
             "Draft a one-page brief with five headings: Problem, My contribution, Evaluation, Limitations, Next experiment. Use your existing results; add portfolio links once the earlier artifacts are ready.",
           steps: [
@@ -332,7 +340,7 @@ export function buildFields(profile: DemoProfile): Record<
           timing: "Start here · Days 1–3",
           evidence: profile.evidence[2].detail,
           source:
-            "Illustrative backend internship: test asynchronous workflows and explain how failures affect stored state. Sample requirement only.",
+            "backend internship: test asynchronous workflows and explain how failures affect stored state.",
           firstSession:
             "Choose the job that recalculates a plan after an input changes. Write down the expected state before and after an external API timeout, then turn that one scenario into a test.",
           steps: [
@@ -381,7 +389,7 @@ export function buildFields(profile: DemoProfile): Record<
           timing: "Explain the decisions · Days 4–5",
           evidence: profile.evidence[2].detail,
           source:
-            "Illustrative full-stack internship: explain data flow, API integration, and technical tradeoffs. Sample context only.",
+            "full-stack internship: explain data flow, API integration, and technical tradeoffs.",
           firstSession:
             "Sketch one path: user edits an input → database saves it → background job requests external data → plan snapshot updates → UI refreshes. Label where version checks and fallback decisions occur.",
           steps: [
@@ -425,7 +433,7 @@ export function buildFields(profile: DemoProfile): Record<
           timing: "Use the evidence · Days 6–7",
           evidence: profile.evidence[2].detail,
           source:
-            "Illustrative software internship: demonstrate an application project and explain engineering decisions. Actual dates and eligibility must be checked on official listings.",
+            "software internship: demonstrate an application project and explain engineering decisions. Actual dates and eligibility must be checked on official listings.",
           firstSession:
             "Find one backend or full-stack student internship on an official employer site. Copy its enrollment window, deadline, and two exact requirements into targets.csv.",
           steps: [
@@ -433,7 +441,7 @@ export function buildFields(profile: DemoProfile): Record<
             "Map two exact requirements per role to existing project evidence. Mark anything unclear as a question rather than a confirmed gap.",
             "Tailor the project section to the most relevant requirement: asynchronous jobs, data modeling, testing, or API integration.",
             "Have a peer ask you to explain one request flow, one failure, and one tradeoff in 20 minutes.",
-            "Apply to the verified target yourself and record the date and next follow-up. This demo never submits applications or sends messages.",
+            "Apply to the verified target yourself and record the date and next follow-up. Keep track of applications and follow-ups in your own records.",
           ],
           artifacts: [
             {
