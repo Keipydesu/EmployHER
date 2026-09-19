@@ -22,6 +22,7 @@ export const EvidenceSchema = z
     source: z.enum(["resume", "user_reported"]),
   })
   .strict();
+export type Evidence = z.infer<typeof EvidenceSchema>;
 export const ProfileSchema = z
   .object({
     id: z.string(),
@@ -157,6 +158,14 @@ export const CommandSchema = z.discriminatedUnion("kind", [
       kind: z.literal("profile"),
       expectedVersion: z.number().int(),
       profileId: z.enum(["maya", "cloud", "starter", "reported", "draft"]),
+    })
+    .strict(),
+  z
+    .object({
+      kind: z.literal("import-profile"),
+      expectedVersion: z.number().int(),
+      name: z.string().min(1).max(100),
+      evidence: z.array(EvidenceSchema).max(skills.length),
     })
     .strict(),
   z

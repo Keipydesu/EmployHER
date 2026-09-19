@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type {
   Fact,
@@ -7,6 +8,8 @@ import type {
   ResumeSuggestion,
 } from "@/profile/contracts";
 import { resumeFixtures, demoPaths } from "@/profile/fixtures";
+import { mapFactsToEvidence } from "@/opportunities/profile-bridge";
+import type { View } from "@/opportunities/state";
 
 type Edit = Pick<Fact, "id" | "kind" | "label" | "detail" | "dateText">;
 async function api<T>(url: string, options?: RequestInit): Promise<T> {
@@ -34,6 +37,7 @@ export function ProfileWorkspace({
   localDemo: boolean;
   liveGemini: boolean;
 }) {
+  const router = useRouter();
   const [session, setSession] = useState(false);
   const requestKeys = useRef(new Map<string, string>());
   function stableKey(intent: string) {
@@ -177,6 +181,33 @@ export function ProfileWorkspace({
         );
       },
     );
+  }
+  async function goToOpportunities() {
+    if (!profile) return;
+    await run("Preparing your opportunities view…", async () => {
+      const evidence = mapFactsToEvidence(profile.facts);
+      const current = await api<View>("/api/demo/opportunities");
+      const intent = `import-profile:${profile.profileId}:${profile.version}`;
+      await api<View>("/api/demo/opportunities", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Idempotency-Key": stableKey(intent),
+        },
+        body: JSON.stringify({
+          kind: "import-profile",
+          expectedVersion: current.version,
+          name: "Your confirmed profile",
+          evidence,
+        }),
+      });
+      requestKeys.current.delete(intent);
+      if (evidence.length === 0)
+        setNotice(
+          "None of your confirmed skills match this demo's tracked categories yet. Opening Opportunities with no evidence.",
+        );
+      router.push("/opportunities");
+    });
   }
   const sourceFor = (f: Edit) => {
     const original = profile?.facts.find((old) => old.id === f.id);
@@ -682,6 +713,28 @@ export function ProfileWorkspace({
               Draft choices stay on this page and do not change your confirmed
               profile. Copy any wording you want to keep.
             </p>
+          </section>
+        )}
+        {profile?.status === "confirmed" && !dirty && (
+          <section className="card opportunities-link">
+            <div className="profile-section-heading">
+              <span className="section-number">04</span>
+              <h2>See matching opportunities</h2>
+            </div>
+            <p className="profile-muted">
+              Carry your confirmed skills into the Opportunities demo. Only
+              skills this demo actually tracks (Python, SQL, Git, cloud, access,
+              monitoring, statistics, modeling, testing, research, circuits)
+              come across — other confirmed skills stay on your profile but
+              aren’t tracked there yet.
+            </p>
+            <button
+              className="button wide"
+              disabled={!!busy}
+              onClick={goToOpportunities}
+            >
+              See matching opportunities <span>→</span>
+            </button>
           </section>
         )}
         <footer>

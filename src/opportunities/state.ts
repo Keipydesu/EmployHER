@@ -96,6 +96,16 @@ export function applyCommand(
       version: state.profile.version + 1,
     };
     state.plan.confirmations = [];
+  } else if (command.kind === "import-profile") {
+    state.profile = {
+      id: "imported",
+      version: state.profile.version + 1,
+      status: "confirmed",
+      name: command.name,
+      evidence: command.evidence,
+      embedding: vectorFor(command.evidence.map((e) => e.skill)),
+    };
+    state.plan.confirmations = [];
   } else if (command.kind === "preferences")
     state.preferences = command.preferences;
   else if (command.kind === "path") {
@@ -215,7 +225,12 @@ export function present(state: State, now = new Date()) {
     mode: "synthetic-demo" as const,
     version: state.version,
     profile: state.profile,
-    profiles: profiles.map((p) => ({ id: p.id, name: p.name })),
+    profiles: [
+      ...profiles.map((p) => ({ id: p.id, name: p.name })),
+      ...(state.profile.id === "imported"
+        ? [{ id: state.profile.id, name: state.profile.name }]
+        : []),
+    ],
     preferences: state.preferences,
     plan: state.plan,
     paths: paths.map((p) => ({
