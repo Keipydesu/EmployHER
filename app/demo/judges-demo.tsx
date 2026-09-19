@@ -144,7 +144,7 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
       "EmployHER — my next steps",
       profile.local
         ? "Local résumé preview. Recommendations are curated examples."
-        : "Synthetic demo profile. Recommendations are curated examples.",
+        : "Résumé-based demo profile. Recommendations are curated examples.",
       ...chosen.map((action) =>
         [
           action.title,
@@ -226,7 +226,7 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
             <small>
               {profile.local
                 ? "Provided résumé · local only"
-                : "Fictional student profile"}
+                : "Résumé-based demo · contacts omitted"}
             </small>
           </div>
         </div>
@@ -331,7 +331,7 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
                       ▤ &nbsp;{" "}
                       {profile.local
                         ? "Provided résumé · selected evidence"
-                        : "Fictional résumé · selected evidence"}
+                        : "Demo résumé · selected evidence"}
                     </span>
                     <span>
                       {profile.local ? "Local preview" : "Demo profile"}
@@ -341,9 +341,7 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
                     <div className="jd-paper-top">
                       <span>{profile.initials}</span>
                       <small>
-                        {profile.local
-                          ? "PROVIDED RÉSUMÉ"
-                          : "THE SAMPLE RÉSUMÉ"}
+                        {profile.local ? "PROVIDED RÉSUMÉ" : "THE DEMO RÉSUMÉ"}
                       </small>
                     </div>
                     <h2>{profile.name}</h2>
@@ -367,7 +365,7 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
                     <div className="jd-paper-foot">
                       {profile.local
                         ? "Selected résumé evidence. Contact details omitted."
-                        : "A fictional profile, made for this demo."}
+                        : "Selected résumé evidence. Contact details omitted."}
                     </div>
                   </div>
                 </section>
@@ -780,7 +778,7 @@ export function JudgesDemo({ profile }: { profile: DemoProfile }) {
             <span>
               {profile.local
                 ? "Provided résumé · Local preview"
-                : "Synthetic résumé"}{" "}
+                : "Résumé-based demo"}{" "}
               · Illustrative requirements · Demo only
             </span>
           </footer>
